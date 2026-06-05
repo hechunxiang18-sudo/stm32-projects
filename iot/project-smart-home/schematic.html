@@ -102,25 +102,7 @@
   </footer>
 
   <script>
-  function triggerDownload(type) {
-    var content = `
-      
-        &#9881;
-        电路原理
-      
-      
-        
-          传感器数据采集：DHT11 单总线协议接 PB0，BH1750 通过 I2C1 (PB6-SCL, PB7-SDA) 读取
-          继电器控制：4 路继电器分别由 PC0-PC3 控制，NPN 三极管驱动，高电平有效
-          WiFi 通信：ESP8266 通过 USART2 (PA2-TX, PA3-RX) 与 STM32 通信，波特率 115200
-          OLED 显示：I2C1 总线上挂载 OLED，地址 0x3C，刷新率 10Hz
-          红外遥控：VS1838B 接收头接 PB1 (外部中断)，发射管接 PB2 (PWM 载波 38kHz)
-          自动联动逻辑：光照 &lt; 50 lux 自动开灯，温度 &gt; 30°C 自动开风扇
-        
-      
-    `;
-    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
-    var blob = new Blob([content], {type: 'text/plain'});
+  function triggerDownload(type) { window.location.href = "schematic.json"; });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = filename;
@@ -135,25 +117,7 @@
   </script>
 
   <script>
-  function triggerDownload(type) {
-    var content = `
-      
-        &#9881;
-        电路原理
-      
-      
-        
-          传感器数据采集：DHT11 单总线协议接 PB0，BH1750 通过 I2C1 (PB6-SCL, PB7-SDA) 读取
-          继电器控制：4 路继电器分别由 PC0-PC3 控制，NPN 三极管驱动，高电平有效
-          WiFi 通信：ESP8266 通过 USART2 (PA2-TX, PA3-RX) 与 STM32 通信，波特率 115200
-          OLED 显示：I2C1 总线上挂载 OLED，地址 0x3C，刷新率 10Hz
-          红外遥控：VS1838B 接收头接 PB1 (外部中断)，发射管接 PB2 (PWM 载波 38kHz)
-          自动联动逻辑：光照 &lt; 50 lux 自动开灯，温度 &gt; 30°C 自动开风扇
-        
-      
-    `;
-    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
-    var blob = new Blob([content], {type: 'text/plain'});
+  function triggerDownload(type) { window.location.href = "schematic.json"; });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = filename;

@@ -1,0 +1,1839 @@
+[
+  {
+    "head": {
+      "docType": "3",
+      "editorVersion": "6.4.43",
+      "newgId": true,
+      "c_para": {
+        "ischeck": true,
+        "sim_step": "0.01",
+        "sim_mode": "time domain"
+      },
+      "x": 0,
+      "y": 0,
+      "id": ""
+    },
+    "canvas": {
+      "BOUNDARY": {
+        "x": 0,
+        "y": 0,
+        "width": 2240,
+        "height": 1540
+      },
+      "GRID": {
+        "step": 10,
+        "size": 10,
+        "dotted": false,
+        "color": "#CCCCCC"
+      },
+      "width": 2240,
+      "height": 1540
+    },
+    "shape": [
+      {
+        "gId": 1,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 30,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "智能家居中控系统 STM32F103C8T6 电路原理图",
+        "size": 20,
+        "layer": "Title"
+      },
+      {
+        "gId": 2,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 55,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "V1.0  |  2026-06  |  DHT11+BH1750+ESP8266+4路继电器+OLED+红外",
+        "size": 13,
+        "layer": "Comment"
+      },
+      {
+        "gId": 3,
+        "cmd": "RECT",
+        "x": 80,
+        "y": 90,
+        "w": 260,
+        "h": 220,
+        "strokeWidth": 1.5,
+        "strokeColor": "#00796b",
+        "fillColor": "rgba(0,121,107,0.04)",
+        "layer": "Comment"
+      },
+      {
+        "gId": 4,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 100,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "电源模块 Power",
+        "size": 14,
+        "layer": "Comment"
+      },
+      {
+        "gId": 6,
+        "cmd": "TEXT",
+        "x": 140,
+        "y": 180,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "U5 AMS1117-3.3",
+        "size": 11,
+        "layer": "Comment"
+      },
+      {
+        "gId": 7,
+        "cmd": "TEXT",
+        "x": 140,
+        "y": 315,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "Vin: 6.5-12V → 3.3V/800mA",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 13,
+        "cmd": "TEXT",
+        "x": 50,
+        "y": 135,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C1",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 14,
+        "cmd": "TEXT",
+        "x": 50,
+        "y": 275,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C2",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 15,
+        "cmd": "TEXT",
+        "x": 300,
+        "y": 135,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C3",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 16,
+        "cmd": "TEXT",
+        "x": 300,
+        "y": 275,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C4",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 17,
+        "cmd": "TEXT",
+        "x": 50,
+        "y": 355,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C5",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 18,
+        "cmd": "NETLABEL",
+        "x": 160,
+        "y": 100,
+        "rotation": 0,
+        "netName": "12V_IN",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 19,
+        "cmd": "NETLABEL",
+        "x": 160,
+        "y": 420,
+        "rotation": 0,
+        "netName": "GND",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 20,
+        "cmd": "NETLABEL",
+        "x": 360,
+        "y": 100,
+        "rotation": 0,
+        "netName": "3.3V",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 21,
+        "cmd": "NETLABEL",
+        "x": 360,
+        "y": 420,
+        "rotation": 0,
+        "netName": "GND",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 22,
+        "cmd": "RECT",
+        "x": 480,
+        "y": 80,
+        "w": 600,
+        "h": 480,
+        "strokeWidth": 1.5,
+        "strokeColor": "#1565c0",
+        "fillColor": "rgba(21,101,192,0.03)",
+        "layer": "Comment"
+      },
+      {
+        "gId": 23,
+        "cmd": "TEXT",
+        "x": 500,
+        "y": 90,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "主控 MCU - STM32F103C8T6 (LQFP-48)",
+        "size": 14,
+        "layer": "Comment"
+      },
+      {
+        "gId": 24,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 120,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PA0  → KEY1 (外部中断下降沿)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 25,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 137,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PA1  → KEY2 (外部中断下降沿)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 26,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 154,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PA2  → USART2_TX → ESP8266 RXD",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 27,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 171,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PA3  → USART2_RX → ESP8266 TXD",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 28,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 188,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PA9  → USART1_TX (调试串口)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 29,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 205,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PA10 → USART1_RX (调试串口)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 30,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 222,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PA13 → SWDIO (调试)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 31,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 239,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PA14 → SWCLK (调试)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 32,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 256,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PB0  → DHT11 Data (单总线)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 33,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 273,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PB1  → VS1838B IR_OUT (EXTI)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 34,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 290,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PB2  → TIM3_CH3 红外发射PWM",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 35,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 307,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PB6  → I2C1_SCL (BH1750+OLED)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 36,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 324,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PB7  → I2C1_SDA (BH1750+OLED)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 37,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 341,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PC0  → 继电器1 IN (灯光)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 38,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 358,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PC1  → 继电器2 IN (风扇)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 39,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 375,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PC2  → 继电器3 IN (空调)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 40,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 392,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PC3  → 继电器4 IN (插座)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 41,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 409,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "NRST → 复位按键+10kΩ上拉",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 42,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 426,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "OSC_IN/OUT → 8MHz+22pF×2",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 43,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 443,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "VDD/VSS → 3.3V + 100nF去耦×6",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 44,
+        "cmd": "TEXT",
+        "x": 520,
+        "y": 460,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "VDDA → 3.3V + 10uF+100nF",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 45,
+        "cmd": "TEXT",
+        "x": 760,
+        "y": 120,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C6-C11: 100nF×6 (VDD去耦)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 46,
+        "cmd": "TEXT",
+        "x": 760,
+        "y": 140,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C12: 10uF + C13: 100nF (VDDA)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 47,
+        "cmd": "TEXT",
+        "x": 760,
+        "y": 170,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "Y1: 8MHz CSTCE8M00G52-R0",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 48,
+        "cmd": "TEXT",
+        "x": 760,
+        "y": 187,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C14: 22pF  C15: 22pF",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 49,
+        "cmd": "TEXT",
+        "x": 760,
+        "y": 217,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "R1: 10kΩ NRST上拉",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 50,
+        "cmd": "TEXT",
+        "x": 760,
+        "y": 234,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "SW1: 复位按键 → GND",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 51,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 120,
+        "rotation": 0,
+        "netName": "KEY1",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 52,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 137,
+        "rotation": 0,
+        "netName": "KEY2",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 53,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 154,
+        "rotation": 0,
+        "netName": "ESP_RXD",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 54,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 171,
+        "rotation": 0,
+        "netName": "ESP_TXD",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 55,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 256,
+        "rotation": 0,
+        "netName": "DHT11_DATA",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 56,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 273,
+        "rotation": 0,
+        "netName": "IR_IN",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 57,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 290,
+        "rotation": 0,
+        "netName": "IR_PWM",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 58,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 307,
+        "rotation": 0,
+        "netName": "I2C_SCL",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 59,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 324,
+        "rotation": 0,
+        "netName": "I2C_SDA",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 60,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 341,
+        "rotation": 0,
+        "netName": "RELAY1",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 61,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 358,
+        "rotation": 0,
+        "netName": "RELAY2",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 62,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 375,
+        "rotation": 0,
+        "netName": "RELAY3",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 63,
+        "cmd": "NETLABEL",
+        "x": 510,
+        "y": 392,
+        "rotation": 0,
+        "netName": "RELAY4",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 64,
+        "cmd": "RECT",
+        "x": 80,
+        "y": 480,
+        "w": 400,
+        "h": 310,
+        "strokeWidth": 1.5,
+        "strokeColor": "#10b981",
+        "fillColor": "rgba(16,185,129,0.03)",
+        "layer": "Comment"
+      },
+      {
+        "gId": 65,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 490,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "传感器模块 Sensors",
+        "size": 14,
+        "layer": "Comment"
+      },
+      {
+        "gId": 66,
+        "cmd": "RECT",
+        "x": 100,
+        "y": 510,
+        "w": 160,
+        "h": 110,
+        "strokeWidth": 1.5,
+        "strokeColor": "#10b981",
+        "fillColor": "transparent",
+        "layer": "Comment"
+      },
+      {
+        "gId": 67,
+        "cmd": "TEXT",
+        "x": 120,
+        "y": 520,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "DHT11 温湿度传感器",
+        "size": 12,
+        "layer": "Comment"
+      },
+      {
+        "gId": 68,
+        "cmd": "TEXT",
+        "x": 120,
+        "y": 540,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "VDD → 3.3V",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 69,
+        "cmd": "TEXT",
+        "x": 120,
+        "y": 555,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "DATA → PB0",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 70,
+        "cmd": "TEXT",
+        "x": 120,
+        "y": 570,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "GND → GND",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 71,
+        "cmd": "TEXT",
+        "x": 120,
+        "y": 590,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "R2: 4.7kΩ DATA上拉",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 72,
+        "cmd": "NETLABEL",
+        "x": 120,
+        "y": 600,
+        "rotation": 0,
+        "netName": "DHT11_DATA",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 73,
+        "cmd": "RECT",
+        "x": 300,
+        "y": 510,
+        "w": 160,
+        "h": 120,
+        "strokeWidth": 1.5,
+        "strokeColor": "#8b5cf6",
+        "fillColor": "transparent",
+        "layer": "Comment"
+      },
+      {
+        "gId": 74,
+        "cmd": "TEXT",
+        "x": 315,
+        "y": 520,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "BH1750 光照传感器",
+        "size": 12,
+        "layer": "Comment"
+      },
+      {
+        "gId": 75,
+        "cmd": "TEXT",
+        "x": 315,
+        "y": 540,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "VCC → 3.3V",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 76,
+        "cmd": "TEXT",
+        "x": 315,
+        "y": 555,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "SCL → PB6 (I2C)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 77,
+        "cmd": "TEXT",
+        "x": 315,
+        "y": 570,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "SDA → PB7 (I2C)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 78,
+        "cmd": "TEXT",
+        "x": 315,
+        "y": 585,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "ADDR → GND (0x23)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 79,
+        "cmd": "TEXT",
+        "x": 315,
+        "y": 600,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "R3=R4: 4.7kΩ I2C上拉",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 80,
+        "cmd": "NETLABEL",
+        "x": 300,
+        "y": 615,
+        "rotation": 0,
+        "netName": "I2C_SCL",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 81,
+        "cmd": "NETLABEL",
+        "x": 300,
+        "y": 630,
+        "rotation": 0,
+        "netName": "I2C_SDA",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 82,
+        "cmd": "RECT",
+        "x": 100,
+        "y": 640,
+        "w": 240,
+        "h": 120,
+        "strokeWidth": 1.5,
+        "strokeColor": "#3b82f6",
+        "fillColor": "rgba(59,130,246,0.03)",
+        "layer": "Comment"
+      },
+      {
+        "gId": 83,
+        "cmd": "TEXT",
+        "x": 120,
+        "y": 650,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "OLED 0.96\" 128×64 显示屏",
+        "size": 12,
+        "layer": "Comment"
+      },
+      {
+        "gId": 84,
+        "cmd": "TEXT",
+        "x": 120,
+        "y": 670,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "VCC → 3.3V",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 85,
+        "cmd": "TEXT",
+        "x": 120,
+        "y": 685,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "SCL → PB6 (I2C)  地址:0x3C",
+        "size": 12,
+        "layer": "Comment"
+      },
+      {
+        "gId": 86,
+        "cmd": "TEXT",
+        "x": 120,
+        "y": 700,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "SDA → PB7 (I2C)",
+        "size": 12,
+        "layer": "Comment"
+      },
+      {
+        "gId": 87,
+        "cmd": "TEXT",
+        "x": 120,
+        "y": 715,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "GND → GND",
+        "size": 12,
+        "layer": "Comment"
+      },
+      {
+        "gId": 88,
+        "cmd": "TEXT",
+        "x": 120,
+        "y": 735,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C16: 100nF VCC去耦",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 89,
+        "cmd": "RECT",
+        "x": 1200,
+        "y": 80,
+        "w": 260,
+        "h": 220,
+        "strokeWidth": 1.5,
+        "strokeColor": "#06b6d4",
+        "fillColor": "rgba(6,182,212,0.03)",
+        "layer": "Comment"
+      },
+      {
+        "gId": 90,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 90,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "WiFi 通信模块",
+        "size": 14,
+        "layer": "Comment"
+      },
+      {
+        "gId": 91,
+        "cmd": "RECT",
+        "x": 1220,
+        "y": 115,
+        "w": 220,
+        "h": 140,
+        "strokeWidth": 1.5,
+        "strokeColor": "#06b6d4",
+        "fillColor": "transparent",
+        "layer": "Comment"
+      },
+      {
+        "gId": 92,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 125,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "ESP8266-01S",
+        "size": 12,
+        "layer": "Comment"
+      },
+      {
+        "gId": 93,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 143,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "VCC  → 3.3V (≥500mA)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 94,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 158,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "RXD  → PA2 (STM32 TX)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 95,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 173,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "TXD  → PA3 (STM32 RX)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 96,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 188,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "CH_PD → 3.3V (R5:10k)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 97,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 203,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "RST  → 3.3V (R6:10k)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 98,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 218,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "GPIO0 → SW2按键 (下载模式)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 99,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 235,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C17: 100uF + C18: 100nF 去耦",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 100,
+        "cmd": "NETLABEL",
+        "x": 1460,
+        "y": 158,
+        "rotation": 0,
+        "netName": "ESP_RXD",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 101,
+        "cmd": "NETLABEL",
+        "x": 1460,
+        "y": 173,
+        "rotation": 0,
+        "netName": "ESP_TXD",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 102,
+        "cmd": "RECT",
+        "x": 1200,
+        "y": 320,
+        "w": 260,
+        "h": 160,
+        "strokeWidth": 1.5,
+        "strokeColor": "#f97316",
+        "fillColor": "rgba(249,115,22,0.03)",
+        "layer": "Comment"
+      },
+      {
+        "gId": 103,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 330,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "红外遥控模块",
+        "size": 14,
+        "layer": "Comment"
+      },
+      {
+        "gId": 104,
+        "cmd": "RECT",
+        "x": 1220,
+        "y": 355,
+        "w": 240,
+        "h": 80,
+        "strokeWidth": 1.5,
+        "strokeColor": "#f97316",
+        "fillColor": "transparent",
+        "layer": "Comment"
+      },
+      {
+        "gId": 105,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 365,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "VS1838B 红外接收头",
+        "size": 12,
+        "layer": "Comment"
+      },
+      {
+        "gId": 106,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 383,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "VCC → 3.3V   OUT → PB1",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 107,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 398,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "GND → GND",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 108,
+        "cmd": "TEXT",
+        "x": 1240,
+        "y": 420,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "IR_LED: 红外发射管 + 47Ω → PB2(PWM 38kHz)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 109,
+        "cmd": "NETLABEL",
+        "x": 1460,
+        "y": 383,
+        "rotation": 0,
+        "netName": "IR_IN",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 110,
+        "cmd": "NETLABEL",
+        "x": 1460,
+        "y": 420,
+        "rotation": 0,
+        "netName": "IR_PWM",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 111,
+        "cmd": "RECT",
+        "x": 1200,
+        "y": 500,
+        "w": 260,
+        "h": 140,
+        "strokeWidth": 1.5,
+        "strokeColor": "#64748b",
+        "fillColor": "rgba(100,116,139,0.03)",
+        "layer": "Comment"
+      },
+      {
+        "gId": 112,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 510,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "SWD 调试接口",
+        "size": 14,
+        "layer": "Comment"
+      },
+      {
+        "gId": 113,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 530,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "SWDIO → PA13   SWCLK → PA14",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 114,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 548,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "VCC → 3.3V   GND → GND",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 115,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 566,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "NRST → NRST (可选)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 116,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 610,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "USB→UART: CH340G (预留调试串口)",
+        "size": 11,
+        "layer": "Comment"
+      },
+      {
+        "gId": 117,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 628,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PA9(TX) → CH340 RX | PA10(RX) → CH340 TX",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 118,
+        "cmd": "RECT",
+        "x": 80,
+        "y": 800,
+        "w": 700,
+        "h": 250,
+        "strokeWidth": 1.5,
+        "strokeColor": "#dc2626",
+        "fillColor": "rgba(220,38,38,0.03)",
+        "layer": "Comment"
+      },
+      {
+        "gId": 119,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 810,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "执行模块 - 4路继电器控制",
+        "size": 14,
+        "layer": "Comment"
+      },
+      {
+        "gId": 120,
+        "cmd": "NETLABEL",
+        "x": 80,
+        "y": 840,
+        "rotation": 0,
+        "netName": "RELAY1",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 121,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 840,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PC0 → Q2:S8050 → RL1:SRD-05VDC (续流1N4007) → 灯光控制",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 122,
+        "cmd": "NETLABEL",
+        "x": 80,
+        "y": 880,
+        "rotation": 0,
+        "netName": "RELAY2",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 123,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 880,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PC1 → Q3:S8050 → RL2:SRD-05VDC (续流1N4007) → 风扇控制",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 124,
+        "cmd": "NETLABEL",
+        "x": 80,
+        "y": 920,
+        "rotation": 0,
+        "netName": "RELAY3",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 125,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 920,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PC2 → Q4:S8050 → RL3:SRD-05VDC (续流1N4007) → 空调/插座",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 126,
+        "cmd": "NETLABEL",
+        "x": 80,
+        "y": 960,
+        "rotation": 0,
+        "netName": "RELAY4",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 127,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 960,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "PC3 → Q5:S8050 → RL4:SRD-05VDC (续流1N4007) → 备用",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 128,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1020,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "继电器电源: 5V 独立电源 (与MCU 3.3V隔离)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 129,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1037,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "续流二极管: 1N4007 ×4 (反并联在继电器线圈两端)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 130,
+        "cmd": "RECT",
+        "x": 1200,
+        "y": 660,
+        "w": 260,
+        "h": 180,
+        "strokeWidth": 1.5,
+        "strokeColor": "#f59e0b",
+        "fillColor": "rgba(245,158,11,0.03)",
+        "layer": "Comment"
+      },
+      {
+        "gId": 131,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 670,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "本地控制",
+        "size": 14,
+        "layer": "Comment"
+      },
+      {
+        "gId": 132,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 690,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "KEY1 (PA0) : 模式切换",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 133,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 708,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "      10kΩ上拉→3.3V, 按键→GND",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 134,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 730,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "KEY2 (PA1) : 确认/开关",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 135,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 748,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "      10kΩ上拉→3.3V, 按键→GND",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 136,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 770,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "LED1: 3.3V→220Ω→LED→GND (电源指示)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 137,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 788,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "LED2: PB1→220Ω→LED→GND (状态指示)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 138,
+        "cmd": "TEXT",
+        "x": 1220,
+        "y": 810,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "R7:220Ω  R8:220Ω (限流电阻)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 139,
+        "cmd": "RECT",
+        "x": 80,
+        "y": 1080,
+        "w": 500,
+        "h": 160,
+        "strokeWidth": 1.5,
+        "strokeColor": "#64748b",
+        "fillColor": "rgba(100,116,139,0.03)",
+        "layer": "Comment"
+      },
+      {
+        "gId": 140,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1090,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "去耦电容清单",
+        "size": 14,
+        "layer": "Comment"
+      },
+      {
+        "gId": 141,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1110,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C1: 10uF  AMS1117 输入",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 142,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1126,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C2: 100nF AMS1117 输入",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 143,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1142,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C3: 10uF  AMS1117 输出",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 144,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1158,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C4: 100nF AMS1117 输出",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 145,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1174,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C5: 100uF AMS1117 输入(电解)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 146,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1190,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C6-C11: 100nF×6 STM32 VDD各引脚",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 147,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1206,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C12: 10uF VDDA滤波",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 148,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1222,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C13: 100nF VDDA高频",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 149,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1238,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C14: 22pF  8MHz晶振",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 150,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1254,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C15: 22pF  8MHz晶振",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 151,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1270,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C16: 100nF OLED VCC",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 152,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1286,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C17: 100uF ESP8266供电",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 153,
+        "cmd": "TEXT",
+        "x": 100,
+        "y": 1302,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "C18: 100nF ESP8266高频",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 154,
+        "cmd": "TEXT",
+        "x": 600,
+        "y": 1090,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "网络连接总线",
+        "size": 14,
+        "layer": "Comment"
+      },
+      {
+        "gId": 155,
+        "cmd": "TEXT",
+        "x": 600,
+        "y": 1115,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "3.3V 网络: STM32(VDD/VDDA) + ESP8266 + DHT11 + BH1750 + OLED + 红外",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 156,
+        "cmd": "TEXT",
+        "x": 600,
+        "y": 1135,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "GND 网络: 所有模块共地, 单点接地",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 157,
+        "cmd": "TEXT",
+        "x": 600,
+        "y": 1155,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "I2C总线: SCL(PB6) → BH1750 SCL + OLED SCL (4.7kΩ上拉×2)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 158,
+        "cmd": "TEXT",
+        "x": 600,
+        "y": 1175,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "I2C总线: SDA(PB7) → BH1750 SDA + OLED SDA (4.7kΩ上拉×2)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 159,
+        "cmd": "TEXT",
+        "x": 600,
+        "y": 1195,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "UART1(PA9/PA10): 调试串口(CH340G)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 160,
+        "cmd": "TEXT",
+        "x": 600,
+        "y": 1215,
+        "rotation": 0,
+        "strokeWidth": 0,
+        "text": "UART2(PA2/PA3): ESP8266 通信 (115200 8N1)",
+        "size": 10,
+        "layer": "Comment"
+      },
+      {
+        "gId": 161,
+        "cmd": "NETLABEL",
+        "x": 160,
+        "y": 90,
+        "rotation": 0,
+        "netName": "12V_IN",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 162,
+        "cmd": "NETLABEL",
+        "x": 360,
+        "y": 90,
+        "rotation": 0,
+        "netName": "3.3V",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 163,
+        "cmd": "NETLABEL",
+        "x": 160,
+        "y": 430,
+        "rotation": 0,
+        "netName": "GND",
+        "layer": "NetLabel"
+      },
+      {
+        "gId": 164,
+        "cmd": "NETLABEL",
+        "x": 360,
+        "y": 430,
+        "rotation": 0,
+        "netName": "GND",
+        "layer": "NetLabel"
+      }
+    ],
+    "element": [
+      {
+        "gId": 5,
+        "package": "SOT-223",
+        "device": "Device:AMS1117-3.3",
+        "x": 200,
+        "y": 200,
+        "rotation": 0,
+        "locked": false,
+        "span": {
+          "x": 30,
+          "y": 20
+        },
+        "config": {
+          "uuid": "936966D084D6480DBF61BBD9",
+          "name": "U5",
+          "value": "AMS1117-3.3",
+          "spicePre": ""
+        }
+      },
+      {
+        "gId": 8,
+        "package": "0805",
+        "device": "Device:C",
+        "x": 80,
+        "y": 140,
+        "rotation": 0,
+        "locked": false,
+        "span": {
+          "x": 10,
+          "y": 10
+        },
+        "config": {
+          "uuid": "449944A3F6664D48BC8D510A",
+          "name": "C1",
+          "value": "10uF",
+          "spicePre": ""
+        }
+      },
+      {
+        "gId": 9,
+        "package": "0805",
+        "device": "Device:C",
+        "x": 80,
+        "y": 280,
+        "rotation": 0,
+        "locked": false,
+        "span": {
+          "x": 10,
+          "y": 10
+        },
+        "config": {
+          "uuid": "2ECFE6D1D6384EEF8B8C8F7F",
+          "name": "C2",
+          "value": "100nF",
+          "spicePre": ""
+        }
+      },
+      {
+        "gId": 10,
+        "package": "0805",
+        "device": "Device:C",
+        "x": 320,
+        "y": 140,
+        "rotation": 0,
+        "locked": false,
+        "span": {
+          "x": 10,
+          "y": 10
+        },
+        "config": {
+          "uuid": "407221D981A94237B7ACBC0F",
+          "name": "C3",
+          "value": "10uF",
+          "spicePre": ""
+        }
+      },
+      {
+        "gId": 11,
+        "package": "0805",
+        "device": "Device:C",
+        "x": 320,
+        "y": 280,
+        "rotation": 0,
+        "locked": false,
+        "span": {
+          "x": 10,
+          "y": 10
+        },
+        "config": {
+          "uuid": "E1443CA4911C4E8DB4F6CBD9",
+          "name": "C4",
+          "value": "100nF",
+          "spicePre": ""
+        }
+      },
+      {
+        "gId": 12,
+        "package": "SMD",
+        "device": "Device:Cap_Pol",
+        "x": 80,
+        "y": 360,
+        "rotation": 0,
+        "locked": false,
+        "span": {
+          "x": 10,
+          "y": 10
+        },
+        "config": {
+          "uuid": "C86A9011E0A64ABDA100F0DD",
+          "name": "C5",
+          "value": "100uF/16V",
+          "spicePre": ""
+        }
+      }
+    ]
+  }
+]
