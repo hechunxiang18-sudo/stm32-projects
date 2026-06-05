@@ -114,9 +114,56 @@ void vTask_AutoControl(void *pvParam) {
       </div>
     </div>
   </div>
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
   <footer class="footer">
-    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+    <p><a href="../..index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>智能家居系统 / 核心代码</strong></p>
   </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        软件架构 - FreeRTOS 任务分配
+      
+      
+        软件架构说明：采用 FreeRTOS 实时操作系统，按功能划分为三个独立任务，
+        利用消息队列实现任务间通信，确保系统实时性和稳定性。
+      
+      /* 智能家居主程序任务结构 (FreeRTOS) */
+
+/* 任务 1：传感器采集（优先级 2，周期 2s） */
+void vTask_SensorCollect(void *pvParam) {
+    for (;;) {
+        DHT11_ReadData();              // 读取温湿度
+        BH1750_ReadLight();            // 读取光照
+        MQTT_Publish_SensorData();     // 发布到 MQTT
+        OLED_UpdateDisplay();          // 更新显示屏
+        vTaskDelay(pdMS_`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('HE-8473').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
 
   <script>
   function triggerDownload(type) {

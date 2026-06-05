@@ -75,7 +75,7 @@
           <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
           <div class="wechat-id">
             <span class="wechat-label">微信号：</span>
-            <span class="wechat-value">{WECHAT_QR}</span>
+            <span class="wechat-value">HE-8473</span>
             <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
           </div>
         </div>
@@ -84,13 +84,13 @@
   </div>
 
   <footer class="footer">
-    <p><a href="{rel}/index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
-    <p class="footer-sub" style="margin-top:6px;">作者微信：{WECHAT_QR} &nbsp;|&nbsp; 欢迎交流嵌入式开发</p>
+    <p><a href="../../index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>酒精检测仪</strong></p>
+    <p class="footer-sub" style="margin-top:6px;">作者微信：HE-8473 &nbsp;|&nbsp; 欢迎交流嵌入式开发</p>
   </footer>
 
   <script>
   function copyWechat() {{
-    navigator.clipboard.writeText('{WECHAT_QR}').then(() => {{
+    navigator.clipboard.writeText('HE-8473').then(() => {{
       const btn = document.querySelector('.wechat-copy-btn');
       btn.textContent = '已复制';
       setTimeout(() => {{ btn.textContent = '复制'; }}, 2000);
