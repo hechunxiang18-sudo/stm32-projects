@@ -8,7 +8,7 @@
 import os, re, glob
 
 BASE = "E:/STM32/stm32-projects"
-WECHAT_QR = "AELL"  # 替换为你的微信号
+WECHAT_QR = "HE-8473"  # 替换为你的微信号
 
 # 新板块顺序（schematic 和 code 标记为 download）
 NEW_SECTIONS = [
