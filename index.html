@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>STM32F103C8T6 嵌入式项目合集 - 51 个项目</title>
+  <meta name="description" content="基于 STM32F103C8T6 的 51 个嵌入式实战项目大全">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">&#9733; STM32 Project Hub</div>
+      <div class="hero-icon">&#9726;</div>
+      <h1>STM32F103C8T6 嵌入式项目大全</h1>
+      <p class="hero-sub">51 个实战项目，涵盖物联网、安防、机器人、仪器仪表、健康穿戴、车载等 8 大方向</p>
+      <div class="hero-stats">
+        <div class="stat-item"><span class="stat-num">51</span><span class="stat-label">项目总数</span></div>
+        <div class="stat-item"><span class="stat-num">8</span><span class="stat-label">应用方向</span></div>
+        <div class="stat-item"><span class="stat-num">60+</span><span class="stat-label">传感器类型</span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-btn active" data-filter="all">全部 (51)</button>
+      <button class="filter-btn" data-filter="iot">物联网</button>
+      <button class="filter-btn" data-filter="security">安防</button>
+      <button class="filter-btn" data-filter="robot">机器人</button>
+      <button class="filter-btn" data-filter="sensor">传感/仪器</button>
+      <button class="filter-btn" data-filter="health">健康穿戴</button>
+      <button class="filter-btn" data-filter="vehicle">车载定位</button>
+      <button class="filter-btn" data-filter="life">生活/音频</button>
+    </div>
+
+    <div class="project-grid" id="projectGrid">
+
+      <!-- ===== 物联网 (IoT) 18 个 ===== -->
+      <a href="iot/project-smart-home/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#127968;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-cyan">WiFi</span></div>
+          <h3 class="card-title">智能家居系统</h3>
+          <p class="card-desc">多传感器环境监测 + 家电远程控制 + MQTT 云端联动 + FreeRTOS</p>
+          <div class="card-meta"><span>DHT11 · BH1750 · ESP8266</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-smart-curtain/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#127758;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-emerald">电机</span></div>
+          <h3 class="card-title">智能窗帘系统</h3>
+          <p class="card-desc">步进电机驱动 · 光感自动 · 遥控定时 · 手机远程 · 遇阻停止</p>
+          <div class="card-meta"><span>28BYJ-48 · HC-05 · ESP8266</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-smart-light/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-purple"><span class="card-emoji">&#128161;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-purple">调光</span></div>
+          <h3 class="card-title">智能灯控系统</h3>
+          <p class="card-desc">PWM 调光调色 · 触摸控制 · 语音识别 · RGB 彩光情景模式</p>
+          <div class="card-meta"><span>RGBW · TTP224 · SU-03T</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-smart-lamp/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-purple"><span class="card-emoji">&#128367;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-gold">照明</span></div>
+          <h3 class="card-title">智能台灯</h3>
+          <p class="card-desc">无级调光 · 色温调节 · 触摸开关 · 自动亮度 · 护眼模式</p>
+          <div class="card-meta"><span>COB · TTP223 · 光敏</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-smart-fan/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#1121;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-cyan">电机</span></div>
+          <h3 class="card-title">智能风扇</h3>
+          <p class="card-desc">直流无刷电机 · 12 档调速 · 温控自动 · 自然风/睡眠风</p>
+          <div class="card-meta"><span>BLDC · IR2104 · NTC</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-smart-socket/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128268;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-gold">计量</span></div>
+          <h3 class="card-title">智能插座</h3>
+          <p class="card-desc">WiFi 远程控制 · 功率计量 · 定时开关 · 过载自动断电</p>
+          <div class="card-meta"><span>HLW8032 · ESP8266 · 计量</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-smart-heater/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-green"><span class="card-emoji">&#127777;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-emerald">温控</span></div>
+          <h3 class="card-title">智能热水器</h3>
+          <p class="card-desc">PID 恒温控制 · 预约加热 · 防干烧 · WiFi 远程 · 漏电检测</p>
+          <div class="card-meta"><span>DS18B20 · NTC · ESP8266</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-smart-clothes-rack/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-green"><span class="card-emoji">&#127793;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-emerald">家居</span></div>
+          <h3 class="card-title">智能晾衣架</h3>
+          <p class="card-desc">雨感自动收回 · 光感升降 · PTC 恒温烘干 · UV 杀菌除螨</p>
+          <div class="card-meta"><span>雨滴传感器 · PTC · UV</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-irrigation/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-green"><span class="card-emoji">&#127793;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-emerald">农业</span></div>
+          <h3 class="card-title">智能灌溉系统</h3>
+          <p class="card-desc">土壤湿度检测 · 8 路电磁阀 · 天气联动 · 手机远程 · 用水统计</p>
+          <div class="card-meta"><span>YL-69 · DS18B20 · ESP8266</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-aquarium/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-green"><span class="card-emoji">&#128031;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-emerald">水族</span></div>
+          <h3 class="card-title">智能鱼缸系统</h3>
+          <p class="card-desc">PID 恒温控制 · 自动喂食 · 水质监测 · RGB 灯光 · 远程控制</p>
+          <div class="card-meta"><span>DS18B20 · PH · ESP8266</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-smart-pot/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-green"><span class="card-emoji">&#127803;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-emerald">园艺</span></div>
+          <h3 class="card-title">智能花盆</h3>
+          <p class="card-desc">土壤湿度监测 · 自动浇水 · 光照检测 · 太阳能供电 · 蓝牙提醒</p>
+          <div class="card-meta"><span>YL-69 · 水泵 · HC-05</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-pet-feeder/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-green"><span class="card-emoji">&#128054;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-gold">宠物</span></div>
+          <h3 class="card-title">智能宠物喂食器</h3>
+          <p class="card-desc">定时定量出粮 · 语音呼唤 · 红外余粮检测 · 远程一键加粮</p>
+          <div class="card-meta"><span>步进电机 · JQ8900 · ESP8266</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-pet-fountain/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-green"><span class="card-emoji">&#128062;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-emerald">宠物</span></div>
+          <h3 class="card-title">智能宠物饮水机</h3>
+          <p class="card-desc">活水循环 · 多级过滤 · UV 杀菌 · 水位报警 · PIR 感应出水</p>
+          <div class="card-meta"><span>水泵 · 活性炭 · UV LED</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-smart-meter/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128200;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-gold">计量</span></div>
+          <h3 class="card-title">智能电表</h3>
+          <p class="card-desc">电压/电流/功率测量 · 过载保护 · WiFi 上传 · Web 可视化</p>
+          <div class="card-meta"><span>HLW8032 · 互感器 · ESP8266</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-water-purifier/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128166;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-cyan">净水</span></div>
+          <h3 class="card-title">智能净水器</h3>
+          <p class="card-desc">TDS 双检测 · 流量计量 · 滤芯寿命 · 自动冲洗 · WiFi 远程</p>
+          <div class="card-meta"><span>TDS · 流量计 · ESP8266</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-weather-clock/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128340;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-cyan">时钟</span></div>
+          <h3 class="card-title">WiFi 天气时钟</h3>
+          <p class="card-desc">NTP 自动校时 · 天气实况预报 · 闹钟 · 温湿度 · 自动亮度</p>
+          <div class="card-meta"><span>ESP8266 · DHT22 · DS3231</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-smart-doorbell/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128276;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-emerald">安防</span></div>
+          <h3 class="card-title">智能门铃</h3>
+          <p class="card-desc">PIR 感应抓拍 · 摄像头拍照 · WiFi 推送 · 双向对讲 · 夜视</p>
+          <div class="card-meta"><span>OV7670 · ESP8266 · PIR</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="iot/project-dashcam/index.html" class="project-card" data-category="iot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128248;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-blue">物联网</span><span class="tag tag-gold">车载</span></div>
+          <h3 class="card-title">智能行车记录仪</h3>
+          <p class="card-desc">1080P 循环录制 · G-Sensor 碰撞锁定 · GPS 轨迹 · WiFi 查看</p>
+          <div class="card-meta"><span>OV5640 · MPU6050 · GPS</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <!-- ===== 安防 (Security) 7 个 ===== -->
+      <a href="security/project-smart-lock/index.html" class="project-card" data-category="security">
+        <div class="card-img card-img-green"><span class="card-emoji">&#128274;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-emerald">安防</span><span class="tag tag-purple">生物识别</span></div>
+          <h3 class="card-title">智能门锁系统</h3>
+          <p class="card-desc">指纹/密码/RFID 三种开锁 · 远程开锁 · 防暴力破解</p>
+          <div class="card-meta"><span>AS608 · RC522 · HC-05</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="security/project-access-control/index.html" class="project-card" data-category="security">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128301;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-emerald">安防</span><span class="tag tag-blue">门禁</span></div>
+          <h3 class="card-title">智能门禁系统</h3>
+          <p class="card-desc">IC 卡 + 密码 + 指纹三重认证 · 云端管理 · 1000 条日志</p>
+          <div class="card-meta"><span>RC522 · AS608 · ESP8266</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="security/project-smart-fire/index.html" class="project-card" data-category="security">
+        <div class="card-img card-img-red"><span class="card-emoji">&#128293;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-rose">消防</span><span class="tag tag-orange">传感</span></div>
+          <h3 class="card-title">智能消防系统</h3>
+          <p class="card-desc">多传感器火情分级 · 自动灭火喷淋 · GSM 短信远程报警</p>
+          <div class="card-meta"><span>MQ-2 · DS18B20 · SIM800L</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="security/project-smart-alarm/index.html" class="project-card" data-category="security">
+        <div class="card-img card-img-red"><span class="card-emoji">&#128680;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-rose">安防</span><span class="tag tag-orange">报警</span></div>
+          <h3 class="card-title">智能报警系统</h3>
+          <p class="card-desc">PIR + 门磁 + 烟雾三传感器 · GSM 短信通知 · 声光联动</p>
+          <div class="card-meta"><span>HC-SR501 · SIM800L · MQ-2</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="security/project-fingerprint-safe/index.html" class="project-card" data-category="security">
+        <div class="card-img card-img-purple"><span class="card-emoji">&#128737;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-emerald">安防</span><span class="tag tag-purple">生物识别</span></div>
+          <h3 class="card-title">指纹保险箱</h3>
+          <p class="card-desc">指纹开锁 · 密码键盘 · 防撬报警 · 3 次失败锁定 · 日志</p>
+          <div class="card-meta"><span>AS608 · 舵机 · 震动传感器</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="security/project-rfid-attendance/index.html" class="project-card" data-category="security">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128179;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-emerald">安防</span><span class="tag tag-blue">IC 卡</span></div>
+          <h3 class="card-title">RFID 考勤机</h3>
+          <p class="card-desc">IC 卡刷卡签到 · LCD 显示 · USB 导出 · 语音播报 · 1000 条</p>
+          <div class="card-meta"><span>RC522 · LCD12864 · CH340</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="security/project-parking-lock/index.html" class="project-card" data-category="security">
+        <div class="card-img card-img-green"><span class="card-emoji">&#128663;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-emerald">安防</span><span class="tag tag-gold">车位</span></div>
+          <h3 class="card-title">智能车位锁</h3>
+          <p class="card-desc">超声波检测 · 自动升降 · 蓝牙遥控 · 防撞保护 · 太阳能</p>
+          <div class="card-meta"><span>HC-SR04 · SG90 · HC-05</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <!-- ===== 机器人 (Robot) 6 个 ===== -->
+      <a href="robot/project-drone-fc/index.html" class="project-card" data-category="robot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128662;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-gold">机器人</span><span class="tag tag-blue">飞控</span></div>
+          <h3 class="card-title">四轴无人机飞控</h3>
+          <p class="card-desc">MPU6050 姿态解算 · 级联 PID · 气压定高 · 2.4G 遥控</p>
+          <div class="card-meta"><span>MPU6050 · NRF24L01 · ESC</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="robot/project-quadruped/index.html" class="project-card" data-category="robot">
+        <div class="card-img card-img-purple"><span class="card-emoji">&#129302;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-gold">机器人</span><span class="tag tag-purple">仿生</span></div>
+          <h3 class="card-title">四足机器人</h3>
+          <p class="card-desc">8 自由度 · 逆运动学 · 三角步态 · 姿态平衡 · 蓝牙遥控</p>
+          <div class="card-meta"><span>MG996R ×8 · PCA9685</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="robot/project-balance-car/index.html" class="project-card" data-category="robot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128663;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-gold">机器人</span><span class="tag tag-blue">控制</span></div>
+          <h3 class="card-title">两轮平衡小车</h3>
+          <p class="card-desc">串级 PID · 编码器速度闭环 · 蓝牙遥控 · OLED 实时调参</p>
+          <div class="card-meta"><span>MPU6050 · TB6612 · HC-05</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="robot/project-line-follower/index.html" class="project-card" data-category="robot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128652;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-gold">机器人</span><span class="tag tag-cyan">竞速</span></div>
+          <h3 class="card-title">循迹小车</h3>
+          <p class="card-desc">5 路红外循迹 · PID 纠偏 · 速度闭环 · 蓝牙调参 · 竞赛级</p>
+          <div class="card-meta"><span>TCRT5000×5 · TB6612 · PID</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="robot/project-obstacle-avoid/index.html" class="project-card" data-category="robot">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128663;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-gold">机器人</span><span class="tag tag-cyan">智能</span></div>
+          <h3 class="card-title">避障小车</h3>
+          <p class="card-desc">3 路超声波 · 舵机扫描 · 路径规划 · 蓝牙遥控/自动切换</p>
+          <div class="card-meta"><span>HC-SR04×3 · SG90 · L298N</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="robot/project-robot-arm/index.html" class="project-card" data-category="robot">
+        <div class="card-img card-img-purple"><span class="card-emoji">&#129310;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-gold">机器人</span><span class="tag tag-purple">机械臂</span></div>
+          <h3 class="card-title">5 轴机械臂</h3>
+          <p class="card-desc">5 自由度舵机 · 逆运动学 · 示教编程 · PS2 遥控 · 姿态记忆</p>
+          <div class="card-meta"><span>MG996R ×5 · PCA9685 · PS2</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <!-- ===== 传感/仪器 (Sensor) 8 个 ===== -->
+      <a href="sensor/project-weather-station/index.html" class="project-card" data-category="sensor">
+        <div class="card-img card-img-green"><span class="card-emoji">&#127758;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-orange">传感</span><span class="tag tag-cyan">无线</span></div>
+          <h3 class="card-title">环境监测站</h3>
+          <p class="card-desc">多要素气象监测 · PM2.5 · 气压 · 风速 · 紫外线 · LoRa</p>
+          <div class="card-meta"><span>DHT22 · BMP280 · PMS5003</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="sensor/project-air-analyzer/index.html" class="project-card" data-category="sensor">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#127788;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-orange">传感</span><span class="tag tag-cyan">空气</span></div>
+          <h3 class="card-title">PM2.5 空气质量仪</h3>
+          <p class="card-desc">PM2.5/PM10 · CO2 · TVOC · 甲醛 · 温湿度 · WiFi 上传</p>
+          <div class="card-meta"><span>PMS5003 · CCS811 · SGP30</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="sensor/project-oscilloscope/index.html" class="project-card" data-category="sensor">
+        <div class="card-img card-img-red"><span class="card-emoji">&#128300;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-orange">仪器</span><span class="tag tag-cyan">测量</span></div>
+          <h3 class="card-title">DIY 微型示波器</h3>
+          <p class="card-desc">1Msps 双通道 ADC · FFT 频谱 · 2.4 寸 TFT 波形显示</p>
+          <div class="card-meta"><span>ADC+DMA · ILI9341 · MCP6002</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="sensor/project-signal-gen/index.html" class="project-card" data-category="sensor">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128290;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-orange">仪器</span><span class="tag tag-blue">信号</span></div>
+          <h3 class="card-title">函数信号发生器</h3>
+          <p class="card-desc">DDS 正弦/方波/三角波 · 1Hz-10MHz · TFT 显示 · 扫频</p>
+          <div class="card-meta"><span>AD9833 · OPA2134 · TFT</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="sensor/project-electronic-load/index.html" class="project-card" data-category="sensor">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128267;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-orange">仪器</span><span class="tag tag-rose">电源</span></div>
+          <h3 class="card-title">电子负载仪</h3>
+          <p class="card-desc">CC/CV/CR 模式 · 电池容量测试 · 过温保护 · OLED 曲线</p>
+          <div class="card-meta"><span>IRFP250 · OP07 · DAC</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="sensor/project-ultrasonic-ruler/index.html" class="project-card" data-category="sensor">
+        <div class="card-img card-img-green"><span class="card-emoji">&#128207;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-orange">传感</span><span class="tag tag-emerald">测距</span></div>
+          <h3 class="card-title">超声波测距仪</h3>
+          <p class="card-desc">高精度 2cm-5m · 声光提示 · 数据记录 · 蓝牙传输 · 激光指示</p>
+          <div class="card-meta"><span>HC-SR04 · OLED · HC-05</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="sensor/project-breathalyzer/index.html" class="project-card" data-category="sensor">
+        <div class="card-img card-img-red"><span class="card-emoji">&#127867;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-rose">检测</span><span class="tag tag-orange">传感</span></div>
+          <h3 class="card-title">酒精检测仪</h3>
+          <p class="card-desc">MQ-3 酒精浓度 · 吹气感应防作弊 · 三色分级 · 语音播报</p>
+          <div class="card-meta"><span>MQ-3 · 流量传感器 · JQ8900</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="sensor/project-soldering-station/index.html" class="project-card" data-category="sensor">
+        <div class="card-img card-img-red"><span class="card-emoji">&#128296;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-orange">工具</span><span class="tag tag-rose">温控</span></div>
+          <h3 class="card-title">智能电烙铁</h3>
+          <p class="card-desc">PID 恒温 100-400°C · OLED 显示 · 编码器调温 · 手势唤醒</p>
+          <div class="card-meta"><span>NTC · IRFZ44N · MPU6050</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <!-- ===== 健康穿戴 (Health) 5 个 ===== -->
+      <a href="health/project-pill-box/index.html" class="project-card" data-category="health">
+        <div class="card-img card-img-purple"><span class="card-emoji">&#128138;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-purple">健康</span><span class="tag tag-gold">医疗</span></div>
+          <h3 class="card-title">智能药盒</h3>
+          <p class="card-desc">6 时段定时提醒 · 自动出药 · 漏服检测 · 远程通知家属</p>
+          <div class="card-meta"><span>DS3231 · 步进电机 · ESP8266</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="health/project-smart-band/index.html" class="project-card" data-category="health">
+        <div class="card-img card-img-purple"><span class="card-emoji">&#128141;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-purple">健康</span><span class="tag tag-gold">运动</span></div>
+          <h3 class="card-title">智能手环</h3>
+          <p class="card-desc">PPG 心率 · 计步算法 · 睡眠追踪 · OLED 触控 · 蓝牙同步</p>
+          <div class="card-meta"><span>MAX30102 · MPU6050 · HC-05</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="health/project-smart-scale/index.html" class="project-card" data-category="health">
+        <div class="card-img card-img-purple"><span class="card-emoji">&#128562;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-purple">健康</span><span class="tag tag-blue">称重</span></div>
+          <h3 class="card-title">智能电子秤</h3>
+          <p class="card-desc">HX711 高精度 · 体脂估算 · 蓝牙健康记录 · 历史趋势</p>
+          <div class="card-meta"><span>HX711 · 压力传感器 · HC-05</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="health/project-incubator/index.html" class="project-card" data-category="health">
+        <div class="card-img card-img-green"><span class="card-emoji">&#129430;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-purple">健康</span><span class="tag tag-emerald">养殖</span></div>
+          <h3 class="card-title">智能孵化器</h3>
+          <p class="card-desc">PID 恒温 ±0.1°C · 自动翻蛋 · 湿度控制 · 照蛋灯 · 倒计时</p>
+          <div class="card-meta"><span>DHT22 · 加热膜 · 步进电机</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="health/project-glucometer/index.html" class="project-card" data-category="health">
+        <div class="card-img card-img-red"><span class="card-emoji">&#128137;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-purple">健康</span><span class="tag tag-rose">医疗</span></div>
+          <h3 class="card-title">智能血糖仪</h3>
+          <p class="card-desc">电化学检测 · 试纸识别 · 7/30 天趋势 · 蓝牙同步 · 高低报警</p>
+          <div class="card-meta"><span>ADS1115 · 恒电位仪 · HC-05</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <!-- ===== 车载定位 (Vehicle) 3 个 ===== -->
+      <a href="vehicle/project-gps-tracker/index.html" class="project-card" data-category="vehicle">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128205;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-gold">定位</span><span class="tag tag-blue">GPS</span></div>
+          <h3 class="card-title">GPS 定位器</h3>
+          <p class="card-desc">GPS+北斗双模 · GSM 上报 · SD 轨迹记录 · 电子围栏</p>
+          <div class="card-meta"><span>NEO-6M · SIM800L · SD 卡</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="vehicle/project-obd-diagnostic/index.html" class="project-card" data-category="vehicle">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#128664;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-gold">车载</span><span class="tag tag-blue">CAN</span></div>
+          <h3 class="card-title">OBD 车载诊断</h3>
+          <p class="card-desc">CAN 总线读取 · 故障码 · 实时数据流 · 蓝牙手机 · 日志</p>
+          <div class="card-meta"><span>MCP2515 · TJA1050 · HC-05</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="vehicle/project-ev-dashboard/index.html" class="project-card" data-category="vehicle">
+        <div class="card-img card-img-green"><span class="card-emoji">&#128664;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-gold">车载</span><span class="tag tag-emerald">仪表</span></div>
+          <h3 class="card-title">电动车智能仪表</h3>
+          <p class="card-desc">速度/里程/电量 · 蓝牙手机 · 故障诊断 · PWM 灯控</p>
+          <div class="card-meta"><span>霍尔传感器 · ADS1115 · HC-05</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <!-- ===== 生活/音频 (Life) 4 个 ===== -->
+      <a href="life/project-bluetooth-speaker/index.html" class="project-card" data-category="life">
+        <div class="card-img card-img-purple"><span class="card-emoji">&#128266;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-purple">音频</span><span class="tag tag-gold">蓝牙</span></div>
+          <h3 class="card-title">蓝牙音箱</h3>
+          <p class="card-desc">蓝牙 5.0 · 30W 数字功放 · RGB 灯效律动 · 均衡器 · TF 卡</p>
+          <div class="card-meta"><span>TPA3116 · RGB LED · I2S</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="life/project-smart-bin/index.html" class="project-card" data-category="life">
+        <div class="card-img card-img-green"><span class="card-emoji">&#128267;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-emerald">生活</span><span class="tag tag-cyan">智能</span></div>
+          <h3 class="card-title">智能垃圾桶</h3>
+          <p class="card-desc">红外感应开盖 · 满桶检测 · 臭氧除臭 · UV杀菌 · 自动打包</p>
+          <div class="card-meta"><span>PIR · SG90 · 臭氧模块</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="life/project-shoe-cabinet/index.html" class="project-card" data-category="life">
+        <div class="card-img card-img-green"><span class="card-emoji">&#128095;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-emerald">生活</span><span class="tag tag-cyan">智能</span></div>
+          <h3 class="card-title">智能鞋柜</h3>
+          <p class="card-desc">PTC 恒温烘干 · UV 杀菌 · 臭氧除臭 · 定时自动 · 触摸屏</p>
+          <div class="card-meta"><span>PTC · DHT22 · UV LED</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+      <a href="life/project-handheld-fan/index.html" class="project-card" data-category="life">
+        <div class="card-img card-img-blue"><span class="card-emoji">&#1121;</span></div>
+        <div class="card-body">
+          <div class="card-tags"><span class="tag tag-cyan">便携</span><span class="tag tag-gold">风扇</span></div>
+          <h3 class="card-title">手持电风扇</h3>
+          <p class="card-desc">3 挡 PWM 调速 · AO3400 直驱 · 18650 供电 · Type-C 充电</p>
+          <div class="card-meta"><span>AO3400 · RF-300 · TP4056</span><span class="card-arrow">&rarr;</span></div>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="placeholder-section">
+      <div class="placeholder-box">
+        <div class="placeholder-icon">&#128640;</div>
+        <h3>更多项目持续开发中</h3>
+        <p>计划中的下一批项目：</p>
+        <div class="upcoming-list">
+          <span class="upcoming-item">智能蓝牙遥控器</span>
+          <span class="upcoming-item">CAN 总线分析仪</span>
+          <span class="upcoming-item">智能咖啡机</span>
+          <span class="upcoming-item">微型热成像仪</span>
+          <span class="upcoming-item">智能跑步机</span>
+          <span class="upcoming-item">NAS 下载器</span>
+          <span class="upcoming-item">智能麦克风</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p><strong>STM32F103C8T6 嵌入式项目大全</strong> &copy; 2026 &nbsp;|&nbsp; 51 个项目 &nbsp;|&nbsp; 持续更新中</p>
+    <p class="footer-sub">基于 ARM Cortex-M3 内核 · 72MHz 主频 · 丰富外设驱动无限可能</p>
+  </footer>
+
+  <script>
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.project-card');
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.dataset.filter;
+        cards.forEach(card => {
+          card.style.display = (filter === 'all' || card.dataset.category === filter) ? 'flex' : 'none';
+        });
+      });
+    });
+  </script>
+</body>
+</html>

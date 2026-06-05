@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 GPS 定位器</title>
+  <meta name="description" content="GPS 北斗定位 · GSM 上报 · 轨迹记录 · 电子围栏">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">GPS 定位器 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128506;</div>
+      <h1>STM32F103C8T6 GPS 定位器</h1>
+      <p class="detail-hero-sub">GPS 北斗定位 · GSM 上报 · 轨迹记录 · 电子围栏</p>
+      <div class="detail-hero-tags">
+        <span>GPS NEO-6M</span>
+        <span>SIM800L</span>
+        <span>SD卡</span>
+        <span>OLED 0.96"</span>
+        <span>锂电池</span>
+        <span>陶瓷天线</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - NMEA 解析与 GSM 短信</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>NMEA 协议解析 $GPGGA 语句提取经纬度，
+        通过 SIM800L AT+CMGS 指令发送短信位置。SD 卡 FATFS 文件系统存储 CSV 轨迹。
+      </div>
+      <pre><code>/* NMEA 解析与 GSM 短信发送 (HAL 库) */
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include "fatfs.h"
+
+/* GPS NMEA 缓冲区 */
+#define NMEA_BUF  128
+static char nmea_buf[NMEA_BUF];
+static uint8_t nmea_idx = 0;
+
+/* 解析后的坐标 */
+typedef struct {
+    float lat;     /* 纬度 */
+    float lng;     /* 经度 */
+    char  ns, ew;  /* N/S, E/W */
+    uint8_t fix;   /* 定位状态 */
+    uint8_t sat;   /* 卫星数 */
+} GPS_t;
+
+GPS_t gps;
+
+/* NMEA 字符接收中断 */
+void USART1_IRQHandler(void) {
+    char c = USART1-&gt;DR;
+    if (c == '\n') {
+        nmea_buf[nmea_idx] = '\0';
+        if (strstr(nmea_buf, "$GPGGA")) {
+            Parse_GPGGA(nmea_buf, &amp;gps);
+        }
+        nmea_idx = 0;
+    } else {
+        if (nmea_idx &lt; NMEA_BUF - 1)
+            nmea_buf[nmea_idx++] = c;
+    }
+}
+
+/* 解析 $GPGGA 语句 */
+void Parse_GPGGA(char *buf, GPS_t *gps) {
+    char *p = buf;
+    int field = 0;
+    while (*p) {
+        if (*p == ',') field++;
+        else if (field == 2) {
+            gps-&gt;lat = atof(p);    /* 纬度 ddmm.mmmm */
+        } else if (field == 3) {
+            gps-&gt;ns = *p;          /* N/S */
+        } else if (field == 4) {
+            gps-&gt;lng = atof(p);   /* 经度 dddmm.mmmm */
+        } else if (field == 5) {
+            gps-&gt;ew = *p;
+        } else if (field == 6) {
+            gps-&gt;fix = atoi(p);
+        } else if (field == 7) {
+            gps-&gt;sat = atoi(p);
+            break;
+        }
+        p++;
+    }
+}
+
+/* SIM800L 发送短信 */
+void GSM_SendSMS(const char *phone, const char *msg) {
+    char cmd[64];
+    sprintf(cmd, "AT+CMGS=\"%s\"\r\n", phone);
+    SIM800L_SendCmd(cmd);
+    HAL_Delay(500);
+    SIM800L_SendCmd(msg);
+    HAL_Delay(200);
+    SIM800L_SendByte(0x1A); /* Ctrl+Z 发送 */
+    HAL_Delay(3000);
+}
+
+/* 生成位置短信并发送 */
+void ReportPosition(GPS_t *gps) {
+    char sms[128];
+    snprintf(sms, sizeof(sms),
+        "位置: %.4f%c, %.4f%c | 卫星: %d | %s",
+        gps-&gt;lat, gps-&gt;ns, gps-&gt;lng, gps-&gt;ew,
+        gps-&gt;sat, (gps-&gt;fix &gt; 0) ? "已定位" : "未定位");
+    GSM_SendSMS("13800138000", sms);
+}
+
+/* 电子围栏检查 */
+void Fence_Check(GPS_t *gps, float lat_min, float lat_max,
+                 float lng_min, float lng_max) {
+    if (gps-&gt;lat &lt; lat_min || gps-&gt;lat &gt; lat_max ||
+        gps-&gt;lng &lt; lng_min || gps-&gt;lng &gt; lng_max) {
+        GSM_SendSMS("13800138000", "警报: 超出电子围栏!");
+    }
+}
+
+/* 轨迹记录到 SD 卡 */
+void Log_Track(GPS_t *gps) {
+    FIL fil;
+    char line[64];
+    snprintf(line, sizeof(line), "%.4f,%c,%.4f,%c,%d\r\n",
+        gps-&gt;lat, gps-&gt;ns, gps-&gt;lng, gps-&gt;ew, gps-&gt;sat);
+    f_open(&amp;fil, "track.csv", FA_OPEN_APPEND | FA_WRITE);
+    f_write(&amp;fil, line, strlen(line), NULL);
+    f_close(&amp;fil);
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - NMEA 解析与 GSM 短信
+      
+      
+        代码说明：NMEA 协议解析 \$GPGGA 语句提取经纬度，
+        通过 SIM800L AT+CMGS 指令发送短信位置。SD 卡 FATFS 文件系统存储 CSV 轨迹。
+      
+      /* NMEA 解析与 GSM 短信发送 (HAL 库) */
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include "fatfs.h"
+
+/* GPS NMEA 缓冲区 */
+#define NMEA_BUF  128
+static char nmea_buf[NMEA_BUF];
+static uint8_t nmea_idx = 0;
+
+/* 解析后的坐标 */
+typedef struct {
+    float lat;     /* 纬度 */
+    float lng;     /* 经度 */
+    char  ns, ew;  /* `;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

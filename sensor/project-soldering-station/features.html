@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能特性 - STM32F103C8T6 智能电烙铁</title>
+  <meta name="description" content="PID 恒温 · OLED 显示 · 休眠待机 · 手势唤醒">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能电烙铁 / 功能特性</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0808 0%, #7f1d1d 40%, #991b1b 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128294;</div>
+      <h1>STM32F103C8T6 智能电烙铁</h1>
+      <p class="detail-hero-sub">PID 恒温 · OLED 显示 · 休眠待机 · 手势唤醒</p>
+      <div class="detail-hero-tags">
+        <span>NTC热敏</span>
+        <span>MOS管</span>
+        <span>OLED</span>
+        <span>编码器</span>
+        <span>加速度计</span>
+        <span>DC-DC</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <span class="sec-nav-item active">功能特性</span>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="features" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#9889;</span>
+        <h2>功能特性</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fc-icon">&#127777;</div>
+          <h4>PID 恒温控制</h4>
+          <p>位置式 PID 算法，100-400°C 精确控温，控温精度 ±2°C，快速回温</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128424;</div>
+          <h4>OLED 实时显示</h4>
+          <p>设定/实际温度并列显示，温度趋势曲线，PID 参数和加热状态一目了然</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128295;</div>
+          <h4>旋转编码器调温</h4>
+          <p>编码器旋转调温，支持加速调节，按下编码器切换显示模式</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128164;</div>
+          <h4>自动休眠</h4>
+          <p>MPU6050 检测静止 3 分钟自动进入休眠，温度降至 200°C 待机</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128170;</div>
+          <h4>手势唤醒</h4>
+          <p>拿起烙铁 MPU6050 检测运动，快速加热恢复设定温度，约 5 秒</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#9881;</div>
+          <h4>温度校准</h4>
+          <p>支持两点校准 (室温/恒温)，修正 NTC 和 ADC 误差，保存至 EEPROM</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

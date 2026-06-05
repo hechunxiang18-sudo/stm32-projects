@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 手持电风扇</title>
+  <meta name="description" content="3 挡调速 · AO3400 MOS 驱动 · 18650 供电 · Type-C 充电">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">手持电风扇 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127788;</div>
+      <h1>STM32F103C8T6 手持电风扇</h1>
+      <p class="detail-hero-sub">3 挡调速 · AO3400 MOS 驱动 · 18650 供电 · Type-C 充电</p>
+      <div class="detail-hero-tags">
+        <span>STM32F103C8T6</span>
+        <span>AO3400</span>
+        <span>RF-300</span>
+        <span>TP4056</span>
+        <span>PWM 10kHz</span>
+        <span>18650</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - PWM 调速与堵转保护</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>TIM2 输出 10kHz PWM 驱动 AO3400 MOS。ADC 采样电流实现堵转保护。按键切换 3 挡模式。
+      </div>
+      <pre><code>/* 手持电风扇 - PWM 调速主控程序 */
+
+#include "fan_control.h"
+#include "oled_display.h"
+#include "battery.h"
+
+/* 风扇挡位 */
+typedef enum {
+    FAN_OFF   = 0,
+    FAN_LOW   = 30,    /* 微风 30% */
+    FAN_MED   = 60,    /* 中档 60% */
+    FAN_HIGH  = 100    /* 强风 100% */
+} FanSpeed;
+
+static FanSpeed current_speed = FAN_OFF;
+static uint8_t speed_table[4] = {0, 30, 60, 100};
+static uint8_t speed_index = 0;
+
+/* 堵转电流阈值 */
+#define STALL_CURRENT_THRESH  1500  /* ADC 值，约 500mA */
+
+/* TIM2 初始化: 10kHz PWM */
+void pwm_init(void) {
+    RCC-&gt;APB1ENR |= RCC_APB1ENR_TIM2EN;
+    TIM2-&gt;PSC = 0;                    /* 72MHz */
+    TIM2-&gt;ARR = 7200 - 1;             /* 72MHz/7200 = 10kHz */
+    TIM2-&gt;CCMR1 = TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2;
+    TIM2-&gt;CCER = TIM_CCER_CC1E;
+    TIM2-&gt;BDTR = TIM_BDTR_MOE;
+    TIM2-&gt;CCR1 = 0;
+    TIM2-&gt;CR1 = TIM_CR1_CEN;
+}
+
+/* 设置风扇速度 */
+void fan_set_speed(uint8_t percent) {
+    uint32_t pulse = (uint32_t)7200 * percent / 100;
+    TIM2-&gt;CCR1 = pulse;
+    current_speed = (FanSpeed)percent;
+}
+
+/* 当前挡位文本 */
+const char* fan_speed_text(void) {
+    switch (current_speed) {
+        case FAN_OFF:  return "关机";
+        case FAN_LOW:  return "1档 微风";
+        case FAN_MED:  return "2档 中档";
+        case FAN_HIGH: return "3档 强风";
+        default:       return "未知";
+    }
+}
+
+/* 按键中断 - 模式切换 */
+void EXTI0_IRQHandler(void) {
+    if (EXTI-&gt;PR & EXTI_PR_PR0) {
+        EXTI-&gt;PR = EXTI_PR_PR0;
+        /* 切换挡位: OFF -> LOW -> MED -> HIGH -> OFF */
+        speed_index = (speed_index + 1) % 4;
+        fan_set_speed(speed_table[speed_index]);
+
+        /* 更新 OLED */
+        oled_show_speed(fan_speed_text(), speed_table[speed_index]);
+    }
+}
+
+/* 按键中断 - 开关 */
+void EXTI1_IRQHandler(void) {
+    if (EXTI-&gt;PR & EXTI_PR_PR1) {
+        EXTI-&gt;PR = EXTI_PR_PR1;
+
+        if (current_speed == FAN_OFF) {
+            /* 开机: 回到上次挡位 */
+            if (speed_index == 0) speed_index = 1;
+            fan_set_speed(speed_table[speed_index]);
+        } else {
+            /* 关机 */
+            speed_index = 0;
+            fan_set_speed(FAN_OFF);
+        }
+
+        oled_show_speed(fan_speed_text(), current_speed);
+    }
+}
+
+/* 堵转检测 (周期 200ms) */
+void stall_detection_task(void) {
+    if (current_speed == FAN_OFF) return;
+
+    uint32_t adc_val = 0;
+    for (int i = 0; i < 8; i++) {
+        ADC1-&gt;CR2 |= ADC_CR2_SWSTART;
+        while (!(ADC1-&gt;SR & ADC_SR_EOC));
+        adc_val += ADC1-&gt;DR;
+    }
+    adc_val /= 8;
+
+    if (adc_val > STALL_CURRENT_THRESH) {
+        /* 堵转保护: 立即关闭 */
+        fan_set_speed(0);
+        speed_index = 0;
+        oled_show_warning("堵转保护!");
+
+        /* 尝试 3 次恢复 */
+        for (int retry = 0; retry < 3; retry++) {
+            delay_ms(2000);
+            fan_set_speed(speed_table[1]);  /* 低速启动 */
+            delay_ms(500);
+            /* 检查电流 */
+            if (adc_read(ADC1, 1) < STALL_CURRENT_THRESH) {
+                fan_set_speed(speed_table[speed_index ? speed_index : 1]);
+                return;
+            }
+            fan_set_speed(0);
+        }
+        /* 3 次都失败，保持停机 */
+        oled_show_warning("请检查风扇");
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - PWM 调速与堵转保护
+      
+      
+        代码说明：TIM2 输出 10kHz PWM 驱动 AO3400 MOS。ADC 采样电流实现堵转保护。按键切换 3 挡模式。
+      
+      /* 手持电风扇 - PWM 调速主控程序 */
+
+#include "fan_control.h"
+#include "oled_display.h"
+#include "battery.h"
+
+/* 风扇挡位 */
+typedef enum {
+    FAN_OFF   = 0,
+    FAN_LOW   = 30,    /* 微风 30% */
+    FAN_MED   = 60,    /* 中档 60% */
+    FAN_HIGH  = 100    /* 强风 100% */
+} FanSpeed;
+
+static FanSpeed current_speed = FAN_OFF;
+static uint8_t speed_table[4] = {0, 30, 6`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

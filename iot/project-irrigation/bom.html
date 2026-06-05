@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>元器件清单 - STM32F103C8T6 智能灌溉系统</title>
+  <meta name="description" content="土壤湿度检测 · 自动灌溉 · 多路电磁阀 · 天气联动 · 远程控制">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能灌溉系统 / 元器件清单</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127793;</div>
+      <h1>STM32F103C8T6 智能灌溉系统</h1>
+      <p class="detail-hero-sub">土壤湿度检测 · 自动灌溉 · 多路电磁阀 · 天气联动 · 远程控制</p>
+      <div class="detail-hero-tags">
+        <span>土壤湿度</span>
+        <span>YL-69</span>
+        <span>电磁阀</span>
+        <span>DS18B20</span>
+        <span>ESP8266</span>
+        <span>雨水检测</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <span class="sec-nav-item active">元器件清单</span>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="bom" class="section">
+      <div class="section-header"><span class="sec-icon">&#128221;</span><h2>元器件清单 (BOM)</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ref</th><th>型号</th><th>说明</th><th>数量</th><th>参考价</th></tr></thead>
+          <tbody>
+            <tr><td>U1</td><td>STM32F103C8T6</td><td>主控 MCU</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>S1-S8</td><td>YL-69（电容式）</td><td>土壤湿度传感器</td><td>8</td><td>¥24.0</td></tr>
+            <tr><td>V1-V8</td><td>12V 电磁阀</td><td>常闭型，1/2 寸接口</td><td>8</td><td>¥80.0</td></tr>
+            <tr><td>U2</td><td>ULN2803</td><td>达林顿驱动阵列</td><td>2</td><td>¥3.0</td></tr>
+            <tr><td>S9</td><td>DS18B20</td><td>数字温度传感器（防水型）</td><td>1</td><td>¥3.0</td></tr>
+            <tr><td>S10</td><td>雨水传感器</td><td>检测是否下雨</td><td>1</td><td>¥2.5</td></tr>
+            <tr><td>F1</td><td>流量计</td><td>霍尔流量计，1-30L/min</td><td>1</td><td>¥8.0</td></tr>
+            <tr><td>U3</td><td>ESP8266-01S</td><td>WiFi 模块</td><td>1</td><td>¥7.0</td></tr>
+            <tr><td>&mdash;</td><td>12V/2A 电源</td><td>适配器供电</td><td>1</td><td>¥8.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="bom-total">全套硬件成本（含 MCU）：<strong>≈ ¥140</strong></p>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

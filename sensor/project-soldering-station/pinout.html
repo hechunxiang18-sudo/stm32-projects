@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>引脚连接 - STM32F103C8T6 智能电烙铁</title>
+  <meta name="description" content="PID 恒温 · OLED 显示 · 休眠待机 · 手势唤醒">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能电烙铁 / 引脚连接</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0808 0%, #7f1d1d 40%, #991b1b 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128294;</div>
+      <h1>STM32F103C8T6 智能电烙铁</h1>
+      <p class="detail-hero-sub">PID 恒温 · OLED 显示 · 休眠待机 · 手势唤醒</p>
+      <div class="detail-hero-tags">
+        <span>NTC热敏</span>
+        <span>MOS管</span>
+        <span>OLED</span>
+        <span>编码器</span>
+        <span>加速度计</span>
+        <span>DC-DC</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">引脚连接</span>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="pinout" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128279;</span>
+        <h2>引脚连接表</h2>
+      </div>
+      <div class="table-wrap pinout-wrap">
+        <table class="pin-table">
+          <thead>
+            <tr><th>STM32 引脚</th><th>功能</th><th>连接目标</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>PA0</td><td>ADC1_IN0</td><td>NTC 分压输出</td><td>经运放 LM358 放大</td></tr>
+            <tr><td>PA1</td><td>EXTI</td><td>编码器 A 相</td><td>编码器旋转检测</td></tr>
+            <tr><td>PA2</td><td>EXTI</td><td>编码器 B 相</td><td>编码器旋转方向</td></tr>
+            <tr><td>PA3</td><td>TIM2_CH1 (PWM)</td><td>IRFZ44N 栅极</td><td>PWM 加热控制 10kHz</td></tr>
+            <tr><td>PA4</td><td>EXTI</td><td>编码器按键</td><td>按下切换模式</td></tr>
+            <tr><td>PB6</td><td>I2C1_SCL</td><td>OLED SCL</td><td>I2C 显示</td></tr>
+            <tr><td>PB7</td><td>I2C1_SDA</td><td>OLED SDA</td><td>I2C 显示</td></tr>
+            <tr><td>PB8</td><td>I2C1_SCL (复用)</td><td>MPU6050 SCL</td><td>加速度计通信</td></tr>
+            <tr><td>PB9</td><td>I2C1_SDA (复用)</td><td>MPU6050 SDA</td><td>加速度计通信</td></tr>
+            <tr><td>PB0</td><td>GPIO Output</td><td>加热指示灯 LED</td><td>加热时亮</td></tr>
+            <tr><td>PB1</td><td>GPIO Output</td><td>休眠指示灯 LED</td><td>休眠时亮</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

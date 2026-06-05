@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能鞋柜</title>
+  <meta name="description" content="烘干除湿 · UV 杀菌 · 除臭 · 定时自动">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能鞋柜 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128095;</div>
+      <h1>STM32F103C8T6 智能鞋柜</h1>
+      <p class="detail-hero-sub">烘干除湿 · UV 杀菌 · 除臭 · 定时自动</p>
+      <div class="detail-hero-tags">
+        <span>PTC加热</span>
+        <span>UV LED</span>
+        <span>臭氧</span>
+        <span>DHT22</span>
+        <span>风扇</span>
+        <span>触摸</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - PID 恒温控制</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>采用位置式 PID 算法控制 PTC 加热器，根据 DHT22 实测温度动态调节 PWM 占空比，实现精确恒温。
+      </div>
+      <pre><code>/* 智能鞋柜 - PID 恒温控制 */
+
+#include "pid_control.h"
+#include "dht22.h"
+#include "relay.h"
+
+/* PID 参数 */
+typedef struct {
+    float kp;
+    float ki;
+    float kd;
+    float integral_limit;
+    float output_limit;
+    float setpoint;
+    float integral;
+    float prev_error;
+} PIDController;
+
+static PIDController pid;
+
+/* 初始化 PID 参数 */
+void pid_init(float setpoint) {
+    pid.kp = 2.8f;
+    pid.ki = 0.12f;
+    pid.kd = 0.35f;
+    pid.integral_limit = 50.0f;
+    pid.output_limit = 100.0f;
+    pid.setpoint = setpoint;
+    pid.integral = 0.0f;
+    pid.prev_error = 0.0f;
+}
+
+/* PID 计算 */
+float pid_compute(float measurement) {
+    float error = pid.setpoint - measurement;
+
+    /* 比例项 */
+    float p_term = pid.kp * error;
+
+    /* 积分项 (带抗积分饱和) */
+    pid.integral += error;
+    if (pid.integral > pid.integral_limit)
+        pid.integral = pid.integral_limit;
+    if (pid.integral < -pid.integral_limit)
+        pid.integral = -pid.integral_limit;
+    float i_term = pid.ki * pid.integral;
+
+    /* 微分项 */
+    float d_term = pid.kd * (error - pid.prev_error);
+    pid.prev_error = error;
+
+    /* 计算输出 */
+    float output = p_term + i_term + d_term;
+
+    /* 限幅 */
+    if (output > pid.output_limit)  output = pid.output_limit;
+    if (output < 0.0f)              output = 0.0f;
+
+    return output;
+}
+
+/* 烘干模式主任务 */
+void vTask_Drying(void *param) {
+    const float target_temp = 45.0f;   /* 目标温度 45°C */
+    const uint16_t total_minutes = 120; /* 总计 2 小时 */
+
+    pid_init(target_temp);
+    Relay_On(HEAT_RELAY);   /* 启动 PTC 电源 */
+    Fan_SetSpeed(FAN1, 80); /* 风扇中速循环 */
+
+    uint16_t elapsed = 0;
+
+    while (elapsed < total_minutes) {
+        /* 读取温湿度 */
+        DHT22_ReadData();
+        float temp = DHT22_GetTemperature();
+
+        /* PID 计算加热占空比 (通过继电器周期性开关实现) */
+        float duty = pid_compute(temp);
+        uint32_t on_time = (uint32_t)(duty * 100);   /* ms */
+        uint32_t off_time = 10000 - on_time;
+
+        /* PID 输出控制加热 */
+        if (duty > 5.0f) {
+            Relay_On(HEAT_RELAY);
+            delay_ms(on_time);
+            Relay_Off(HEAT_RELAY);
+            delay_ms(off_time);
+        } else {
+            Relay_Off(HEAT_RELAY);
+            delay_ms(10000);
+        }
+
+        /* 超温保护 */
+        if (temp > 65.0f) {
+            Relay_Off(HEAT_RELAY);
+            OLED_ShowWarning("超温保护!");
+            Buzzer_Beep(3);
+            break;
+        }
+
+        /* 门开检测 - 开门暂停加热 */
+        if (GPIO_ReadPin(GPIOB, GPIO_PIN_0) == 1) {
+            Relay_Off(HEAT_RELAY);
+            OLED_ShowMessage("门已打开");
+            while (GPIO_ReadPin(GPIOB, GPIO_PIN_0) == 1)
+                delay_ms(100);
+        }
+
+        OLED_UpdateDisplay();
+        elapsed++;
+        vTaskDelay(pdMS_TO_TICKS(60000)); /* 每分钟循环 */
+    }
+
+    /* 完成 */
+    Relay_Off(HEAT_RELAY);
+    Fan_SetSpeed(FAN1, 0);
+    OLED_ShowMessage("烘干完成");
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - PID 恒温控制
+      
+      
+        代码说明：采用位置式 PID 算法控制 PTC 加热器，根据 DHT22 实测温度动态调节 PWM 占空比，实现精确恒温。
+      
+      /* 智能鞋柜 - PID 恒温控制 */
+
+#include "pid_control.h"
+#include "dht22.h"
+#include "relay.h"
+
+/* PID 参数 */
+typedef struct {
+    float kp;
+    float ki;
+    float kd;
+    float integral_limit;
+    float output_limit;
+    float setpoint;
+    float integral;
+    float prev_error;
+} PIDController;
+
+static PIDController pid;
+
+/* 初始化 PID 参数 */
+void pid_init(float `;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

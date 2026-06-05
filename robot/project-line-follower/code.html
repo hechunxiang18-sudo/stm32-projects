@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 循迹小车</title>
+  <meta name="description" content="5 路红外循迹 · PID 纠偏 · 速度可调 · 竞赛级">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">循迹小车 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#9726;</div>
+      <h1>STM32F103C8T6 循迹小车</h1>
+      <p class="detail-hero-sub">5 路红外循迹 · PID 纠偏 · 速度可调 · 竞赛级</p>
+      <div class="detail-hero-tags">
+        <span>TCRT5000×5</span>
+        <span>TB6612</span>
+        <span>PID</span>
+        <span>编码器</span>
+        <span>OLED</span>
+        <span>蓝牙</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心软件代码</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>以下展示循迹小车的核心代码，包括 PID 循迹算法、霍尔编码器测速、速度闭环和蓝牙调参功能。
+      </div>
+      <pre><code>/* ========== 循迹小车 - PID 控制主程序 ========== */
+
+#include "pid.h"
+#include "encoder.h"
+#include "motor.h"
+#include "oled.h"
+
+/* PID 结构体 */
+typedef struct {
+    float Kp, Ki, Kd;       /* PID 系数 */
+    float integral;          /* 积分累积 */
+    float lastError;         /* 上次偏差 */
+    float output;            /* 输出值 */
+} PID_t;
+
+PID_t g_pidPos;              /* 位置 PID (循迹) */
+PID_t g_pidSpeedL, g_pidSpeedR;  /* 速度 PID */
+
+/* 循迹传感器偏差表（5路 -> 偏差权重） */
+const int8_t g_sensorWeight[32] = {
+    /* 二进制 5 位 -> 偏差值 */
+    /* 位: 左1左2中右1右2 */
+    [0b00000] = 0,     /* 全黑（跨线） */
+    [0b00100] = 0,     /* 正中 */
+    [0b01100] = 1,     /* 偏左 */
+    [0b11100] = 2,     /* 左  */
+    [0b11000] = 3,     /* 最左 */
+    [0b00110] = -1,    /* 偏右 */
+    [0b00111] = -2,    /* 右  */
+    [0b00011] = -3,    /* 最右 */
+    /* ... 更多组合 */
+};
+
+/* ===== 1. 传感器偏差计算 ===== */
+int8_t Line_GetDeviation(void) {
+    uint8_t raw = 0;
+    /* 读取 5 路传感器 */
+    if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0)) raw |= 0x01;
+    if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1)) raw |= 0x02;
+    if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_2)) raw |= 0x04;
+    if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_3)) raw |= 0x08;
+    if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_4)) raw |= 0x10;
+
+    return g_sensorWeight[raw];
+}
+
+/* ===== 2. PID 位置控制（循迹纠偏） ===== */
+float PID_Calc(PID_t *pid, float target, float current) {
+    float error = target - current;
+
+    /* 位置式 PID */
+    pid->integral += error;
+    /* 积分限幅 */
+    if (pid->integral > 100) pid->integral = 100;
+    if (pid->integral < -100) pid->integral = -100;
+
+    float derivative = error - pid->lastError;
+    pid->lastError = error;
+
+    /* 输出 = P + I + D */
+    pid->output = pid->Kp * error +
+                  pid->Ki * pid->integral +
+                  pid->Kd * derivative;
+
+    /* 输出限幅 */
+    if (pid->output > 100) pid->output = 100;
+    if (pid->output < -100) pid->output = -100;
+
+    return pid->output;
+}
+
+/* ===== 3. 编码器测速（定时器中断中调用） ===== */
+volatile int32_t g_encoderCntL = 0;
+volatile int32_t g_encoderCntR = 0;
+
+float Encoder_GetSpeed(int32_t *cnt, uint32_t dt_ms) {
+    /* 速度 = 脉冲数 / (线数 * 减速比 * 时间) * 轮周长 */
+    /* 13线编码器 * 4倍频 * 48减速比 = 2496 脉冲/转 */
+    /* 轮径 65mm -> 周长 204.2mm */
+    static int32_t lastL = 0, lastR = 0;
+
+    int32_t delta = *cnt - (*cnt == g_encoderCntL ? lastL : lastR);
+    if (*cnt == g_encoderCntL) lastL = *cnt; else lastR = *cnt;
+
+    float speed = (float)delta / 2496.0f * 0.2042f / ((float)dt_ms / 1000.0f);
+    return speed;  /* m/s */
+}
+
+/* ===== 4. 速度闭环控制 ===== */
+void Speed_Control(float targetSpeedL, float targetSpeedR) {
+    /* 读取实际速度 */
+    float speedL = Encoder_GetSpeed(&g_encoderCntL, 50);
+    float speedR = Encoder_GetSpeed(&g_encoderCntR, 50);
+
+    /* 左右轮独立 PID 速度控制 */
+    float outL = PID_Calc(&g_pidSpeedL, targetSpeedL, speedL);
+    float outR = PID_Calc(&g_pidSpeedR, targetSpeedR, speedR);
+
+    /* 输出到电机 */
+    Motor_SetSpeed(0, (int16_t)outL);
+    Motor_SetSpeed(1, (int16_t)outR);
+}
+
+/* ===== 5. 蓝牙调参 ===== */
+void Bluetooth_ParamUpdate(void) {
+    if (!BT_DataAvailable()) return;
+
+    char buf[32];
+    uint16_t len = BT_Receive((uint8_t *)buf, 32);
+
+    /* 格式: "KP=1.5" "KI=0.1" "KD=0.8" "SPD=1.0" */
+    if (sscanf(buf, "KP=%f", &g_pidPos.Kp) == 1) {
+        OLED_Printf(2, 0, "KP:%.2f", g_pidPos.Kp);
+    } else if (sscanf(buf, "KI=%f", &g_pidPos.Ki) == 1) {
+        OLED_Printf(2, 0, "KI:%.2f", g_pidPos.Ki);
+    } else if (sscanf(buf, "KD=%f", &g_pidPos.Kd) == 1) {
+        OLED_Printf(2, 0, "KD:%.2f", g_pidPos.Kd);
+    } else if (sscanf(buf, "SPD=%f", &g_targetSpeed) == 1) {
+        OLED_Printf(3, 0, "SPD:%.2f", g_targetSpeed);
+    }
+}
+
+/* ===== 6. OLED 显示更新 ===== */
+void OLED_UpdateData(int8_t deviation, float pidOut, float speed) {
+    static uint32_t lastUpdate = 0;
+    if (HAL_GetTick() - lastUpdate < 100) return;
+    lastUpdate = HAL_GetTick();
+
+    OLED_Clear();
+    OLED_Printf(0, 0, "Dev: %+3d", deviation);
+    OLED_Printf(1, 0, "PID: %+6.1f", pidOut);
+    OLED_Printf(2, 0, "SPD: %.2f m/s", speed);
+    OLED_Printf(3, 0, "Kp:%.1f Ki:%.1f", g_pidPos.Kp, g_pidPos.Ki);
+}
+
+/* ===== 7. 主循环 ===== */
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+
+    GPIO_Init();             /* TCRT5000 输入 */
+    TIM2_PWM_Init();         /* 电机 PWM */
+    TIM3_PWM_Init();
+    UART1_Init(9600);        /* HC-05 蓝牙 */
+    I2C1_Init();             /* OLED */
+    EXTI_Init();             /* 编码器中断 */
+
+    Motor_Init();
+    OLED_Init();
+
+    /* PID 初始化 */
+    g_pidPos.Kp = 1.5f;
+    g_pidPos.Ki = 0.05f;
+    g_pidPos.Kd = 0.8f;
+
+    g_pidSpeedL.Kp = 0.8f;
+    g_pidSpeedL.Ki = 0.1f;
+    g_pidSpeedL.Kd = 0.2f;
+
+    /* 同样初始化右轮速度 PID */
+    memcpy(&g_pidSpeedR, &g_pidSpeedL, sizeof(PID_t));
+
+    float targetSpeed = 0.5f;  /* 初始目标速度 0.5 m/s */
+
+    OLED_ShowString(0, 0, "循迹小车 v2.0");
+    OLED_ShowString(2, 0, "按按键启动");
+    HAL_Delay(2000);
+
+    while (1) {
+        /* 1. 传感器偏差获取 */
+        int8_t dev = Line_GetDeviation();
+
+        /* 2. PID 位置纠偏 */
+        float pidOut = PID_Calc(&g_pidPos, 0, dev);
+
+        /* 3. 计算左右轮速度 */
+        float speedL = targetSpeed + pidOut * 0.01f;
+        float speedR = targetSpeed - pidOut * 0.01f;
+
+        /* 速度限幅 */
+        if (speedL < 0) speedL = 0;
+        if (speedR < 0) speedR = 0;
+        if (speedL > 2.0f) speedL = 2.0f;
+        if (speedR > 2.0f) speedR = 2.0f;
+
+        /* 4. 速度闭环控制 */
+        Speed_Control(speedL, speedR);
+
+        /* 5. 蓝牙调参 */
+        Bluetooth_ParamUpdate();
+
+        /* 6. 更新显示 */
+        float actualSpeed = (Encoder_GetSpeed(&g_encoderCntL, 50)
+                           + Encoder_GetSpeed(&g_encoderCntR, 50)) / 2.0f;
+        OLED_UpdateData(dev, pidOut, actualSpeed);
+
+        HAL_Delay(50);  /* 20Hz 控制频率 */
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心软件代码
+      
+      
+        代码说明：以下展示循迹小车的核心代码，包括 PID 循迹算法、霍尔编码器测速、速度闭环和蓝牙调参功能。
+      
+      /* ========== 循迹小车 - PID 控制主程序 ========== */
+
+#include "pid.h"
+#include "encoder.h"
+#include "motor.h"
+#include "oled.h"
+
+/* PID 结构体 */
+typedef struct {
+    float Kp, Ki, Kd;       /* PID 系数 */
+    float integral;          /* 积分累积 */
+    float lastError;         /* 上次偏差 */
+    float output;            /* 输出值 */
+} PID_t;
+
+PID_t g_pidPos;              /* 位置 PID (循迹) */
+PI`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

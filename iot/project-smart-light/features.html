@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能特性 - STM32F103C8T6 智能灯控系统</title>
+  <meta name="description" content="PWM 调光调色 · 触摸控制 · 语音识别 · 情景模式">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能灯控系统 / 功能特性</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128161;</div>
+      <h1>STM32F103C8T6 智能灯控系统</h1>
+      <p class="detail-hero-sub">PWM 调光调色 · 触摸控制 · 语音识别 · 情景模式</p>
+      <div class="detail-hero-tags">
+        <span>PWM</span>
+        <span>RGB</span>
+        <span>触摸按键</span>
+        <span>语音模块</span>
+        <span>ESP8266</span>
+        <span>蓝牙</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <span class="sec-nav-item active">功能特性</span>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="features" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#9889;</span>
+        <h2>功能特性</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fc-icon">&#9728;</div>
+          <h4>无极调光</h4>
+          <p>PWM 驱动 MOS 管，亮度 1%-100% 无级平滑调节，无频闪</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#127777;</div>
+          <h4>色温调节</h4>
+          <p>3000K 暖光到 6500K 冷光自由切换，适应不同场景需求</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#127912;</div>
+          <h4>RGB 彩光</h4>
+          <p>独立 RGB 控制，1670 万色全彩可调，营造氛围灯光</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128074;</div>
+          <h4>触摸按键</h4>
+          <p>TTP224 四通道触摸，开关/调光/模式切换一键触达</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#127908;</div>
+          <h4>语音控制</h4>
+          <p>SU-03T 离线语音识别，"开灯""调亮""暖光模式"等指令</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128241;</div>
+          <h4>手机 App</h4>
+          <p>ESP8266 接入云端，手机远程开关、调光、切换情景模式</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

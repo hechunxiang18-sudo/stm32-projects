@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>元器件清单 - STM32F103C8T6 智能电表</title>
+  <meta name="description" content="电流/电压/功率测量 · WiFi 上传 · 过载保护 · Web 展示">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能电表 / 元器件清单</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128200;</div>
+      <h1>STM32F103C8T6 智能电表</h1>
+      <p class="detail-hero-sub">电流/电压/功率测量 · WiFi 上传 · 过载保护 · Web 展示</p>
+      <div class="detail-hero-tags">
+        <span>HLW8032</span>
+        <span>电流互感器</span>
+        <span>继电器</span>
+        <span>ESP8266</span>
+        <span>OLED</span>
+        <span>校准</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <span class="sec-nav-item active">元器件清单</span>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="bom" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128221;</span>
+        <h2>元器件清单 (BOM)</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Ref</th><th>型号</th><th>封装</th><th>说明</th><th>数量</th><th>参考价</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>U1</td><td>STM32F103C8T6</td><td>LQFP-48</td><td>主控 MCU，72MHz Cortex-M3</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>U2</td><td>HLW8032</td><td>SOP-8</td><td>高精度电能计量芯片，UART 输出</td><td>1</td><td>¥4.5</td></tr>
+            <tr><td>T1</td><td>ZMCT103C</td><td>PCB 模组</td><td>5A/5mA 电流互感器，隔离采样</td><td>1</td><td>¥3.5</td></tr>
+            <tr><td>RL1</td><td>继电器 20A</td><td>PCB 模组</td><td>250VAC/20A 继电器 + 驱动</td><td>1</td><td>¥8.0</td></tr>
+            <tr><td>U3</td><td>ESP8266-01S</td><td>PCB 模组</td><td>WiFi 模块，AT 指令/MQTT</td><td>1</td><td>¥7.0</td></tr>
+            <tr><td>U4</td><td>OLED 0.96"</td><td>PCB 模组</td><td>I2C 接口 128×64 单色显示</td><td>1</td><td>¥12.0</td></tr>
+            <tr><td>B1</td><td>有源蜂鸣器</td><td>12×9.5mm</td><td>3.3V 有源蜂鸣器</td><td>1</td><td>¥1.0</td></tr>
+            <tr><td>S1</td><td>轻触按键</td><td>6×6mm</td><td>校准/设置按键</td><td>2</td><td>¥0.4</td></tr>
+            <tr><td>&mdash;</td><td>AC-DC 电源</td><td>HLK-PM01</td><td>220V 转 5V 隔离电源模块</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>&mdash;</td><td>AMS1117-3.3</td><td>SOT-223</td><td>3.3V 稳压 LDO</td><td>1</td><td>¥0.3</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="bom-total">全套硬件成本（含 MCU）：<strong>≈ ¥47</strong></p>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

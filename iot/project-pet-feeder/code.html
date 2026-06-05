@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能宠物喂食器</title>
+  <meta name="description" content="定时定量喂食 · 语音呼唤 · 红外检测 · 远程投喂">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能宠物喂食器 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128054;</div>
+      <h1>STM32F103C8T6 智能宠物喂食器</h1>
+      <p class="detail-hero-sub">定时定量喂食 · 语音呼唤 · 红外检测 · 远程投喂</p>
+      <div class="detail-hero-tags">
+        <span>步进电机</span>
+        <span>语音模块</span>
+        <span>ESP8266</span>
+        <span>红外对射</span>
+        <span>OLED 0.96"</span>
+        <span>HX711</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - 定时喂食调度与步进电机控制</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>RTC 定时触发喂食任务，步进电机按预设步数出粮，
+        HX711 称重闭环校准确保出粮精度。ESP8266 接收远程指令即时加粮。
+      </div>
+      <pre><code>/* 喂食器主控逻辑 - 定时调度与电机控制 (HAL 库) */
+
+#include &lt;string.h&gt;
+
+/* 喂食计划 */
+typedef struct {
+    uint8_t hour;
+    uint8_t min;
+    uint16_t steps;   /* 步进电机步数，对应出粮量 */
+} MealPlan_t;
+
+#define MAX_MEALS 4
+MealPlan_t meals[MAX_MEALS];
+uint8_t meal_count = 0;
+
+/* 步进电机驱动 (28BYJ-48, ULN2003) */
+#define STEP_PORT GPIOA
+#define STEP_PINS (GPIO_PIN_3|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6)
+
+const uint8_t step_seq[8][4] = {
+    {1,0,0,0},{1,1,0,0},{0,1,0,0},{0,1,1,0},
+    {0,0,1,0},{0,0,1,1},{0,0,0,1},{1,0,0,1}
+};
+
+void Stepper_Run(int steps) {
+    for (int i = 0; i &lt; steps; i++) {
+        int idx = i & 0x07;
+        HAL_GPIO_WritePin(STEP_PORT, STEP_PINS, GPIO_PIN_RESET);
+        if (step_seq[idx][0]) HAL_GPIO_WritePin(STEP_PORT, GPIO_PIN_3, GPIO_PIN_SET);
+        if (step_seq[idx][1]) HAL_GPIO_WritePin(STEP_PORT, GPIO_PIN_4, GPIO_PIN_SET);
+        if (step_seq[idx][2]) HAL_GPIO_WritePin(STEP_PORT, GPIO_PIN_5, GPIO_PIN_SET);
+        if (step_seq[idx][3]) HAL_GPIO_WritePin(STEP_PORT, GPIO_PIN_6, GPIO_PIN_SET);
+        HAL_Delay(2);
+    }
+    /* 关闭释放 */
+    HAL_GPIO_WritePin(STEP_PORT, STEP_PINS, GPIO_PIN_RESET);
+}
+
+/* 检查是否需要喂食 */
+void Check_FeedingTime(RTC_HandleTypeDef *hrtc) {
+    RTC_TimeTypeDef time;
+    HAL_RTC_GetTime(hrtc, &amp;time, RTC_FORMAT_BIN);
+
+    for (int i = 0; i &lt; meal_count; i++) {
+        if (time.Hours == meals[i].hour &amp;&amp; time.Minutes == meals[i].min
+            &amp;&amp; time.Seconds == 0) {
+            /* 触发喂食 */
+            Stepper_Run(meals[i].steps);
+            /* 语音提示 */
+            JQ8900_Play(1);  /* 播放 "开饭啦" */
+            /* OLED 更新 */
+            OLED_ShowString(0, 3, "Feeding...");
+        }
+    }
+}
+
+/* ESP8266 远程加粮指令处理 */
+void Handle_RemoteCmd(const char *cmd) {
+    if (strstr(cmd, "+FEED")) {
+        // AT+FEED=500
+        int steps = 0;
+        sscanf(cmd, "+FEED=%d", &amp;steps);
+        if (steps &gt; 0 &amp;&amp; steps &lt;= 2000) {
+            Stepper_Run(steps);
+            JQ8900_Play(1);
+        }
+    } else if (strstr(cmd, "+SETMEAL")) {
+        // AT+SETMEAL=1,08:00,300
+        int idx, h, m, s;
+        sscanf(cmd, "+SETMEAL=%d,%d:%d,%d", &amp;idx, &amp;h, &amp;m, &amp;s);
+        if (idx &gt;= 0 &amp;&amp; idx &lt; MAX_MEALS) {
+            meals[idx].hour  = h;
+            meals[idx].min   = m;
+            meals[idx].steps = s;
+        }
+    } else if (strstr(cmd, "+CHECK")) {
+        /* 查询余粮 - 红外传感器 */
+        uint8_t level = HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_1);
+        ESP8266_Send("+FOOD=");
+        ESP8266_Send(level ? "LOW" : "OK");
+    }
+}
+
+/* JQ8900 语音播放 */
+void JQ8900_Play(uint8_t index) {
+    uint8_t cmd[] = {0x7E, 0x03, 0x41, index, 0xEF};
+    HAL_UART_Transmit(&amp;huart2, cmd, 5, 100);
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - 定时喂食调度与步进电机控制
+      
+      
+        代码说明：RTC 定时触发喂食任务，步进电机按预设步数出粮，
+        HX711 称重闭环校准确保出粮精度。ESP8266 接收远程指令即时加粮。
+      
+      /* 喂食器主控逻辑 - 定时调度与电机控制 (HAL 库) */
+
+#include &lt;string.h&gt;
+
+/* 喂食计划 */
+typedef struct {
+    uint8_t hour;
+    uint8_t min;
+    uint16_t steps;   /* 步进电机步数，对应出粮量 */
+} MealPlan_t;
+
+#define MAX_MEALS 4
+MealPlan_t meals[MAX_MEALS];
+uint8_t meal_count = 0;
+
+/* 步进电机驱动 (28BYJ-48, ULN2003) */
+#define STEP_PORT GPIOA
+#define STEP_PINS (G`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

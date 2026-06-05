@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>引脚连接 - STM32F103C8T6 智能晾衣架</title>
+  <meta name="description" content="雨感自动 · 光感升降 · 烘干风干 · 紫外线杀菌">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能晾衣架 / 引脚连接</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127748;</div>
+      <h1>STM32F103C8T6 智能晾衣架</h1>
+      <p class="detail-hero-sub">雨感自动 · 光感升降 · 烘干风干 · 紫外线杀菌</p>
+      <div class="detail-hero-tags">
+        <span>雨滴传感器</span>
+        <span>步进电机</span>
+        <span>光敏</span>
+        <span>PTC 加热</span>
+        <span>UV 灯</span>
+        <span>限位开关</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">引脚连接</span>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="pinout" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128279;</span>
+        <h2>引脚连接表</h2>
+      </div>
+      <div class="table-wrap pinout-wrap">
+        <table class="pin-table">
+          <thead>
+            <tr><th>STM32 引脚</th><th>功能</th><th>连接目标</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>PA0</td><td>ADC1_IN0</td><td>雨滴传感器输出</td><td>模拟量检测雨量</td></tr>
+            <tr><td>PA1</td><td>ADC1_IN1</td><td>光敏电阻分压</td><td>模拟量检测光照</td></tr>
+            <tr><td>PA2</td><td>USART2_TX</td><td>HC-05 RXD</td><td>蓝牙 9600 8N1</td></tr>
+            <tr><td>PA3</td><td>USART2_RX</td><td>HC-05 TXD</td><td>蓝牙 9600 8N1</td></tr>
+            <tr><td>PA4</td><td>TIM3_CH1 (PWM)</td><td>电机驱动 PWM (速度)</td><td>电机调速</td></tr>
+            <tr><td>PA5</td><td>GPIO Output</td><td>电机驱动方向</td><td>高=伸出，低=收回</td></tr>
+            <tr><td>PB0</td><td>EXTI0</td><td>上限位开关</td><td>伸出到位检测</td></tr>
+            <tr><td>PB1</td><td>EXTI1</td><td>下限位开关</td><td>收回到位检测</td></tr>
+            <tr><td>PB2</td><td>GPIO Output</td><td>UV 灯继电器</td><td>高电平开启 UV 杀菌</td></tr>
+            <tr><td>PB3</td><td>GPIO Output</td><td>PTC 继电器</td><td>高电平开启烘干</td></tr>
+            <tr><td>PA9</td><td>EXTI9 / GPIO</td><td>红外接收头</td><td>外部中断接收遥控</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

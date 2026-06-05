@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>元器件清单 - STM32F103C8T6 智能宠物喂食器</title>
+  <meta name="description" content="定时定量喂食 · 语音呼唤 · 红外检测 · 远程投喂">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能宠物喂食器 / 元器件清单</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128054;</div>
+      <h1>STM32F103C8T6 智能宠物喂食器</h1>
+      <p class="detail-hero-sub">定时定量喂食 · 语音呼唤 · 红外检测 · 远程投喂</p>
+      <div class="detail-hero-tags">
+        <span>步进电机</span>
+        <span>语音模块</span>
+        <span>ESP8266</span>
+        <span>红外对射</span>
+        <span>OLED 0.96"</span>
+        <span>HX711</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <span class="sec-nav-item active">元器件清单</span>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="bom" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128221;</span>
+        <h2>元器件清单 (BOM)</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Ref</th><th>型号</th><th>封装</th><th>说明</th><th>数量</th><th>参考价</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>U1</td><td>STM32F103C8T6</td><td>LQFP-48</td><td>主控 MCU，72MHz Cortex-M3</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>M1</td><td>28BYJ-48</td><td>步进电机</td><td>5V 四相 + ULN2003 驱动板</td><td>1</td><td>¥5.5</td></tr>
+            <tr><td>U2</td><td>JQ8900-16P</td><td>PCB 模组</td><td>语音播放模块，TF 卡存储</td><td>1</td><td>¥8.0</td></tr>
+            <tr><td>U3</td><td>ESP8266-01S</td><td>PCB 模组</td><td>WiFi 模块，AT 指令/MQTT</td><td>1</td><td>¥7.0</td></tr>
+            <tr><td>S1</td><td>红外对射</td><td>PCB 模组</td><td>红外发射+接收，检测余粮</td><td>1</td><td>¥3.0</td></tr>
+            <tr><td>U4</td><td>HX711</td><td>SOP-16</td><td>24 位 ADC，称重反馈</td><td>1</td><td>¥3.5</td></tr>
+            <tr><td>U5</td><td>OLED 0.96"</td><td>PCB 模组</td><td>I2C 128×64</td><td>1</td><td>¥12.0</td></tr>
+            <tr><td>&mdash;</td><td>按键×2</td><td>&mdash;</td><td>功能设置按键</td><td>2</td><td>¥0.3</td></tr>
+            <tr><td>&mdash;</td><td>电源模块</td><td>&mdash;</td><td>5V 2A 适配器 + 3.3V 稳压</td><td>1</td><td>¥8.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="bom-total">全套硬件成本（含 MCU）：<strong>≈ ¥52.3</strong></p>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

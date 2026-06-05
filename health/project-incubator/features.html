@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能特性 - STM32F103C8T6 智能孵化器</title>
+  <meta name="description" content="温湿度 PID 控制 · 自动翻蛋 · 照蛋灯 · 孵化记录">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能孵化器 / 功能特性</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#129514;</div>
+      <h1>STM32F103C8T6 智能孵化器</h1>
+      <p class="detail-hero-sub">温湿度 PID 控制 · 自动翻蛋 · 照蛋灯 · 孵化记录</p>
+      <div class="detail-hero-tags">
+        <span>DHT22</span>
+        <span>加热膜</span>
+        <span>步进电机</span>
+        <span>风扇</span>
+        <span>触摸按键</span>
+        <span>OLED</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <span class="sec-nav-item active">功能特性</span>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="features" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#9889;</span>
+        <h2>功能特性</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fc-icon">&#127777;</div>
+          <h4>PID 恒温</h4>
+          <p>陶瓷加热膜 50W，PID 算法控温精度 ±0.1&deg;C</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128167;</div>
+          <h4>湿度控制</h4>
+          <p>超声波雾化片加湿，40-80%RH 可调范围</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#9881;</div>
+          <h4>自动翻蛋</h4>
+          <p>28BYJ-48 步进电机，可设 1-6 小时翻蛋周期</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128161;</div>
+          <h4>照蛋灯</h4>
+          <p>高亮 LED 透光观察胚胎发育状态</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128156;</div>
+          <h4>触摸设定</h4>
+          <p>4 个触摸按键，支持参数设置与模式切换</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#9200;</div>
+          <h4>倒计时</h4>
+          <p>孵化天数倒计时，到期蜂鸣提示</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

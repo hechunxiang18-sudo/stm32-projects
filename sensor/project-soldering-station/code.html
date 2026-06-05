@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能电烙铁</title>
+  <meta name="description" content="PID 恒温 · OLED 显示 · 休眠待机 · 手势唤醒">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能电烙铁 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0808 0%, #7f1d1d 40%, #991b1b 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128294;</div>
+      <h1>STM32F103C8T6 智能电烙铁</h1>
+      <p class="detail-hero-sub">PID 恒温 · OLED 显示 · 休眠待机 · 手势唤醒</p>
+      <div class="detail-hero-tags">
+        <span>NTC热敏</span>
+        <span>MOS管</span>
+        <span>OLED</span>
+        <span>编码器</span>
+        <span>加速度计</span>
+        <span>DC-DC</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - PID 温度控制与休眠管理</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>ADC 采集 NTC 温度值，PID 计算 PWM 占空比控制 MOS 加热。MPU6050 检测静止/运动状态切换工作模式。
+      </div>
+      <pre><code>/* 智能电烙铁 - PID 温度控制与休眠管理 */
+
+#include "soldering_control.h"
+#include "ntc_temp.h"
+#include "pid.h"
+#include "mpu6050.h"
+#include "encoder.h"
+#include "oled_display.h"
+
+/* 工作状态 */
+typedef enum {
+    WORK_NORMAL,      /* 正常工作 */
+    WORK_SLEEP,       /* 休眠待机 (200°C) */
+    WORK_BOOST,       /* 快速回温中 */
+    WORK_CALIBRATE    /* 校准模式 */
+} WorkState;
+
+static WorkState state = WORK_NORMAL;
+static uint16_t set_temp = 350;   /* 设定温度 */
+static uint16_t actual_temp = 0;
+static uint32_t idle_seconds = 0;
+
+/* PID 控制器实例 */
+static PID_TypeDef pid;
+
+/* NTC 温度读取 (经运放调理) */
+uint16_t ntc_read_temperature(void) {
+    uint32_t sum = 0;
+    for (int i = 0; i < 16; i++) {
+        ADC1-&gt;CR2 |= ADC_CR2_SWSTART;   /* 启动转换 */
+        while (!(ADC1-&gt;SR & ADC_SR_EOC));
+        sum += ADC1-&gt;DR;
+    }
+    uint16_t adc_val = sum / 16;
+
+    /* NTC 分压 → 电阻 → 温度 (查表法) */
+    float ntc_r = ntc_calc_resistance(adc_val);
+    return ntc_lookup_temperature(ntc_r);
+}
+
+/* PID 初始化 */
+void pid_configure(void) {
+    PID_Init(&pid);
+    pid.Kp = 2.8f;
+    pid.Ki = 0.12f;
+    pid.Kd = 0.35f;
+    pid.IntegralLimit = 50.0f;
+    pid.OutputLimit = 100.0f;
+    PID_SetTarget(&pid, (float)set_temp);
+}
+
+/* 加热控制 */
+void heater_set_power(uint8_t percent) {
+    /* PWM 占空比控制 MOS */
+    uint32_t pulse = (uint32_t)7199 * percent / 100;
+    TIM2-&gt;CCR1 = pulse;
+}
+
+/* 主控循环 (周期 100ms) */
+void soldering_main_loop(void) {
+    actual_temp = ntc_read_temperature();
+
+    switch (state) {
+        case WORK_NORMAL:
+            /* 读取编码器设定值 */
+            int16_t enc_delta = encoder_get_delta();
+            if (enc_delta != 0) {
+                int16_t new_temp = set_temp + enc_delta * 5;
+                if (new_temp < 100)  new_temp = 100;
+                if (new_temp > 400)  new_temp = 400;
+                set_temp = (uint16_t)new_temp;
+                PID_SetTarget(&pid, (float)set_temp);
+            }
+
+            /* PID 计算并输出 */
+            float pid_out = PID_Compute(&pid, (float)actual_temp);
+            heater_set_power((uint8_t)pid_out);
+            idle_seconds = 0;
+            break;
+
+        case WORK_SLEEP:
+            /* 休眠保持 200°C */
+            if (actual_temp < 200) {
+                heater_set_power(20);   /* 低功率维持 */
+            } else {
+                heater_set_power(0);
+            }
+            break;
+
+        case WORK_BOOST:
+            /* 快速回温: 全功率加热 */
+            heater_set_power(100);
+            if (actual_temp >= set_temp - 5) {
+                state = WORK_NORMAL;
+            }
+            break;
+    }
+
+    /* 更新 OLED */
+    oled_display_temp(set_temp, actual_temp, state);
+}
+
+/* MPU6050 手势检测任务 (周期 500ms) */
+void vTask_GestureDetect(void *param) {
+    int16_t ax, ay, az;
+    float threshold = 0.5f;  /* 运动阈值 (g) */
+
+    for (;;) {
+        MPU6050_ReadAccel(&ax, &ay, &az);
+
+        float fx = ax / 16384.0f;
+        float fy = ay / 16384.0f;
+        float fz = az / 16384.0f;
+
+        float motion = sqrtf(fx*fx + fy*fy + fz*fz) - 1.0f;
+        if (motion < 0) motion = -motion;
+
+        if (motion > threshold) {
+            /* 检测到运动 */
+            idle_seconds = 0;
+            if (state == WORK_SLEEP) {
+                state = WORK_BOOST;   /* 唤醒 */
+            }
+        } else {
+            if (state == WORK_NORMAL) {
+                idle_seconds++;
+                if (idle_seconds >= 360) {   /* 3 分钟 */
+                    state = WORK_SLEEP;
+                }
+            }
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - PID 温度控制与休眠管理
+      
+      
+        代码说明：ADC 采集 NTC 温度值，PID 计算 PWM 占空比控制 MOS 加热。MPU6050 检测静止/运动状态切换工作模式。
+      
+      /* 智能电烙铁 - PID 温度控制与休眠管理 */
+
+#include "soldering_control.h"
+#include "ntc_temp.h"
+#include "pid.h"
+#include "mpu6050.h"
+#include "encoder.h"
+#include "oled_display.h"
+
+/* 工作状态 */
+typedef enum {
+    WORK_NORMAL,      /* 正常工作 */
+    WORK_SLEEP,       /* 休眠待机 (200°C) */
+    WORK_BOOST,       /* 快速回温中 */
+    WORK_CALIBRATE    /* 校准模式 */
+} Work`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

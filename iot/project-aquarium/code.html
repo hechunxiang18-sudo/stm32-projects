@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能鱼缸系统</title>
+  <meta name="description" content="恒温控制 · 自动喂食 · 水质检测 · 灯光模拟 · 远程监控">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能鱼缸 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128031;</div>
+      <h1>STM32F103C8T6 智能鱼缸系统</h1>
+      <p class="detail-hero-sub">恒温控制 · 自动喂食 · 水质检测 · 灯光模拟 · 远程监控</p>
+      <div class="detail-hero-tags">
+        <span>DS18B20</span>
+        <span>PH 传感器</span>
+        <span>步进电机</span>
+        <span>RGB LED</span>
+        <span>ESP8266</span>
+        <span>水泵</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header"><span class="sec-icon">&#128187;</span><h2>核心固件代码</h2></div>
+      <pre><code>/* 智能鱼缸 PID 恒温控制 */
+
+static PID_t temp_pid = {
+    .kp = 15.0f,
+    .ki = 0.5f,
+    .kd = 2.0f,
+};
+static float target_temp = 26.0f;  // 目标温度 26°C
+
+void Aquarium_TempControl(void) {
+    /* 读取水温（双传感器平均） */
+    float t1 = DS18B20_Read(0);
+    float t2 = DS18B20_Read(1);
+    float current = (t1 + t2) / 2.0f;
+
+    /* PID 计算 */
+    float error = target_temp - current;
+    temp_pid.integral += error * 0.5f;  // 每 0.5s 执行一次
+    temp_pid.integral = CLAMP(temp_pid.integral, -50, 50);
+
+    float derivative = (error - temp_pid.prev_error) / 0.5f;
+    temp_pid.prev_error = error;
+
+    float output = temp_pid.kp * error
+                 + temp_pid.ki * temp_pid.integral
+                 + temp_pid.kd * derivative;
+
+    /* 输出控制（死区 ±0.3°C）*/
+    if (fabs(error) &lt; 0.3f) {
+        Relay_Off(HEATER_RELAY);
+        Relay_Off(COOLER_RELAY);
+        return;
+    }
+
+    if (output > 0) {
+        /* 需要加热 - PWM 控制加热棒功率 */
+        uint16_t duty = (uint16_t)(output * 100);
+        TIM_SetCompare(TIM2, CLAMP(duty, 0, 100));
+        Relay_Off(COOLER_RELAY);
+    } else {
+        /* 需要制冷 - 开启半导体制冷 */
+        Relay_On(COOLER_RELAY);
+        Relay_Off(HEATER_RELAY);
+    }
+}
+
+/* 灯光日出日落模拟 */
+void Aquarium_LightCycle(void) {
+    RTC_TimeTypeDef now;
+    HAL_RTC_GetTime(&amp;hrtc, &amp;now, RTC_FORMAT_BIN);
+
+    uint8_t h = now.Hours, m = now.Minutes;
+    uint8_t minutes = h * 60 + m;
+
+    /* 6:00 日出渐变 → 12:00 全亮 → 18:00 日落 → 22:00 关闭 */
+    if (minutes >= 360 &amp;&amp; minutes &lt; 720) {
+        uint16_t t = (minutes - 360) * 255 / 360;  // 线性渐变
+        LED_SetBrightness(t);
+    } else if (minutes >= 1080 &amp;&amp; minutes &lt; 1320) {
+        uint16_t t = 255 - (minutes - 1080) * 255 / 240;
+        LED_SetBrightness(t);
+    } else if (minutes >= 1320 || minutes &lt; 360) {
+        LED_SetBrightness(0);  // 夜晚关灯
+    } else {
+        LED_SetBrightness(255);  // 白天全亮
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      &#128187;核心固件代码
+      /* 智能鱼缸 PID 恒温控制 */
+
+static PID_t temp_pid = {
+    .kp = 15.0f,
+    .ki = 0.5f,
+    .kd = 2.0f,
+};
+static float target_temp = 26.0f;  // 目标温度 26°C
+
+void Aquarium_TempControl(void) {
+    /* 读取水温（双传感器平均） */
+    float t1 = DS18B20_Read(0);
+    float t2 = DS18B20_Read(1);
+    float current = (t1 + t2) / 2.0f;
+
+    /* PID 计算 */
+    float error = target_temp - current;
+    temp_pid.integral += error * 0.5f;  // 每 0.5s 执行一次
+    temp_pid.integral = CLAMP(temp_pid.integral, -`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

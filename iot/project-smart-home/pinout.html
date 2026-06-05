@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>引脚连接 - STM32F103C8T6 智能家居系统</title>
+  <meta name="description" content="多传感器采集 · 家电远程控制 · MQTT 云端联动 · 红外学习遥控">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能家居系统 / 引脚连接</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127968;</div>
+      <h1>STM32F103C8T6 智能家居系统</h1>
+      <p class="detail-hero-sub">多传感器采集 · 家电远程控制 · MQTT 云端联动 · 红外学习遥控</p>
+      <div class="detail-hero-tags">
+        <span>DHT11</span>
+        <span>BH1750</span>
+        <span>ESP8266</span>
+        <span>OLED 0.96"</span>
+        <span>4路继电器</span>
+        <span>FreeRTOS</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">引脚连接</span>
+              <a href="schematic.html" class="sec-nav-item item-download">电路原理图 &#128229;</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="pinout" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128279;</span>
+        <h2>引脚连接表</h2>
+      </div>
+      <div class="table-wrap pinout-wrap">
+        <table class="pin-table">
+          <thead>
+            <tr><th>STM32 引脚</th><th>功能</th><th>连接目标</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>PB0</td><td>GPIO Input</td><td>DHT11 Data</td><td>单总线协议，上拉 4.7k&Omega;</td></tr>
+            <tr><td>PB6</td><td>I2C1_SCL</td><td>BH1750 + OLED SCL</td><td>共用 I2C 总线</td></tr>
+            <tr><td>PB7</td><td>I2C1_SDA</td><td>BH1750 + OLED SDA</td><td>共用 I2C 总线</td></tr>
+            <tr><td>PC0-PC3</td><td>GPIO Output</td><td>继电器模块 IN1-IN4</td><td>高电平有效（需三极管）</td></tr>
+            <tr><td>PA2</td><td>USART2_TX</td><td>ESP8266 RXD</td><td>115200 8N1</td></tr>
+            <tr><td>PA3</td><td>USART2_RX</td><td>ESP8266 TXD</td><td>115200 8N1</td></tr>
+            <tr><td>PB1</td><td>EXTI1</td><td>VS1838B OUT</td><td>红外接收，下降沿触发</td></tr>
+            <tr><td>PB2</td><td>TIM3_CH3 (PWM)</td><td>红外发射管</td><td>38kHz 载波调制</td></tr>
+            <tr><td>PA0</td><td>EXTI0</td><td>按键 1（模式切换）</td><td>外部中断，下降沿</td></tr>
+            <tr><td>PA1</td><td>EXTI1</td><td>按键 2（确认/开关）</td><td>外部中断，下降沿</td></tr>
+            <tr><td>PA9</td><td>USART1_TX</td><td>预留调试串口</td><td>可选</td></tr>
+            <tr><td>PA10</td><td>USART1_RX</td><td>预留调试串口</td><td>可选</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

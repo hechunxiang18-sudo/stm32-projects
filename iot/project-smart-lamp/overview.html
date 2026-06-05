@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目概述 - STM32F103C8T6 智能台灯</title>
+  <meta name="description" content="无级调光 · 色温调节 · 触摸开关 · 护眼模式">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能台灯 / 项目概述</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128161;</div>
+      <h1>STM32F103C8T6 智能台灯</h1>
+      <p class="detail-hero-sub">无级调光 · 色温调节 · 触摸开关 · 护眼模式</p>
+      <div class="detail-hero-tags">
+        <span>PWM</span>
+        <span>RGBW</span>
+        <span>触摸</span>
+        <span>TTP223</span>
+        <span>光敏</span>
+        <span>OLED</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <span class="sec-nav-item active">项目概述</span>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="overview" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128161;</span>
+        <h2>项目概述</h2>
+      </div>
+      <div class="project-intro">
+        <div class="project-intro-text">
+          <p>
+            基于 STM32F103C8T6 的智能台灯，通过四路 MOS 管 PWM 驱动分别控制白光 COB 灯珠的亮度、色温和 RGB 氛围灯。
+            支持 10%-100% 无级亮度调节、3000K-6500K 宽域色温调节，内置光敏电阻实现环境光自适应调光。
+          </p>
+          <p>
+            搭载 TTP223 电容触摸模块实现三种触摸控制模式，0.96 寸 OLED 屏实时显示状态信息，
+            具备 45 分钟休息提醒护眼功能，是一款功能全面的桌面智能照明设备。
+          </p>
+        </div>
+        <div class="project-intro-icon">&#128161;</div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

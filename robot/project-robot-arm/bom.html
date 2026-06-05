@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>元器件清单 - STM32F103C8T6 5轴机械臂</title>
+  <meta name="description" content="5 自由度舵机 · 逆运动学 · 示教编程 · 蓝牙遥控">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">5轴机械臂 / 元器件清单</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#129302;</div>
+      <h1>STM32F103C8T6 5轴机械臂</h1>
+      <p class="detail-hero-sub">5 自由度舵机 · 逆运动学 · 示教编程 · 蓝牙遥控</p>
+      <div class="detail-hero-tags">
+        <span>MG996R×5</span>
+        <span>PCA9685</span>
+        <span>MPU6050</span>
+        <span>HC-05</span>
+        <span>PS2手柄</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <span class="sec-nav-item active">元器件清单</span>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="bom" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128221;</span>
+        <h2>元器件清单 (BOM)</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Ref</th><th>型号</th><th>封装</th><th>说明</th><th>数量</th><th>参考价</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>U1</td><td>STM32F103C8T6</td><td>LQFP-48</td><td>主控 MCU，72MHz Cortex-M3</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>U2</td><td>PCA9685</td><td>TSSOP-28</td><td>16 路 12bit PWM 舵机驱动板</td><td>1</td><td>¥8.0</td></tr>
+            <tr><td>U3</td><td>MPU6050</td><td>QFN-24</td><td>六轴陀螺仪 + 加速度计</td><td>1</td><td>¥6.0</td></tr>
+            <tr><td>M1-M5</td><td>MG996R</td><td>舵机</td><td>数字舵机，扭矩 10kg·cm</td><td>5</td><td>¥75.0</td></tr>
+            <tr><td>U4</td><td>HC-05</td><td>PCB 模组</td><td>蓝牙 2.0 串口通信模组</td><td>1</td><td>¥12.0</td></tr>
+            <tr><td>U5</td><td>PS2 接收器</td><td>PCB 模组</td><td>PS2 手柄无线接收器</td><td>1</td><td>¥8.0</td></tr>
+            <tr><td>&mdash;</td><td>3D打印结构件</td><td>PLA</td><td>机械臂机身、底座、夹爪</td><td>1套</td><td>¥50.0</td></tr>
+            <tr><td>&mdash;</td><td>7.4V 锂电池</td><td>2S</td><td>7.4V 2200mAh 锂电 + 保护板</td><td>1</td><td>¥30.0</td></tr>
+            <tr><td>&mdash;</td><td>降压模块</td><td>PCB</td><td>LM2596 降压模块 5V/3.3V 输出</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>&mdash;</td><td>轴承 + 螺丝</td><td>&mdash;</td><td>6900 轴承 × 3 + 不锈钢螺丝套装</td><td>1套</td><td>¥6.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="bom-total">全套硬件成本（含 MCU）：<strong>≈ ¥205</strong></p>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

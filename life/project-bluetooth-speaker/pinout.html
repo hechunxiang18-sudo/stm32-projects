@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>引脚连接 - STM32F103C8T6 蓝牙音箱</title>
+  <meta name="description" content="蓝牙音频解码 · 数字功放 · RGB 灯效 · 7 段均衡器">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">蓝牙音箱 / 引脚连接</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128266;</div>
+      <h1>STM32F103C8T6 蓝牙音箱</h1>
+      <p class="detail-hero-sub">蓝牙音频解码 · 数字功放 · RGB 灯效 · 7 段均衡器</p>
+      <div class="detail-hero-tags">
+        <span>AC6925</span>
+        <span>TPA3116D2</span>
+        <span>RGB LED</span>
+        <span>TTP224</span>
+        <span>锂电池 11.1V</span>
+        <span>I2S</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">引脚连接</span>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="pinout" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128279;</span>
+        <h2>引脚连接表</h2>
+      </div>
+      <div class="table-wrap pinout-wrap">
+        <table class="pin-table">
+          <thead>
+            <tr><th>STM32 引脚</th><th>功能</th><th>连接目标</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>PA0</td><td>I2S2_WS</td><td>TPA3116 LRCLK</td><td>I2S 字选择</td></tr>
+            <tr><td>PA1</td><td>I2S2_CK</td><td>TPA3116 BCLK</td><td>I2S 位时钟</td></tr>
+            <tr><td>PA2</td><td>USART2_TX</td><td>AC6925 RXD</td><td>蓝牙模块串口</td></tr>
+            <tr><td>PA3</td><td>USART2_RX</td><td>AC6925 TXD</td><td>蓝牙模块串口</td></tr>
+            <tr><td>PB0</td><td>TIM3_CH3 (PWM)</td><td>RGB LED R</td><td>红色通道</td></tr>
+            <tr><td>PB1</td><td>TIM3_CH4 (PWM)</td><td>RGB LED G</td><td>绿色通道</td></tr>
+            <tr><td>PB2</td><td>TIM4_CH1 (PWM)</td><td>RGB LED B</td><td>蓝色通道</td></tr>
+            <tr><td>PC0-PC3</td><td>GPIO Input</td><td>TTP224 OUT1-4</td><td>触摸按键输入</td></tr>
+            <tr><td>PA6</td><td>GPIO Output</td><td>EQ 控制 1</td><td>7 段 EQ 选通</td></tr>
+            <tr><td>PA7</td><td>GPIO Output</td><td>EQ 控制 2</td><td>7 段 EQ 选通</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

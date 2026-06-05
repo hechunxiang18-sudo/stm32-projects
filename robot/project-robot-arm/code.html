@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 5轴机械臂</title>
+  <meta name="description" content="5 自由度舵机 · 逆运动学 · 示教编程 · 蓝牙遥控">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">5轴机械臂 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#129302;</div>
+      <h1>STM32F103C8T6 5轴机械臂</h1>
+      <p class="detail-hero-sub">5 自由度舵机 · 逆运动学 · 示教编程 · 蓝牙遥控</p>
+      <div class="detail-hero-tags">
+        <span>MG996R×5</span>
+        <span>PCA9685</span>
+        <span>MPU6050</span>
+        <span>HC-05</span>
+        <span>PS2手柄</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - 逆运动学解算</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>以下为机械臂逆运动学解算核心函数，输入末端执行器坐标 (x, y, z)，输出五个舵机的目标角度，实现空间点到点的平滑运动。
+      </div>
+      <pre><code>/* 5轴机械臂逆运动学解算 */
+
+/* 机械臂 D-H 参数（单位：mm）*/
+#define L1  60  /* 底座到肩部高度 */
+#define L2  80  /* 大臂长度 */
+#define L3  70  /* 小臂长度 */
+#define L4  40  /* 腕部偏距 */
+
+/* 舵机角度结构体 */
+typedef struct {
+    float base;    /* 底盘旋转角度 0-180 */
+    float shoulder; /* 肩部角度 0-180 */
+    float elbow;    /* 肘部角度 0-180 */
+    float wrist;    /* 腕部角度 0-180 */
+    float gripper;  /* 夹爪开合 0-180 */
+} ServoAngles_t;
+
+/* 逆运动学解算：输入末端坐标 (x,y,z)，输出各关节角度 */
+ServoAngles_t IK_Solve(float x, float y, float z) {
+    ServoAngles_t angles = {0};
+
+    /* 1. 底盘旋转角 = atan2(y, x) */
+    angles.base = atan2f(y, x) * 180.0f / M_PI;
+    if (angles.base &lt; 0) angles.base += 180;
+
+    /* 2. 计算在肩部坐标系中的位置 */
+    float r = sqrtf(x*x + y*y);       /* 水平距离 */
+    float h = z - L1;                 /* 垂直高度（减去底座）*/
+
+    /* 3. 余弦定理求解肩部和肘部角度 */
+    float d = sqrtf(r*r + h*h);       /* 肩部到腕部距离 */
+    float cos_elbow = (L2*L2 + L3*L3 - d*d) / (2*L2*L3);
+    float cos_shoulder = (L2*L2 + d*d - L3*L3) / (2*L2*d);
+
+    /* 边界钳位 */
+    if (cos_elbow &gt; 1.0f) cos_elbow = 1.0f;
+    if (cos_elbow &lt; -1.0f) cos_elbow = -1.0f;
+    if (cos_shoulder &gt; 1.0f) cos_shoulder = 1.0f;
+    if (cos_shoulder &lt; -1.0f) cos_shoulder = -1.0f;
+
+    /* 肘部角度（锐角模式）*/
+    angles.elbow = acosf(cos_elbow) * 180.0f / M_PI;
+
+    /* 肩部角度（含基座偏置补偿）*/
+    float alpha = atan2f(h, r);
+    float beta = acosf(cos_shoulder);
+    angles.shoulder = (alpha + beta) * 180.0f / M_PI;
+
+    /* 4. 腕部角度保持夹爪水平 */
+    angles.wrist = 180.0f - angles.shoulder - angles.elbow;
+    if (angles.wrist &lt; 0) angles.wrist = 0;
+
+    /* 5. 夹爪默认闭合 */
+    angles.gripper = 90.0f;
+
+    return angles;
+}
+
+/* 空间直线插补：从起点到终点平滑移动 */
+void IK_MoveLinear(float x1, float y1, float z1,
+                   float x2, float y2, float z2, int steps) {
+    for (int i = 0; i &lt;= steps; i++) {
+        float t = (float)i / steps;
+        float x = x1 + (x2 - x1) * t;
+        float y = y1 + (y2 - y1) * t;
+        float z = z1 + (z2 - z1) * t;
+        ServoAngles_t ang = IK_Solve(x, y, z);
+        PCA9685_SetServoAll(ang);
+        delay(20);  /* 20ms 间隔 */
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - 逆运动学解算
+      
+      
+        代码说明：以下为机械臂逆运动学解算核心函数，输入末端执行器坐标 (x, y, z)，输出五个舵机的目标角度，实现空间点到点的平滑运动。
+      
+      /* 5轴机械臂逆运动学解算 */
+
+/* 机械臂 D-H 参数（单位：mm）*/
+#define L1  60  /* 底座到肩部高度 */
+#define L2  80  /* 大臂长度 */
+#define L3  70  /* 小臂长度 */
+#define L4  40  /* 腕部偏距 */
+
+/* 舵机角度结构体 */
+typedef struct {
+    float base;    /* 底盘旋转角度 0-180 */
+    float shoulder; /* 肩部角度 0-180 */
+    float elbow;    /* 肘部角度 0-180 */
+    float wrist;    /* 腕部角度 0-180 */
+    float gripp`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

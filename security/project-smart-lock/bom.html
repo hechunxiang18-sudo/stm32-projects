@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>元器件清单 - STM32F103C8T6 智能门锁系统</title>
+  <meta name="description" content="指纹识别 · 密码键盘 · RFID 刷卡 · 蓝牙远程 · 安全防护">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能门锁系统 / 元器件清单</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #0a3d2e 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128274;</div>
+      <h1>STM32F103C8T6 智能门锁系统</h1>
+      <p class="detail-hero-sub">指纹识别 · 密码键盘 · RFID 刷卡 · 蓝牙远程 · 安全防护</p>
+      <div class="detail-hero-tags">
+        <span>AS608</span>
+        <span>RC522</span>
+        <span>4×4 键盘</span>
+        <span>电磁锁</span>
+        <span>HC-05</span>
+        <span>DS3231 RTC</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <span class="sec-nav-item active">元器件清单</span>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="bom" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128221;</span>
+        <h2>元器件清单 (BOM)</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Ref</th><th>型号</th><th>封装</th><th>说明</th><th>数量</th><th>参考价</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>U1</td><td>STM32F103C8T6</td><td>LQFP-48</td><td>主控 MCU</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>F1</td><td>AS608</td><td>PCB 模组</td><td>光学指纹模块，UART 接口</td><td>1</td><td>¥25.0</td></tr>
+            <tr><td>F2</td><td>RC522</td><td>PCB 模组</td><td>RFID 读写模块，SPI 接口</td><td>1</td><td>¥4.5</td></tr>
+            <tr><td>K1</td><td>4×4 矩阵键盘</td><td>PCB 模组</td><td>16 键薄膜键盘</td><td>1</td><td>¥3.5</td></tr>
+            <tr><td>D1</td><td>OLED 0.96"</td><td>PCB 模组</td><td>I2C 显示模块</td><td>1</td><td>¥12.0</td></tr>
+            <tr><td>B1</td><td>有源蜂鸣器</td><td>9×5.5mm</td><td>报警提示音</td><td>1</td><td>¥0.5</td></tr>
+            <tr><td>L1</td><td>电磁锁</td><td>12V 型</td><td>12V 电磁锁，拉力 180kg</td><td>1</td><td>¥18.0</td></tr>
+            <tr><td>Q1</td><td>IRLZ44N</td><td>TO-220</td><td>N-MOSFET，驱动电磁锁</td><td>1</td><td>¥1.5</td></tr>
+            <tr><td>U2</td><td>HC-05</td><td>PCB 模组</td><td>蓝牙 2.0 模块，远程开锁</td><td>1</td><td>¥8.0</td></tr>
+            <tr><td>U3</td><td>DS3231</td><td>PCB 模组</td><td>高精度 RTC 模块，日志时间戳</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>&mdash;</td><td>电池盒</td><td>4×AA</td><td>4 节 5 号电池供电 (6V)</td><td>1</td><td>¥2.0</td></tr>
+            <tr><td>&mdash;</td><td>AMS1117-3.3</td><td>SOT-223</td><td>3.3V 稳压</td><td>1</td><td>¥0.3</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="bom-total">全套硬件成本（含 MCU）：<strong>≈ ¥85</strong></p>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

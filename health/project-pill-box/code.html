@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能药盒</title>
+  <meta name="description" content="定时语音提醒 · 自动出药 · 缺药检测 · 远程管理 · 用药记录">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能药盒 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128138;</div>
+      <h1>STM32F103C8T6 智能药盒</h1>
+      <p class="detail-hero-sub">定时语音提醒 · 自动出药 · 缺药检测 · 远程管理 · 用药记录</p>
+      <div class="detail-hero-tags">
+        <span>DS3231</span>
+        <span>语音播报</span>
+        <span>步进电机</span>
+        <span>ESP8266</span>
+        <span>OLED</span>
+        <span>红外检测</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header"><span class="sec-icon">&#128187;</span><h2>核心固件代码</h2></div>
+      <pre><code>/* 智能药盒主控逻辑 */
+
+typedef struct {
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t slot_id;     // 药仓号 (0-5)
+    uint8_t enabled;
+} Alarm_t;
+
+Alarm_t alarms[6];
+
+/* RTC 闹钟中断回调 */
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc) {
+    /* 获取当前时间，匹配闹钟 */
+    RTC_TimeTypeDef now;
+    HAL_RTC_GetTime(hrtc, &amp;now, RTC_FORMAT_BIN);
+
+    for (int i = 0; i &lt; 6; i++) {
+        if (!alarms[i].enabled) continue;
+        if (alarms[i].hour == now.Hours &amp;&amp; alarms[i].minute == now.Minutes) {
+            PillBox_Execute(i);
+            break;
+        }
+    }
+}
+
+void PillBox_Execute(uint8_t alarm_idx) {
+    OLED_ShowAlarm(alarm_idx);
+
+    // 1. 语音播报
+    JQ8900_PlayTrack(alarm_idx);
+    delay_ms(200);
+
+    // 2. 驱动步进电机旋转至对应药仓
+    Stepper_RotateToSlot(alarms[alarm_idx].slot_id);
+
+    // 3. 等待取药（最多 5 分钟）
+    uint32_t start = HAL_GetTick();
+    uint8_t taken = 0;
+    while ((HAL_GetTick() - start) &lt; 300000) {  // 5min
+        if (IR_Sensor_Check()) {                  // 手伸入检测
+            taken = 1;
+            break;
+        }
+        delay_ms(50);
+    }
+
+    // 4. 取药结果处理
+    if (taken) {
+        ESP8266_SendMsg("服药提醒", "已按时服药");
+        OLED_ShowIcon(ICON_OK);
+    } else {
+        ESP8266_SendMsg("服药提醒", "未取药！请关注！");
+        OLED_ShowIcon(ICON_WARN);
+        Buzzer_Alert();  // 持续蜂鸣
+    }
+
+    Stepper_ReturnHome();  // 药仓归位
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      &#128187;核心固件代码
+      /* 智能药盒主控逻辑 */
+
+typedef struct {
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t slot_id;     // 药仓号 (0-5)
+    uint8_t enabled;
+} Alarm_t;
+
+Alarm_t alarms[6];
+
+/* RTC 闹钟中断回调 */
+void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc) {
+    /* 获取当前时间，匹配闹钟 */
+    RTC_TimeTypeDef now;
+    HAL_RTC_GetTime(hrtc, &amp;now, RTC_FORMAT_BIN);
+
+    for (int i = 0; i &lt; 6; i++) {
+        if (!alarms[i].enabled) continue;
+        if (alarms[i].hour == now.Hours &amp;&amp; a`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

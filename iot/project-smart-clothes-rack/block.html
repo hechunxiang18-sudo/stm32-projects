@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统框图 - STM32F103C8T6 智能晾衣架</title>
+  <meta name="description" content="雨感自动 · 光感升降 · 烘干风干 · 紫外线杀菌">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能晾衣架 / 系统框图</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127748;</div>
+      <h1>STM32F103C8T6 智能晾衣架</h1>
+      <p class="detail-hero-sub">雨感自动 · 光感升降 · 烘干风干 · 紫外线杀菌</p>
+      <div class="detail-hero-tags">
+        <span>雨滴传感器</span>
+        <span>步进电机</span>
+        <span>光敏</span>
+        <span>PTC 加热</span>
+        <span>UV 灯</span>
+        <span>限位开关</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <span class="sec-nav-item active">系统框图</span>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="block" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128200;</span>
+        <h2>系统框图</h2>
+      </div>
+      <div class="block-diagram">
+        <div class="bd-title">智能晾衣架系统架构</div>
+        <div class="bd-flow">
+          <div class="bd-node">
+            <div class="bd-icon">&#127783;</div>
+            <div class="bd-label">雨滴传感器</div>
+            <small>雨水检测</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#9728;</div>
+            <div class="bd-label">光敏电阻</div>
+            <small>光照检测</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node primary">
+            <div class="bd-icon">&#9726;</div>
+            <div class="bd-label">STM32F103</div>
+            <small>主控 MCU</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#9881;</div>
+            <div class="bd-label">直流电机</div>
+            <small>升降驱动</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#127748;</div>
+            <div class="bd-label">晾衣架</div>
+            <small>升降执行</small>
+          </div>
+        </div>
+        <div class="bd-flow" style="margin-top:10px;">
+          <div class="bd-node">
+            <div class="bd-icon">&#128264;</div>
+            <div class="bd-label">HC-05</div>
+            <small>蓝牙遥控</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node primary">
+            <div class="bd-icon">&#9726;</div>
+            <div class="bd-label">STM32F103</div>
+            <small>逻辑控制</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#9898;</div>
+            <div class="bd-label">UV + PTC</div>
+            <small>杀菌烘干</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#128241;</div>
+            <div class="bd-label">手机 App</div>
+            <small>远程控制</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

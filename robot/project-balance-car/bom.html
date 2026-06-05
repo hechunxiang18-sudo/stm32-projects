@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>元器件清单 - STM32F103C8T6 两轮平衡小车</title>
+  <meta name="description" content="MPU6050 姿态自平衡 · 串级 PID · 蓝牙遥控 · 编码器测速">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">平衡小车 / 元器件清单</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128663;</div>
+      <h1>STM32F103C8T6 两轮平衡小车</h1>
+      <p class="detail-hero-sub">MPU6050 姿态自平衡 · 串级 PID · 蓝牙遥控 · 编码器测速</p>
+      <div class="detail-hero-tags">
+        <span>MPU6050</span>
+        <span>TB6612</span>
+        <span>霍尔编码器</span>
+        <span>HC-05</span>
+        <span>PID</span>
+        <span>OLED</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <span class="sec-nav-item active">元器件清单</span>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="bom" class="section">
+      <div class="section-header"><span class="sec-icon">&#128221;</span><h2>元器件清单 (BOM)</h2></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Ref</th><th>型号</th><th>说明</th><th>数量</th><th>参考价</th></tr></thead>
+          <tbody>
+            <tr><td>U1</td><td>STM32F103C8T6</td><td>主控 MCU</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>U2</td><td>MPU6050</td><td>六轴姿态传感器</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>U3</td><td>TB6612FNG</td><td>双 H 桥电机驱动</td><td>1</td><td>¥4.0</td></tr>
+            <tr><td>M1-M2</td><td>直流减速电机</td><td>1:30 减速比 + 霍尔编码器</td><td>2</td><td>¥20.0</td></tr>
+            <tr><td>W1-W2</td><td>65mm 轮胎</td><td>橡胶轮 + 联轴器</td><td>2</td><td>¥6.0</td></tr>
+            <tr><td>U4</td><td>HC-05</td><td>蓝牙模块</td><td>1</td><td>¥8.0</td></tr>
+            <tr><td>U5</td><td>OLED 0.96"</td><td>显示角度/PID 参数</td><td>1</td><td>¥12.0</td></tr>
+            <tr><td>&mdash;</td><td>亚克力底盘</td><td>激光切割车架</td><td>1</td><td>¥8.0</td></tr>
+            <tr><td>&mdash;</td><td>7.4V 锂电池</td><td>2S 1200mAh</td><td>1</td><td>¥20.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="bom-total">全套硬件成本（含 MCU）：<strong>≈ ¥88</strong></p>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

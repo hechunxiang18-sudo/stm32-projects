@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>引脚连接 - STM32F103C8T6 5轴机械臂</title>
+  <meta name="description" content="5 自由度舵机 · 逆运动学 · 示教编程 · 蓝牙遥控">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">5轴机械臂 / 引脚连接</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#129302;</div>
+      <h1>STM32F103C8T6 5轴机械臂</h1>
+      <p class="detail-hero-sub">5 自由度舵机 · 逆运动学 · 示教编程 · 蓝牙遥控</p>
+      <div class="detail-hero-tags">
+        <span>MG996R×5</span>
+        <span>PCA9685</span>
+        <span>MPU6050</span>
+        <span>HC-05</span>
+        <span>PS2手柄</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">引脚连接</span>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="pinout" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128279;</span>
+        <h2>引脚连接表</h2>
+      </div>
+      <div class="table-wrap pinout-wrap">
+        <table class="pin-table">
+          <thead>
+            <tr><th>STM32 引脚</th><th>功能</th><th>连接目标</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>PA0</td><td>GPIO Input</td><td>PS2 接收器 DAT</td><td>SPI 数据输入</td></tr>
+            <tr><td>PA1</td><td>GPIO Output</td><td>PS2 接收器 CMD</td><td>SPI 命令输出</td></tr>
+            <tr><td>PA2</td><td>USART2_TX</td><td>HC-05 RXD</td><td>蓝牙 9600 8N1</td></tr>
+            <tr><td>PA3</td><td>USART2_RX</td><td>HC-05 TXD</td><td>蓝牙 9600 8N1</td></tr>
+            <tr><td>PB6</td><td>I2C1_SCL</td><td>PCA9685 SCL</td><td>I2C 时钟线</td></tr>
+            <tr><td>PB7</td><td>I2C1_SDA</td><td>PCA9685 SDA</td><td>I2C 数据线</td></tr>
+            <tr><td>PB8</td><td>I2C2_SCL</td><td>MPU6050 SCL</td><td>I2C 时钟线</td></tr>
+            <tr><td>PB9</td><td>I2C2_SDA</td><td>MPU6050 SDA</td><td>I2C 数据线</td></tr>
+            <tr><td>PA4</td><td>SPI1_NSS</td><td>PS2 接收器 CS</td><td>片选信号</td></tr>
+            <tr><td>PA5</td><td>SPI1_SCK</td><td>PS2 接收器 CLK</td><td>SPI 时钟线</td></tr>
+            <tr><td>PA6</td><td>SPI1_MISO</td><td>PS2 接收器 DAT</td><td>SPI 数据输入</td></tr>
+            <tr><td>PA7</td><td>SPI1_MOSI</td><td>PS2 接收器 CMD</td><td>SPI 数据输出</td></tr>
+            <tr><td>PA9</td><td>USART1_TX</td><td>调试串口</td><td>可选</td></tr>
+            <tr><td>PA10</td><td>USART1_RX</td><td>调试串口</td><td>可选</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

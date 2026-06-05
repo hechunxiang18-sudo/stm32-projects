@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>引脚连接 - STM32F103C8T6 智能鞋柜</title>
+  <meta name="description" content="烘干除湿 · UV 杀菌 · 除臭 · 定时自动">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能鞋柜 / 引脚连接</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128095;</div>
+      <h1>STM32F103C8T6 智能鞋柜</h1>
+      <p class="detail-hero-sub">烘干除湿 · UV 杀菌 · 除臭 · 定时自动</p>
+      <div class="detail-hero-tags">
+        <span>PTC加热</span>
+        <span>UV LED</span>
+        <span>臭氧</span>
+        <span>DHT22</span>
+        <span>风扇</span>
+        <span>触摸</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">引脚连接</span>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="pinout" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128279;</span>
+        <h2>引脚连接表</h2>
+      </div>
+      <div class="table-wrap pinout-wrap">
+        <table class="pin-table">
+          <thead>
+            <tr><th>STM32 引脚</th><th>功能</th><th>连接目标</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>PA0</td><td>GPIO (单总线)</td><td>DHT22 Data</td><td>温湿度读取</td></tr>
+            <tr><td>PA1</td><td>GPIO Output</td><td>PTC 加热继电器 IN</td><td>高电平加热</td></tr>
+            <tr><td>PA2</td><td>GPIO Output</td><td>UV LED 继电器 IN</td><td>高电平杀菌</td></tr>
+            <tr><td>PA3</td><td>GPIO Output</td><td>臭氧模块继电器 IN</td><td>高电平除臭</td></tr>
+            <tr><td>PA4</td><td>TIM2_CH1 (PWM)</td><td>风扇 1 PWM</td><td>PWM 调速</td></tr>
+            <tr><td>PA5</td><td>TIM2_CH2 (PWM)</td><td>风扇 2 PWM</td><td>PWM 调速</td></tr>
+            <tr><td>PC0</td><td>GPIO (触摸)</td><td>触摸按键 1 (电源)</td><td>电容触摸感应</td></tr>
+            <tr><td>PC1</td><td>GPIO (触摸)</td><td>触摸按键 2 (模式)</td><td>电容触摸感应</td></tr>
+            <tr><td>PC2</td><td>GPIO (触摸)</td><td>触摸按键 3 (加)</td><td>电容触摸感应</td></tr>
+            <tr><td>PC3</td><td>GPIO (触摸)</td><td>触摸按键 4 (减)</td><td>电容触摸感应</td></tr>
+            <tr><td>PB6</td><td>I2C1_SCL</td><td>OLED SCL</td><td>I2C 显示</td></tr>
+            <tr><td>PB7</td><td>I2C1_SDA</td><td>OLED SDA</td><td>I2C 显示</td></tr>
+            <tr><td>PB0</td><td>EXTI</td><td>门磁开关</td><td>开门检测</td></tr>
+            <tr><td>PB1</td><td>ADC</td><td>NTC 过温保护</td><td>超温检测</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

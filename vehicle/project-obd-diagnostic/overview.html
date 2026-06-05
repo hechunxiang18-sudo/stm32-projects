@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目概述 - STM32F103C8T6 OBD 车载诊断系统</title>
+  <meta name="description" content="CAN 总线读取 · 车辆故障码 · 实时数据流 · 蓝牙显示">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">OBD 车载诊断 / 项目概述</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128663;</div>
+      <h1>STM32F103C8T6 OBD 车载诊断系统</h1>
+      <p class="detail-hero-sub">CAN 总线读取 · 车辆故障码 · 实时数据流 · 蓝牙显示</p>
+      <div class="detail-hero-tags">
+        <span>MCP2515</span>
+        <span>TJA1050</span>
+        <span>HC-05</span>
+        <span>OLED 1.3"</span>
+        <span>SD 卡</span>
+        <span>DS3231</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <span class="sec-nav-item active">项目概述</span>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="overview" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128663;</span>
+        <h2>项目概述</h2>
+      </div>
+      <div class="project-intro">
+        <div class="project-intro-text">
+          <p>
+            基于 STM32F103C8T6 的 OBD-II 车载诊断系统，通过 MCP2515 CAN 控制器 + TJA1050 收发器
+            接入车辆 OBD 接口，读取发动机故障码(DTC)、实时车速、转速、水温、油耗等数据流。
+            支持标准 OBD-II 协议(ISO 15765-4 CAN)，可清除故障码。
+          </p>
+          <p>
+            数据通过 HC-05 蓝牙传输至手机 App 显示仪表盘，SD 卡记录日志，DS3231 为每条数据添加时间戳。
+            1.3 寸 OLED 本地显示关键参数，3 个按键用于功能切换。适合车辆自检、维修辅助与驾驶行为分析。
+          </p>
+        </div>
+      </div>
+
+      <div class="svg-product">
+        <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="obd-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1628"/><stop offset="100%" stop-color="#1a2a4a"/></linearGradient>
+            <linearGradient id="obd-case" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2a2a3a"/><stop offset="100%" stop-color="#15152a"/></linearGradient>
+            <linearGradient id="obd-screen" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a2a"/><stop offset="100%" stop-color="#050d1a"/></linearGradient>
+            <filter id="obd-shadow"><feDropShadow dx="2" dy="4" stdDeviation="5" flood-opacity="0.5"/></filter>
+          </defs>
+          <rect width="800" height="300" fill="url(#obd-bg)" rx="12"/>
+          <ellipse cx="400" cy="270" rx="260" ry="15" fill="rgba(0,0,0,0.3)"/>
+          <!-- 设备外壳 -->
+          <rect x="230" y="90" width="340" height="160" rx="15" fill="url(#obd-case)" filter="url(#obd-shadow)"/>
+          <rect x="230" y="90" width="340" height="160" rx="15" fill="none" stroke="#3a3a5a" stroke-width="1"/>
+          <!-- OBD 接口 -->
+          <rect x="260" y="105" width="60" height="40" rx="5" fill="#2a2a2a" stroke="#555" stroke-width="0.5"/>
+          <text x="290" y="128" text-anchor="middle" fill="#888" font-size="7" font-family="sans-serif">OBD-II</text>
+          <text x="290" y="140" text-anchor="middle" fill="#666" font-size="6" font-family="sans-serif">16-Pin</text>
+          <!-- 连接线 -->
+          <line x1="320" y1="125" x2="370" y2="125" stroke="#444" stroke-width="2"/>
+          <!-- 主显示屏 -->
+          <rect x="370" y="100" width="160" height="80" rx="6" fill="url(#obd-screen)"/>
+          <rect x="370" y="100" width="160" height="80" rx="6" fill="none" stroke="#2a4a6a" stroke-width="1"/>
+          <!-- 仪表盘显示 -->
+          <text x="450" y="118" text-anchor="middle" fill="#ff6644" font-size="16" font-family="monospace">88</text>
+          <text x="450" y="126" text-anchor="middle" fill="#ff8866" font-size="6" font-family="sans-serif">km/h</text>
+          <text x="400" y="145" text-anchor="middle" fill="#44aaff" font-size="8" font-family="monospace">3200 rpm</text>
+          <text x="500" y="145" text-anchor="middle" fill="#44dd88" font-size="8" font-family="monospace">92&deg;C</text>
+          <text x="450" y="162" text-anchor="middle" fill="#aaaaff" font-size="8" font-family="monospace">DTC: P0300</text>
+          <!-- 蓝牙模块 -->
+          <rect x="480" y="195" width="60" height="30" rx="5" fill="#1a1a2a" stroke="#3a3a5a" stroke-width="0.5"/>
+          <text x="510" y="214" text-anchor="middle" fill="#88aaff" font-size="7" font-family="sans-serif">HC-05</text>
+          <circle cx="495" cy="206" r="3" fill="#4488ff">
+            <animate attributeName="opacity" values="0.2;1;0.2" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <!-- SD 卡 -->
+          <rect x="300" y="195" width="50" height="30" rx="4" fill="#1a1a2a" stroke="#3a3a5a" stroke-width="0.5"/>
+          <text x="325" y="214" text-anchor="middle" fill="#8899aa" font-size="7" font-family="sans-serif">SD</text>
+          <!-- 故障灯 -->
+          <circle cx="560" cy="112" r="7" fill="#3a1a1a" stroke="#ff4444" stroke-width="1"/>
+          <circle cx="560" cy="112" r="4" fill="#ff4444" opacity="0.9">
+            <animate attributeName="opacity" values="1;0.2;1" dur="1s" repeatCount="indefinite"/>
+          </circle>
+          <text x="560" y="128" text-anchor="middle" fill="#ff6666" font-size="6">CEL</text>
+          <!-- CAN 芯片标签 -->
+          <rect x="260" y="160" width="90" height="25" rx="4" fill="#1a2a3a" stroke="#3a5a7a" stroke-width="0.5"/>
+          <text x="305" y="177" text-anchor="middle" fill="#6a8aaa" font-size="7" font-family="sans-serif">MCP2515+TJA1050</text>
+          <!-- 按键 -->
+          <circle cx="564" cy="192" r="8" fill="#2a2a3a" stroke="#555" stroke-width="0.5"/>
+          <text x="564" y="195" text-anchor="middle" fill="#888" font-size="6">M</text>
+          <circle cx="564" cy="215" r="8" fill="#2a2a3a" stroke="#555" stroke-width="0.5"/>
+          <text x="564" y="218" text-anchor="middle" fill="#888" font-size="6">S</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

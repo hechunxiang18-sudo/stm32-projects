@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 DIY 示波器</title>
+  <meta name="description" content="1Msps ADC 采样 · 2.4 寸 TFT 显示 · 边沿触发 · FFT 频谱分析">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">DIY 示波器 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128300;</div>
+      <h1>STM32F103C8T6 DIY 示波器</h1>
+      <p class="detail-hero-sub">1Msps ADC 采样 · 2.4 寸 TFT 显示 · 边沿触发 · FFT 频谱分析</p>
+      <div class="detail-hero-tags">
+        <span>ADC1</span>
+        <span>ILI9341</span>
+        <span>DMA</span>
+        <span>定时器触发</span>
+        <span>FFT</span>
+        <span>探头</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header"><span class="sec-icon">&#128187;</span><h2>核心固件代码</h2></div>
+      <pre><code>/* 示波器 ADC 采样 + DMA + 波形绘制 */
+
+#define SAMPLE_DEPTH  256   // 采样深度
+uint16_t adc_buf[SAMPLE_DEPTH * 2];  // CH1 + CH2 交替
+
+/* 定时器触发 ADC 采样（DMA 自动搬运） */
+void ADC_Init_ForScope(void) {
+    /* TIM3 输出 TRGO 触发 ADC */
+    TIM_TimeBaseInitTypeDef tim = {
+        .TIM_Period = 72 - 1,       // 72MHz/72 = 1MHz → 1us 采样间隔
+        .TIM_Prescaler = 1 - 1,
+    };
+    TIM_TimeBaseInit(TIM3, &amp;tim);
+    TIM_SelectOutputTrigger(TIM3, TIM_TRGOSource_Update);
+
+    /* ADC1 双通道扫描 + DMA */
+    ADC_InitTypeDef adc = {
+        .ADC_Mode = ADC_Mode_Independent,
+        .ADC_ScanConvMode = ENABLE,
+        .ADC_ContinuousConvMode = ENABLE,
+        .ADC_ExternalTrigConv = ADC_ExternalTrigConv_T3_TRGO,
+    };
+    ADC_Init(ADC1, &amp;adc);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_0, 1, ADC_SampleTime_13Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_1, 2, ADC_SampleTime_13Cycles5);
+
+    DMA_InitTypeDef dma = {
+        .DMA_PeripheralBaseAddr = (uint32_t)&amp;ADC1->DR,
+        .DMA_MemoryBaseAddr = (uint32_t)adc_buf,
+        .DMA_BufferSize = SAMPLE_DEPTH * 2,
+        .DMA_Mode = DMA_Mode_Circular,
+    };
+    DMA_Init(DMA1_Channel1, &amp;dma);
+}
+
+/* 波形绘制到 TFT */
+void Scope_DrawWaveform(void) {
+    static uint16_t prev_y[2] = {0, 0};
+
+    /* 清空波形区域 */
+    TFT_FillRect(40, 10, 280, 220, COLOR_BLACK);
+
+    /* 绘制网格 */
+    for (int i = 0; i &lt; 10; i++)
+        TFT_DrawLine(40, 10 + i*22, 320, 10 + i*22, COLOR_GRID);
+
+    /* 绘制 CH1（黄色）*/
+    for (int i = 1; i &lt; SAMPLE_DEPTH; i++) {
+        uint16_t y1 = 10 + (adc_buf[i-1] * 220 / 4096);
+        uint16_t y2 = 10 + (adc_buf[i]   * 220 / 4096);
+        TFT_DrawLine(40 + i, y1, 40 + i + 1, y2, COLOR_YELLOW);
+    }
+
+    /* 绘制 CH2（蓝色）*/
+    for (int i = 1; i &lt; SAMPLE_DEPTH; i++) {
+        uint16_t y1 = 10 + (adc_buf[SAMPLE_DEPTH + i - 1] * 220 / 4096);
+        uint16_t y2 = 10 + (adc_buf[SAMPLE_DEPTH + i]     * 220 / 4096);
+        TFT_DrawLine(40 + i, y1, 40 + i + 1, y2, COLOR_CYAN);
+    }
+
+    /* 触发位置标记 */
+    TFT_DrawLine(40 + trigger_pos, 10, 40 + trigger_pos, 230, COLOR_RED);
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      &#128187;核心固件代码
+      /* 示波器 ADC 采样 + DMA + 波形绘制 */
+
+#define SAMPLE_DEPTH  256   // 采样深度
+uint16_t adc_buf[SAMPLE_DEPTH * 2];  // CH1 + CH2 交替
+
+/* 定时器触发 ADC 采样（DMA 自动搬运） */
+void ADC_Init_ForScope(void) {
+    /* TIM3 输出 TRGO 触发 ADC */
+    TIM_TimeBaseInitTypeDef tim = {
+        .TIM_Period = 72 - 1,       // 72MHz/72 = 1MHz → 1us 采样间隔
+        .TIM_Prescaler = 1 - 1,
+    };
+    TIM_TimeBaseInit(TIM3, &amp;tim);
+    TIM_SelectOutputTrigger(TIM3, TIM_TRGOSource_Update);
+
+    /* ADC1 双通道扫描 + DM`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

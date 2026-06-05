@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 酒精检测仪</title>
+  <meta name="description" content="MQ-3 酒精检测 · 吹气感应 · 声光报警 · 数据记录">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">酒精检测仪 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0808 0%, #7f1d1d 40%, #991b1b 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127867;</div>
+      <h1>STM32F103C8T6 酒精检测仪</h1>
+      <p class="detail-hero-sub">MQ-3 酒精检测 · 吹气感应 · 声光报警 · 数据记录</p>
+      <div class="detail-hero-tags">
+        <span>MQ-3</span>
+        <span>ADC</span>
+        <span>吹气流量</span>
+        <span>OLED</span>
+        <span>蜂鸣器</span>
+        <span>RGB LED</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - 酒精检测与分级逻辑</h2>
+      </div>
+      <div class="note-box">
+        <strong>检测流程：</strong>系统预热后进入待机状态，检测到吹气流量后启动酒精传感器采样，
+        经过中值滤波和浓度换算后通过 RGB LED 和语音播报结果，同时记录到历史数据库。
+      </div>
+      <pre><code>/* 酒精检测仪核心控制代码 */
+
+/* 酒精浓度分级阈值 (mg/L) */
+#define LEVEL_GREEN  0.2f   /* 安全 */
+#define LEVEL_YELLOW 0.8f   /* 警告 */
+#define LEVEL_RED    2.0f   /* 超标 */
+
+/* MQ-3 ADC 转浓度 (mg/L) */
+/* 拟合曲线: y = a * x^b, 通过标定获取参数 */
+float MQ3_ADC_To_MgL(uint16_t adc_value) {
+    float Rs_R0 = (4095.0f / adc_value - 1.0f);
+    /* 根据 MQ-3 特性曲线拟合 */
+    float mg_l = 4.56f * powf(Rs_R0, -1.23f);
+    if (mg_l < 0) mg_l = 0;
+    if (mg_l > 5.0f) mg_l = 5.0f;
+    return mg_l;
+}
+
+/* 检测分级 */
+typedef enum {
+    LEVEL_SAFE   = 0,  /* 绿色 */
+    LEVEL_WARN   = 1,  /* 黄色 */
+    LEVEL_DANGER = 2,  /* 红色 */
+    LEVEL_CRIT   = 3   /* 红色 + 蜂鸣器 */
+} AlcoholLevel_t;
+
+AlcoholLevel_t GetAlcoholLevel(float mg_l) {
+    if (mg_l < LEVEL_GREEN) return LEVEL_SAFE;
+    if (mg_l < LEVEL_YELLOW) return LEVEL_WARN;
+    if (mg_l < LEVEL_RED) return LEVEL_DANGER;
+    return LEVEL_CRIT;
+}
+
+/* RGB LED 控制 */
+void RGB_SetColor(uint8_t r, uint8_t g, uint8_t b) {
+    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, r);
+    __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_4, g);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_2, b > 0);
+}
+
+/* 分级指示 */
+void RGB_LevelIndicate(AlcoholLevel_t level) {
+    switch (level) {
+        case LEVEL_SAFE:   RGB_SetColor(0, 255, 0);   break;
+        case LEVEL_WARN:   RGB_SetColor(255, 150, 0); break;
+        case LEVEL_DANGER: RGB_SetColor(255, 0, 0);   break;
+        case LEVEL_CRIT:   RGB_SetColor(255, 0, 0);
+                           Buzzer_On();                break;
+    }
+}
+
+/* 语音播报结果 */
+void Voice_PlayResult(float mg_l, AlcoholLevel_t level) {
+    char cmd[16];
+    switch (level) {
+        case LEVEL_SAFE:
+            sprintf(cmd, "SAFE"); break;
+        case LEVEL_WARN:
+            sprintf(cmd, "WARN"); break;
+        case LEVEL_DANGER:
+        case LEVEL_CRIT:
+            sprintf(cmd, "DANGER"); break;
+    }
+    JQ8900_Play(cmd);  /* 播放对应音频文件 */
+}
+
+/* 主检测流程 */
+void Breathalyzer_Test(void) {
+    OLED_Clear();
+    OLED_ShowString("请吹气...");
+
+    /* 等待吹气流量 */
+    uint32_t flow_confirm = 0;
+    while (flow_confirm < 50) { /* 持续 500ms 确认 */
+        uint16_t flow_adc = HAL_ADC_GetValue(&hadc1);
+        if (flow_adc > FLOW_THRESHOLD) {
+            flow_confirm++;
+        } else {
+            flow_confirm = 0;
+        }
+        HAL_Delay(10);
+    }
+
+    /* 吹气确认，开始检测 */
+    OLED_ShowString("检测中...");
+
+    /* 多次采样取中值 */
+    float samples[10];
+    for (int i = 0; i < 10; i++) {
+        uint16_t adc = HAL_ADC_GetValue(&hadc1);
+        samples[i] = MQ3_ADC_To_MgL(adc);
+        HAL_Delay(50);
+    }
+
+    /* 冒泡排序取中值 */
+    for (int i = 0; i < 10; i++) {
+        for (int j = i + 1; j < 10; j++) {
+            if (samples[i] > samples[j]) {
+                float t = samples[i]; samples[i] = samples[j]; samples[j] = t;
+            }
+        }
+    }
+    float result = (samples[4] + samples[5]) / 2.0f;
+
+    /* 分级指示 */
+    AlcoholLevel_t level = GetAlcoholLevel(result);
+    RGB_LevelIndicate(level);
+    Voice_PlayResult(result, level);
+
+    /* 获取时间戳并记录 */
+    RTC_Time_t now;
+    DS3231_GetTime(&now);
+    SaveRecord(&now, result, level);
+
+    /* OLED 显示结果 */
+    char buf[32];
+    sprintf(buf, "%.2f mg/L", result);
+    OLED_ShowBigNum(buf);
+    OLED_ShowLevel(level);
+
+    /* 自动返回待机 */
+    HAL_Delay(5000);
+    RGB_SetColor(0, 0, 0);
+    Buzzer_Off();
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - 酒精检测与分级逻辑
+      
+      
+        检测流程：系统预热后进入待机状态，检测到吹气流量后启动酒精传感器采样，
+        经过中值滤波和浓度换算后通过 RGB LED 和语音播报结果，同时记录到历史数据库。
+      
+      /* 酒精检测仪核心控制代码 */
+
+/* 酒精浓度分级阈值 (mg/L) */
+#define LEVEL_GREEN  0.2f   /* 安全 */
+#define LEVEL_YELLOW 0.8f   /* 警告 */
+#define LEVEL_RED    2.0f   /* 超标 */
+
+/* MQ-3 ADC 转浓度 (mg/L) */
+/* 拟合曲线: y = a * x^b, 通过标定获取参数 */
+float MQ3_ADC_To_MgL(uint16_t adc_value) {
+    float Rs_R0 = (4095.0f / adc_value - 1.0f);
+    /* 根据 MQ-3 特性曲线拟合 *`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

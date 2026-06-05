@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>引脚连接 - STM32F103C8T6 WiFi 天气时钟</title>
+  <meta name="description" content="NTP 自动校时 · 天气实况 · 闹钟 · 温湿度显示">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">WiFi 天气时钟 / 引脚连接</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127774;</div>
+      <h1>STM32F103C8T6 WiFi 天气时钟</h1>
+      <p class="detail-hero-sub">NTP 自动校时 · 天气实况 · 闹钟 · 温湿度显示</p>
+      <div class="detail-hero-tags">
+        <span>ESP8266</span>
+        <span>OLED 1.3"</span>
+        <span>DHT22</span>
+        <span>DS3231</span>
+        <span>光敏电阻</span>
+        <span>触摸按键</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">引脚连接</span>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="pinout" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128279;</span>
+        <h2>引脚连接表</h2>
+      </div>
+      <div class="table-wrap pinout-wrap">
+        <table class="pin-table">
+          <thead>
+            <tr><th>STM32 引脚</th><th>功能</th><th>连接目标</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>PA2</td><td>USART2_TX</td><td>ESP8266 RXD</td><td>WiFi AT 指令</td></tr>
+            <tr><td>PA3</td><td>USART2_RX</td><td>ESP8266 TXD</td><td>WiFi 数据</td></tr>
+            <tr><td>PB6</td><td>I2C1_SCL</td><td>OLED SCL</td><td>I2C 时钟</td></tr>
+            <tr><td>PB7</td><td>I2C1_SDA</td><td>OLED SDA</td><td>I2C 数据</td></tr>
+            <tr><td>PB8</td><td>I2C2_SCL</td><td>DS3231 SCL</td><td>RTC 时钟线</td></tr>
+            <tr><td>PB9</td><td>I2C2_SDA</td><td>DS3231 SDA</td><td>RTC 数据线</td></tr>
+            <tr><td>PA0</td><td>GPIO Input</td><td>DHT22 Data</td><td>单总线协议</td></tr>
+            <tr><td>PA1</td><td>ADC1_IN1</td><td>光敏电阻分压</td><td>环境光 ADC</td></tr>
+            <tr><td>PB0</td><td>GPIO Output</td><td>蜂鸣器</td><td>闹钟输出</td></tr>
+            <tr><td>PC0-PC3</td><td>GPIO Input</td><td>触摸按键 1-4</td><td>电容触摸输入</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

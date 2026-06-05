@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目概述 - STM32F103C8T6 四足机器人</title>
+  <meta name="description" content="8 自由度 · 逆运动学 · 步态规划 · 姿态自平衡 · 蓝牙遥控">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">四足机器人 / 项目概述</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#129302;</div>
+      <h1>STM32F103C8T6 四足机器人</h1>
+      <p class="detail-hero-sub">8 自由度 · 逆运动学 · 步态规划 · 姿态自平衡 · 蓝牙遥控</p>
+      <div class="detail-hero-tags">
+        <span>MG996R ×8</span>
+        <span>MPU6050</span>
+        <span>PCA9685</span>
+        <span>HC-05</span>
+        <span>PS2</span>
+        <span>舵机</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <span class="sec-nav-item active">项目概述</span>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="overview" class="section">
+      <div class="section-header"><span class="sec-icon">&#129302;</span><h2>项目概述</h2></div>
+      <div class="project-intro">
+        <div class="project-intro-text">
+          <p>基于 STM32F103C8T6 的桌面级四足机器人（仿生狗）。8 个 MG996R 舵机构成 4 条腿（每条腿 2 自由度），PCA9685 舵机驱动板管理 PWM，MPU6050 姿态传感器用于机身平衡检测。支持三角步态行走、原地转向、俯卧/站立姿态切换，可通过手机蓝牙或 PS2 手柄遥控。</p>
+          <p>采用 3D 打印机身（PLA 材质），总重约 600g，可负载 200g 扩展模块（如摄像头、超声波）。</p>
+        </div>
+        <div class="project-intro-icon">&#129302;</div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目概述 - STM32F103C8T6 智能热水器</title>
+  <meta name="description" content="PID 恒温 · 预约加热 · 防干烧 · WiFi 远程控制">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能热水器 / 项目概述</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128293;</div>
+      <h1>STM32F103C8T6 智能热水器</h1>
+      <p class="detail-hero-sub">PID 恒温 · 预约加热 · 防干烧 · WiFi 远程控制</p>
+      <div class="detail-hero-tags">
+        <span>DS18B20</span>
+        <span>继电器</span>
+        <span>NTC</span>
+        <span>加热管</span>
+        <span>水位检测</span>
+        <span>ESP8266</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <span class="sec-nav-item active">项目概述</span>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="overview" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128293;</span>
+        <h2>项目概述</h2>
+      </div>
+      <div class="project-intro">
+        <div class="project-intro-text">
+          <p>
+            基于 STM32F103C8T6 的智能热水器控制系统，采用 PID 算法实现精密恒温控制，通过 DS18B20 防水温度传感器
+            实时监测水温，40A 大功率继电器驱动加热管。搭载水位传感器检测水箱水位，配合防干烧保护机制确保安全。
+          </p>
+          <p>
+            支持触摸按键本地操作、ESP8266 WiFi 远程控制、预约加热和漏电检测功能，
+            适用于家庭储水式电热水器的智能化升级改造。
+          </p>
+        </div>
+        <div class="project-intro-icon">&#128293;</div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

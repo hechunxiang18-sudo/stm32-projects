@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 PM2.5 空气质量仪</title>
+  <meta name="description" content="PM2.5/PM10 · CO2 · TVOC · 甲醛 · 温湿度">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">PM2.5 空气质量仪 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127800;</div>
+      <h1>STM32F103C8T6 PM2.5 空气质量仪</h1>
+      <p class="detail-hero-sub">PM2.5/PM10 · CO2 · TVOC · 甲醛 · 温湿度</p>
+      <div class="detail-hero-tags">
+        <span>PMS5003</span>
+        <span>CCS811</span>
+        <span>SGP30</span>
+        <span>甲醛传感器</span>
+        <span>OLED</span>
+        <span>WiFi</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - 多传感器数据融合</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>采用多传感器数据融合策略，周期性采集各传感器数据，交叉校准后计算 AQI 并上传。
+      </div>
+      <pre><code>/* 空气质量仪 - 多传感器数据采集与融合 */
+
+#include "air_quality.h"
+#include "pms5003.h"
+#include "ccs811.h"
+#include "sgp30.h"
+#include "ze08.h"
+#include "dht22.h"
+
+/* 空气质量数据结构 */
+typedef struct {
+    uint16_t pm25;        /* PM2.5 浓度 (ug/m3) */
+    uint16_t pm10;        /* PM10 浓度 (ug/m3) */
+    uint16_t co2;         /* CO2 浓度 (ppm) */
+    uint16_t tvoc_ccs;    /* TVOC (ppb) - CCS811 */
+    uint16_t tvoc_sgp;    /* TVOC (ppb) - SGP30 */
+    float    hcho;        /* 甲醛 (mg/m3) */
+    float    temperature; /* 温度 (°C) */
+    float    humidity;    /* 湿度 (%RH) */
+    uint8_t  aqi_level;   /* AQI 等级 0-5 */
+} AirQualityData;
+
+static AirQualityData air_data;
+
+/* AQI 计算 (PM2.5 为主) */
+static uint8_t calc_aqi_level(uint16_t pm25) {
+    if (pm25 <= 35)    return 0;  /* 优秀 */
+    if (pm25 <= 75)    return 1;  /* 良好 */
+    if (pm25 <= 115)   return 2;  /* 轻度污染 */
+    if (pm25 <= 150)   return 3;  /* 中度污染 */
+    if (pm25 <= 250)   return 4;  /* 重度污染 */
+    return 5;                      /* 严重 */
+}
+
+/* TVOC 交叉校准: CCS811 和 SGP30 加权融合 */
+static uint16_t fusion_tvoc(uint16_t ccs, uint16_t sgp) {
+    /* 简单加权平均，SGP30 权重更高 */
+    uint32_t result = (uint32_t)ccs * 40 + (uint32_t)sgp * 60;
+    return (uint16_t)(result / 100);
+}
+
+/* 传感器采集任务 (周期 2 秒) */
+void vTask_SensorCollect(void *param) {
+    /* 等待传感器初始化 */
+    vTaskDelay(pdMS_TO_TICKS(2000));
+
+    for (;;) {
+        /* 读取 PMS5003 (UART 被动接收，检查新数据) */
+        if (pms5003_has_new_data()) {
+            PM25_Data pms_data;
+            pms5003_read(&pms_data);
+            air_data.pm25 = pms_data.pm25_ae;
+            air_data.pm10 = pms_data.pm10_ae;
+        }
+
+        /* 读取 CCS811 */
+        if (ccs811_is_ready()) {
+            uint16_t co2, tvoc;
+            ccs811_read_algorithm_results(&co2, &tvoc);
+            air_data.co2 = co2;
+            air_data.tvoc_ccs = tvoc;
+        }
+
+        /* 读取 SGP30 */
+        if (sgp30_is_ready()) {
+            uint16_t tvoc_sgp, eco2;
+            sgp30_measure_air_quality(&tvoc_sgp, &eco2);
+            air_data.tvoc_sgp = tvoc_sgp;
+        }
+
+        /* 读取甲醛 (ZE08 串口被动接收) */
+        air_data.hcho = ze08_read_formaldehyde();
+
+        /* 读取温湿度 (DHT22) */
+        DHT22_ReadData();
+        air_data.temperature = DHT22_GetTemperature();
+        air_data.humidity = DHT22_GetHumidity();
+
+        /* 计算 AQI */
+        air_data.aqi_level = calc_aqi_level(air_data.pm25);
+
+        /* TVOC 融合 */
+        uint16_t tvoc_fused = fusion_tvoc(
+            air_data.tvoc_ccs, air_data.tvoc_sgp);
+
+        /* 更新 OLED */
+        oled_show_air_quality(&air_data, tvoc_fused);
+
+        /* 上传到 WiFi */
+        wifi_upload_air_quality(&air_data);
+
+        vTaskDelay(pdMS_TO_TICKS(2000));
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - 多传感器数据融合
+      
+      
+        代码说明：采用多传感器数据融合策略，周期性采集各传感器数据，交叉校准后计算 AQI 并上传。
+      
+      /* 空气质量仪 - 多传感器数据采集与融合 */
+
+#include "air_quality.h"
+#include "pms5003.h"
+#include "ccs811.h"
+#include "sgp30.h"
+#include "ze08.h"
+#include "dht22.h"
+
+/* 空气质量数据结构 */
+typedef struct {
+    uint16_t pm25;        /* PM2.5 浓度 (ug/m3) */
+    uint16_t pm10;        /* PM10 浓度 (ug/m3) */
+    uint16_t co2;         /* CO2 浓度 (ppm) */
+    uint16_t tvoc_ccs;    /* TVOC (ppb) - CC`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

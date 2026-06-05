@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能特性 - STM32F103C8T6 四足机器人</title>
+  <meta name="description" content="8 自由度 · 逆运动学 · 步态规划 · 姿态自平衡 · 蓝牙遥控">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">四足机器人 / 功能特性</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#129302;</div>
+      <h1>STM32F103C8T6 四足机器人</h1>
+      <p class="detail-hero-sub">8 自由度 · 逆运动学 · 步态规划 · 姿态自平衡 · 蓝牙遥控</p>
+      <div class="detail-hero-tags">
+        <span>MG996R ×8</span>
+        <span>MPU6050</span>
+        <span>PCA9685</span>
+        <span>HC-05</span>
+        <span>PS2</span>
+        <span>舵机</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <span class="sec-nav-item active">功能特性</span>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="features" class="section">
+      <div class="section-header"><span class="sec-icon">&#9889;</span><h2>功能特性</h2></div>
+      <div class="feature-grid">
+        <div class="feature-card"><div class="fc-icon">&#129302;</div><h4>三角步态</h4><p>3 腿支撑/1 腿迈步，步态周期可调 0.5-2s</p></div>
+        <div class="feature-card"><div class="fc-icon">&#128200;</div><h4>姿态自平衡</h4><p>MPU6050 检测倾斜，实时补偿舵机角度</p></div>
+        <div class="feature-card"><div class="fc-icon">&#128257;</div><h4>8 自由度</h4><p>每条腿 2 个舵机（髋+膝），独立控制</p></div>
+        <div class="feature-card"><div class="fc-icon">&#128247;</div><h4>PS2/蓝牙遥控</h4><p>HC-05 蓝牙 App 或 PS2 无线手柄双模控制</p></div>
+        <div class="feature-card"><div class="fc-icon">&#128200;</div><h4>逆运动学</h4><p>足端坐标 → 舵机角度实时解算，步态平滑</p></div>
+        <div class="feature-card"><div class="fc-icon">&#128228;</div><h4>3D 打印机身</h4><p>PLA 材质，开源图纸可直接打印组装</p></div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

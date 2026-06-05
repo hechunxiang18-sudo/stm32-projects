@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能特性 - STM32F103C8T6 智能门铃</title>
+  <meta name="description" content="PIR 感应 · 摄像头拍照 · WiFi 推送 · 双向对讲">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能门铃 / 功能特性</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#9726;</div>
+      <h1>STM32F103C8T6 智能门铃</h1>
+      <p class="detail-hero-sub">PIR 感应 · 摄像头拍照 · WiFi 推送 · 双向对讲</p>
+      <div class="detail-hero-tags">
+        <span>PIR</span>
+        <span>OV7670</span>
+        <span>ESP8266</span>
+        <span>麦克风</span>
+        <span>扬声器</span>
+        <span>SD卡</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <span class="sec-nav-item active">功能特性</span>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="features" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#9889;</span>
+        <h2>功能特性</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fc-icon">&#128064;</div>
+          <h4>PIR 人体感应</h4>
+          <p>HC-SR501 检测 3-5 米范围人体移动，自动唤醒系统</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128247;</div>
+          <h4>摄像头抓拍</h4>
+          <p>OV7670 30 万像素带 FIFO，自动抓拍并 JPEG 压缩</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128252;</div>
+          <h4>WiFi 推送</h4>
+          <p>ESP8266 MQTT 推送图片到手机，延迟 &lt;2 秒</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128265;</div>
+          <h4>双向对讲</h4>
+          <p>MAX9814 采样 + LM386 功放，半双工语音通话</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#127769;</div>
+          <h4>夜视补光</h4>
+          <p>8 颗红外 LED，低照度自动开启，有效距离 3 米</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128451;</div>
+          <h4>SD 卡录像</h4>
+          <p>MicroSD 卡存储抓拍图片与录像，支持循环覆盖</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

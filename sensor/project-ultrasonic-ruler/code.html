@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 超声波测距仪</title>
+  <meta name="description" content="高精度测距 · 声光提示 · 数据记录 · 蓝牙传输">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">超声波测距仪 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128207;</div>
+      <h1>STM32F103C8T6 超声波测距仪</h1>
+      <p class="detail-hero-sub">高精度测距 · 声光提示 · 数据记录 · 蓝牙传输</p>
+      <div class="detail-hero-tags">
+        <span>HC-SR04</span>
+        <span>TFT</span>
+        <span>蜂鸣器</span>
+        <span>蓝牙</span>
+        <span>锂电池</span>
+        <span>按键</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - 超声波测距与温度补偿</h2>
+      </div>
+      <div class="note-box">
+        <strong>测距原理：</strong>Trig 脚输出 10us TTL 高电平触发测距，Echo 脚返回高电平脉宽与距离成正比。
+        利用 NTC 温度传感器实时采集环境温度，对声速进行温度补偿，显著提高测量精度。
+      </div>
+      <pre><code>/* 超声波测距仪核心代码 - 温补测距 */
+
+/* 温度补偿声速: v = 331.3 * sqrt(1 + T/273.15) */
+float GetSoundSpeed(float temp_celsius) {
+    return 331.3f * sqrtf(1.0f + temp_celsius / 273.15f);
+}
+
+/* 读取温度 (DS18B20 或 NTC) */
+float Read_Temperature(void) {
+    uint32_t adc = 0;
+    for (int i = 0; i < 8; i++) {
+        adc += HAL_ADC_GetValue(&hadc1);
+    }
+    adc >>= 3; /* 均值滤波 */
+    float R_ntc = 10000.0f / (4095.0f / adc - 1.0f);
+    /* NTC 10K 3950 B 值 */
+    float temp = 1.0f / (logf(R_ntc / 10000.0f) / 3950.0f + 1.0f / 298.15f) - 273.15f;
+    return temp;
+}
+
+/* 精密度距 (带温度补偿) */
+float Ultrasonic_Measure(void) {
+    /* 1. 触发测距 */
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
+    delay_us(12);
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
+
+    /* 2. 等待 Echo 高电平 */
+    uint32_t timeout = 0;
+    while (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1)) {
+        if (++timeout > 50000) return -1.0f;
+    }
+
+    /* 3. 测量高电平宽度 */
+    uint32_t start = micros();
+    timeout = 0;
+    while (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_1)) {
+        if (++timeout > 50000) return -1.0f;
+    }
+    uint32_t duration = micros() - start;
+
+    /* 4. 温度补偿声速 */
+    float temp = Read_Temperature();
+    float sound_speed = GetSoundSpeed(temp); /* mm/us */
+
+    /* 5. 计算距离 (往返折半) */
+    float distance_mm = duration * sound_speed / 2.0f;
+
+    /* 6. 多次测量中值滤波 */
+    static float buf[5] = {0};
+    static uint8_t idx = 0;
+    buf[idx++ % 5] = distance_mm;
+
+    /* 冒泡取中值 */
+    float sorted[5];
+    memcpy(sorted, buf, sizeof(sorted));
+    for (int i = 0; i < 5; i++) {
+        for (int j = i + 1; j < 5; j++) {
+            if (sorted[i] > sorted[j]) {
+                float tmp = sorted[i];
+                sorted[i] = sorted[j];
+                sorted[j] = tmp;
+            }
+        }
+    }
+    return sorted[2];
+}
+
+/* 蜂鸣器声音提示 - PWM 频率随距离变化 */
+void Buzzer_Beep(float distance_cm) {
+    uint16_t freq = 0;
+    if (distance_cm < 10) {
+        freq = 4000;   /* 急促高音 */
+    } else if (distance_cm < 50) {
+        freq = 2000;   /* 中音 */
+    } else if (distance_cm < 100) {
+        freq = 1000;   /* 低音 */
+    } else {
+        freq = 0;      /* 静音 */
+    }
+    if (freq > 0) {
+        __HAL_TIM_SET_AUTORELOAD(&htim3, 72000000 / freq - 1);
+        __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, 36000000 / freq - 1);
+        HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3);
+    } else {
+        HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_3);
+    }
+}
+
+/* 蓝牙发送测量数据 */
+void BT_SendData(float distance, float temp, float max_val, float min_val) {
+    char buf[64];
+    sprintf(buf, "DIST:%.2f,TEMP:%.1f,MAX:%.2f,MIN:%.2f\r\n",
+            distance, temp, max_val, min_val);
+    HAL_UART_Transmit(&huart2, (uint8_t*)buf, strlen(buf), 100);
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - 超声波测距与温度补偿
+      
+      
+        测距原理：Trig 脚输出 10us TTL 高电平触发测距，Echo 脚返回高电平脉宽与距离成正比。
+        利用 NTC 温度传感器实时采集环境温度，对声速进行温度补偿，显著提高测量精度。
+      
+      /* 超声波测距仪核心代码 - 温补测距 */
+
+/* 温度补偿声速: v = 331.3 * sqrt(1 + T/273.15) */
+float GetSoundSpeed(float temp_celsius) {
+    return 331.3f * sqrtf(1.0f + temp_celsius / 273.15f);
+}
+
+/* 读取温度 (DS18B20 或 NTC) */
+float Read_Temperature(void) {
+    uint32_t adc = 0;
+    for (int i = 0; i >= 3; /* 均值滤波 */
+    float R_ntc = 10`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 指纹保险箱</title>
+  <meta name="description" content="指纹开锁 · 密码键盘 · 防撬报警 · 开锁记录">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">指纹保险箱 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#9726;</div>
+      <h1>STM32F103C8T6 指纹保险箱</h1>
+      <p class="detail-hero-sub">指纹开锁 · 密码键盘 · 防撬报警 · 开锁记录</p>
+      <div class="detail-hero-tags">
+        <span>AS608</span>
+        <span>矩阵键盘</span>
+        <span>舵机</span>
+        <span>蜂鸣器</span>
+        <span>OLED</span>
+        <span>震动传感器</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心软件代码</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>以下展示指纹保险箱的核心功能模块，包括指纹录入/匹配、密码键盘扫描、舵机控制和报警处理。
+      </div>
+      <pre><code>/* ========== 指纹保险箱 - 主程序框架 ========== */
+
+/* 全局变量 */
+uint8_t g_lockState = 0;         /* 0=锁定 1=解锁 */
+uint8_t g_failCount = 0;         /* 连续失败次数 */
+uint8_t g_lockoutTimer = 0;      /* 锁定倒计时(秒) */
+RTC_TimeTypeDef g_rtcTime;       /* RTC 时间 */
+
+/* ===== 1. AS608 指纹录入 ===== */
+void Fingerprint_Enroll(uint8_t id) {
+    OLED_Clear();
+    OLED_ShowString(0, 0, "请按手指...");
+
+    /* 发送录入指令: 0x01 录入, id为指纹编号 */
+    uint8_t cmd[] = {0xEF, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x00, 0x03, 0x01, id, 0x00, 0x00};
+    UART1_Send(cmd, sizeof(cmd));
+
+    /* 等待模块返回确认 */
+    if (UART1_ReceiveAck() == ACK_SUCCESS) {
+        OLED_ShowString(0, 2, "请再次按同一手指...");
+        /* 第二次采集 */
+        if (UART1_ReceiveAck() == ACK_SUCCESS) {
+            OLED_ShowString(0, 4, "录入成功!");
+            Buzzer_Beep(200);  /* 蜂鸣提示 */
+        }
+    } else {
+        OLED_ShowString(0, 4, "录入失败!");
+    }
+}
+
+/* ===== 2. 指纹匹配验证 ===== */
+uint8_t Fingerprint_Verify(void) {
+    uint8_t cmd[] = {0xEF, 0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0x01, 0x00, 0x03, 0x05, 0x00, 0x00, 0x00};
+
+    /* 发送搜索指令(1:N 匹配) */
+    UART1_Send(cmd, sizeof(cmd));
+
+    /* 解析返回包，获取匹配ID */
+    uint8_t resp[16];
+    UART1_Receive(resp, 16);
+
+    if (resp[9] == 0x00) {       /* 模块返回成功标志 */
+        uint8_t matchID = resp[10];
+        OLED_ShowString(0, 4, "验证通过!");
+        g_failCount = 0;          /* 清零失败计数 */
+        return matchID;           /* 返回匹配到的指纹ID */
+    }
+    g_failCount++;
+    OLED_ShowString(0, 4, "验证失败!");
+    return 0;
+}
+
+/* ===== 3. 键盘密码验证 ===== */
+uint8_t Keypad_PasswordVerify(void) {
+    uint8_t input[6] = {0};
+    uint8_t idx = 0;
+    uint8_t correctPwd[6] = {1,2,3,4,5,6};  /* 预设密码 */
+
+    OLED_ShowString(0, 0, "输入密码:");
+    OLED_ShowString(0, 2, "******");
+
+    while (idx < 6) {
+        uint8_t key = Keypad_Scan();       /* 扫描矩阵键盘 */
+        if (key != KEY_NONE) {
+            input[idx++] = key;
+            Buzzer_Beep(50);               /* 按键音 */
+            HAL_Delay(150);
+        }
+    }
+
+    /* 验证密码 */
+    if (memcmp(input, correctPwd, 6) == 0) {
+        OLED_ShowString(0, 4, "密码正确!");
+        g_failCount = 0;
+        return 1;
+    }
+    g_failCount++;
+    OLED_ShowString(0, 4, "密码错误!");
+    return 0;
+}
+
+/* ===== 4. 舵机控制（开锁/关锁） ===== */
+void Servo_Lock(void) {
+    /* SG90: 0.5ms(锁定) PWM = 2.5% 占空比 */
+    TIM3->CCR3 = 50;   /* ARR=1999, 50/2000=2.5% */
+    g_lockState = 0;
+    OLED_ShowString(0, 0, "已锁定");
+}
+
+void Servo_Unlock(void) {
+    /* SG90: 2.5ms(开锁) PWM = 12.5% 占空比 */
+    TIM3->CCR3 = 250;  /* 250/2000=12.5% */
+    g_lockState = 1;
+    OLED_ShowString(0, 0, "已解锁");
+    /* 记录日志 */
+    Log_WriteEntry(g_lastFingerID, LOG_TYPE_FINGER);
+}
+
+/* ===== 5. 防撬报警处理 ===== */
+void EXTI0_IRQHandler(void) {
+    if (EXTI_GetITStatus(EXTI_Line0) != RESET) {
+        if (GPIO_ReadInputDataBit(GPIOC, GPIO_Pin_0) == SET) {
+            /* 检测到震动，触发报警 */
+            for (int i = 0; i < 10; i++) {
+                Buzzer_On();                /* 蜂鸣器响 */
+                HAL_Delay(100);
+                Buzzer_Off();
+                HAL_Delay(100);
+            }
+            OLED_ShowString(0, 6, "!! 防撬报警 !!");
+            Log_WriteEntry(0, LOG_TYPE_ALARM);  /* 记录报警日志 */
+        }
+        EXTI_ClearITPendingBit(EXTI_Line0);
+    }
+}
+
+/* ===== 6. 主循环逻辑 ===== */
+int main(void) {
+    HAL_Init();  SystemClock_Config();
+    UART1_Init(57600);       /* AS608 指纹模块 */
+    I2C1_Init();             /* OLED + DS3231 + EEPROM */
+    TIM3_PWM_Init(1999, 71); /* 舵机 PWM, 50Hz */
+    EXTI0_Init();            /* 震动中断 */
+
+    OLED_Init();
+    OLED_ShowString(0, 0, "指纹保险箱 v1.0");
+    OLED_ShowString(0, 2, "请按手指或输入密码");
+    Servo_Lock();  /* 初始为锁定状态 */
+
+    while (1) {
+        /* 检查锁定状态 */
+        if (g_lockoutTimer > 0) {
+            /* 锁定倒计时 */
+            char buf[16];
+            sprintf(buf, "锁定 %ds", g_lockoutTimer);
+            OLED_ShowString(0, 6, buf);
+            HAL_Delay(1000);
+            g_lockoutTimer--;
+            continue;
+        }
+
+        /* 键盘扫描（非阻塞） */
+        uint8_t key = Keypad_Scan();
+        if (key == KEY_ASTERISK) {
+            /* *键切换至密码模式 */
+            if (Keypad_PasswordVerify()) {
+                Servo_Unlock();
+            }
+        } else if (key == KEY_HASH) {
+            /* #键进入指纹注册模式（需管理权限） */
+            Fingerprint_Enroll(GetNextFreeID());
+        }
+
+        /* 尝试指纹匹配（每500ms轮询一次） */
+        if (AS608_IsFingerPressed()) {
+            uint8_t fid = Fingerprint_Verify();
+            if (fid > 0) {
+                g_lastFingerID = fid;
+                Servo_Unlock();
+            }
+        }
+
+        /* 失败3次锁定30秒 */
+        if (g_failCount >= 3) {
+            g_lockoutTimer = 30;
+            OLED_ShowString(0, 6, "失败3次! 锁定30s");
+            g_failCount = 0;
+        }
+
+        HAL_Delay(200);
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心软件代码
+      
+      
+        代码说明：以下展示指纹保险箱的核心功能模块，包括指纹录入/匹配、密码键盘扫描、舵机控制和报警处理。
+      
+      /* ========== 指纹保险箱 - 主程序框架 ========== */
+
+/* 全局变量 */
+uint8_t g_lockState = 0;         /* 0=锁定 1=解锁 */
+uint8_t g_failCount = 0;         /* 连续失败次数 */
+uint8_t g_lockoutTimer = 0;      /* 锁定倒计时(秒) */
+RTC_TimeTypeDef g_rtcTime;       /* RTC 时间 */
+
+/* ===== 1. AS608 指纹录入 ===== */
+void Fingerprint_Enroll(uint8_t id) {
+    OLED_Clear();
+    OLED_ShowString(0, 0, "请按手指...");
+
+   `;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

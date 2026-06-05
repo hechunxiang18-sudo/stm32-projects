@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCB 布局 - STM32F103C8T6 智能消防系统</title>
+  <meta name="description" content="多传感器融合探测 · 三级火情分级 · 自动灭火喷淋 · GSM 短信报警">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能消防系统 / PCB 布局</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0808 0%, #7f1d1d 40%, #991b1b 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128293;</div>
+      <h1>STM32F103C8T6 智能消防系统</h1>
+      <p class="detail-hero-sub">多传感器融合探测 · 三级火情分级 · 自动灭火喷淋 · GSM 短信报警</p>
+      <div class="detail-hero-tags">
+        <span>火焰传感器 ×5</span>
+        <span>MQ-2 烟雾</span>
+        <span>DS18B20 ×3</span>
+        <span>SIM800L GSM</span>
+        <span>12V 水泵</span>
+        <span>LCD1602</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="workflow.html" class="sec-nav-item">工作流程</a>
+              <a href="algorithm.html" class="sec-nav-item">判据算法</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="schematic.html" class="sec-nav-item">电路原理</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item">核心代码</a>
+              <span class="sec-nav-item active">PCB 布局</span>
+
+    </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="pcb" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128204;</span>
+        <h2>PCB 布局要点</h2>
+      </div>
+      <div class="pcb-grid">
+        <div class="pcb-card">
+          <h4>&#9654; 传感器分区布局</h4>
+          <p>5 路火焰传感器均匀分布在 PCB 四角 + 中心，确保 360° 无盲区覆盖。</p>
+        </div>
+        <div class="pcb-card">
+          <h4>&#9654; 功率与信号隔离</h4>
+          <p>水泵、继电器等大功率部分与 MCU/传感器区域保持 10mm 以上间距，独立铺地。</p>
+        </div>
+        <div class="pcb-card">
+          <h4>&#9654; GSM 天线净空</h4>
+          <p>SIM800L 天线区域不铺铜，净空区 &ge; 15mm&sup2;，确保信号强度。</p>
+        </div>
+        <div class="pcb-card">
+          <h4>&#9654; 电源冗余</h4>
+          <p>12V 主电源 + 5V 备用电池切换，MCU 端加 TVS 管防浪涌。</p>
+        </div>
+        <div class="pcb-card">
+          <h4>&#9654; 去耦电容就近放</h4>
+          <p>每个 IC 的 VDD 引脚旁放置 100nF 陶瓷电容，距引脚 &lt; 5mm。</p>
+        </div>
+        <div class="pcb-card">
+          <h4>&#9654; 防水处理</h4>
+          <p>传感器接口使用防反接端子，PCB 喷涂三防漆，适用于高湿环境。</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

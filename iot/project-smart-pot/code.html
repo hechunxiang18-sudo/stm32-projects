@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能花盆</title>
+  <meta name="description" content="土壤湿度检测 · 自动浇水 · 光照监测 · 蓝牙提醒">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能花盆 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127793;</div>
+      <h1>STM32F103C8T6 智能花盆</h1>
+      <p class="detail-hero-sub">土壤湿度检测 · 自动浇水 · 光照监测 · 蓝牙提醒</p>
+      <div class="detail-hero-tags">
+        <span>YL-69</span>
+        <span>光敏电阻</span>
+        <span>微型水泵</span>
+        <span>太阳能板</span>
+        <span>HC-05</span>
+        <span>DHT11</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - 土壤湿度阈值与自动浇水</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>ADC 采集土壤湿度百分比，低于阈值启动水泵，
+        高于停止。DHT11 温湿度辅助判断是否适合浇水（低温不浇）。
+      </div>
+      <pre><code>/* 智能花盆 - 自动浇水逻辑 (HAL 库) */
+
+#include &lt;stdio.h&gt;
+
+/* 阈值定义 */
+#define SOIL_DRY_THRESHOLD  30   /* 低于 30% 开始浇水 */
+#define SOIL_WET_THRESHOLD  70   /* 高于 70% 停止浇水 */
+#define PUMP_RUN_SEC        5    /* 每次最长浇水 5 秒 */
+#define ADC_RESOLUTION      4096
+
+/* 获取土壤湿度百分比 */
+uint8_t Soil_GetMoisture(void) {
+    HAL_ADC_Start(&amp;hadc1);
+    HAL_ADC_PollForConversion(&amp;hadc1, 50);
+    uint16_t adc = HAL_ADC_GetValue(&amp;hadc1);
+    HAL_ADC_Stop(&amp;hadc1);
+    /* YL-69: 干燥时 ADC 高，湿润时低，反转 */
+    uint8_t pct = 100 - (adc * 100 / ADC_RESOLUTION);
+    return pct;
+}
+
+/* 光照检测 (lux 估算) */
+uint16_t Light_GetLux(void) {
+    HAL_ADC_Start(&amp;hadc2);
+    HAL_ADC_PollForConversion(&amp;hadc2, 50);
+    uint16_t adc = HAL_ADC_GetValue(&amp;hadc2);
+    HAL_ADC_Stop(&amp;hadc2);
+    /* 粗略换算 */
+    return (uint16_t)(adc * 1000 / ADC_RESOLUTION);
+}
+
+/* 水泵控制 */
+void Pump_On(void) {
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET); /* MOS 低电平导通 */
+}
+
+void Pump_Off(void) {
+    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
+}
+
+/* 自动浇水任务 (每 10 秒执行一次) */
+void AutoWater_Task(void) {
+    uint8_t moisture = Soil_GetMoisture();
+    float temp, humi;
+
+    DHT11_Read(&amp;temp, &amp;humi);
+
+    /* 低温 (&lt; 5&deg;C) 不浇水防冻 */
+    if (temp &lt; 5.0f) {
+        Pump_Off();
+        return;
+    }
+
+    if (moisture &lt; SOIL_DRY_THRESHOLD) {
+        Pump_On();
+        HAL_Delay(PUMP_RUN_SEC * 1000);
+        /* 再次检测，若仍低于阈值继续 */
+        uint8_t recheck = Soil_GetMoisture();
+        if (recheck &gt;= SOIL_WET_THRESHOLD) {
+            Pump_Off();
+        }
+        /* 超时保护：最多运行 30 秒 */
+        for (int i = 0; i &lt; 6; i++) {
+            if (Soil_GetMoisture() &gt;= SOIL_WET_THRESHOLD) {
+                Pump_Off();
+                break;
+            }
+            HAL_Delay(5000);
+        }
+        Pump_Off();
+    } else {
+        Pump_Off();
+    }
+}
+
+/* 蓝牙推送养护报告 */
+void Send_Report(void) {
+    char buf[128];
+    uint8_t m = Soil_GetMoisture();
+    uint16_t l = Light_GetLux();
+    float t, h;
+    DHT11_Read(&amp;t, &amp;h);
+
+    snprintf(buf, sizeof(buf),
+        "植物报告 | 土壤:%d%% | 光照:%dlux | %d&deg;C %d%%RH\r\n",
+        m, l, (int)t, (int)h);
+    HC05_SendString(buf);
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - 土壤湿度阈值与自动浇水
+      
+      
+        代码说明：ADC 采集土壤湿度百分比，低于阈值启动水泵，
+        高于停止。DHT11 温湿度辅助判断是否适合浇水（低温不浇）。
+      
+      /* 智能花盆 - 自动浇水逻辑 (HAL 库) */
+
+#include &lt;stdio.h&gt;
+
+/* 阈值定义 */
+#define SOIL_DRY_THRESHOLD  30   /* 低于 30% 开始浇水 */
+#define SOIL_WET_THRESHOLD  70   /* 高于 70% 停止浇水 */
+#define PUMP_RUN_SEC        5    /* 每次最长浇水 5 秒 */
+#define ADC_RESOLUTION      4096
+
+/* 获取土壤湿度百分比 */
+uint8_t Soil_GetMoisture(void) {
+    HAL_ADC_Start(&amp;hadc1);
+    HAL_ADC`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目概述 - STM32F103C8T6 WiFi 天气时钟</title>
+  <meta name="description" content="NTP 自动校时 · 天气实况 · 闹钟 · 温湿度显示">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">WiFi 天气时钟 / 项目概述</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127774;</div>
+      <h1>STM32F103C8T6 WiFi 天气时钟</h1>
+      <p class="detail-hero-sub">NTP 自动校时 · 天气实况 · 闹钟 · 温湿度显示</p>
+      <div class="detail-hero-tags">
+        <span>ESP8266</span>
+        <span>OLED 1.3"</span>
+        <span>DHT22</span>
+        <span>DS3231</span>
+        <span>光敏电阻</span>
+        <span>触摸按键</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <span class="sec-nav-item active">项目概述</span>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="overview" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#127774;</span>
+        <h2>项目概述</h2>
+      </div>
+      <div class="project-intro">
+        <div class="project-intro-text">
+          <p>
+            基于 STM32F103C8T6 的 WiFi 天气时钟，通过 ESP8266 连接互联网获取 NTP 网络时间自动校时，
+            同时从天气 API 获取实时天气和未来 3 天预报数据。DS3231 RTC 作为本地时钟备份，
+            断电后时间不丢失。
+          </p>
+          <p>
+            DHT22 采集本地温湿度，光敏电阻实现自动亮度调节。1.3 寸 OLED 展示时钟、天气、温湿度、
+            闹钟等信息，4 个触摸按键切换显示模式。配备蜂鸣器闹钟功能，适合桌面电子日历、家庭信息台等场景。
+          </p>
+        </div>
+      </div>
+
+      <div class="svg-product">
+        <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="wth-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1628"/><stop offset="100%" stop-color="#1a3a6b"/></linearGradient>
+            <linearGradient id="wth-frame" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3a3a4a"/><stop offset="100%" stop-color="#1a1a2a"/></linearGradient>
+            <linearGradient id="wth-screen" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1a2a"/><stop offset="100%" stop-color="#050d1a"/></linearGradient>
+            <filter id="wth-shadow"><feDropShadow dx="3" dy="4" stdDeviation="6" flood-opacity="0.5"/></filter>
+            <linearGradient id="wth-sun" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffee44"/><stop offset="100%" stop-color="#ffaa00"/></linearGradient>
+          </defs>
+          <rect width="800" height="300" fill="url(#wth-bg)" rx="12"/>
+          <ellipse cx="400" cy="275" rx="280" ry="15" fill="rgba(0,0,0,0.3)"/>
+          <!-- 桌面支架 -->
+          <path d="M340 270 L360 240 L440 240 L460 270 Z" fill="#2a2a3a"/>
+          <ellipse cx="400" cy="272" rx="80" ry="8" fill="#1a1a2a"/>
+          <!-- 主机外壳 -->
+          <rect x="220" y="80" width="360" height="165" rx="15" fill="url(#wth-frame)" filter="url(#wth-shadow)"/>
+          <rect x="220" y="80" width="360" height="165" rx="15" fill="rgba(255,255,255,0.03)"/>
+          <!-- 屏幕区域 -->
+          <rect x="240" y="95" width="225" height="120" rx="8" fill="url(#wth-screen)"/>
+          <rect x="240" y="95" width="225" height="120" rx="8" fill="none" stroke="#2a4a6a" stroke-width="1"/>
+          <!-- 时间显示 -->
+          <text x="352" y="120" text-anchor="middle" fill="#ffffff" font-size="28" font-family="monospace">12:45</text>
+          <text x="352" y="133" text-anchor="middle" fill="#6688aa" font-size="7" font-family="sans-serif">2026-06-05 周五</text>
+          <!-- 天气图标 -->
+          <circle cx="280" cy="165" r="14" fill="url(#wth-sun)"/>
+          <circle cx="280" cy="165" r="6" fill="#ffee88"/>
+          <!-- 光线 -->
+          <line x1="280" y1="148" x2="280" y2="144" stroke="#ffee44" stroke-width="1.5" opacity="0.6"/>
+          <line x1="294" y1="153" x2="298" y2="150" stroke="#ffee44" stroke-width="1.5" opacity="0.6"/>
+          <line x1="298" y1="165" x2="302" y2="165" stroke="#ffee44" stroke-width="1.5" opacity="0.6"/>
+          <line x1="294" y1="177" x2="298" y2="180" stroke="#ffee44" stroke-width="1.5" opacity="0.6"/>
+          <line x1="266" y1="153" x2="262" y2="150" stroke="#ffee44" stroke-width="1.5" opacity="0.6"/>
+          <line x1="262" y1="165" x2="258" y2="165" stroke="#ffee44" stroke-width="1.5" opacity="0.6"/>
+          <!-- 温度 -->
+          <text x="330" y="162" text-anchor="middle" fill="#ffaa44" font-size="10" font-family="sans-serif">28&deg;C</text>
+          <text x="330" y="176" text-anchor="middle" fill="#88aacc" font-size="8" font-family="sans-serif">晴 东风2级</text>
+          <!-- 未来三天预报 -->
+          <text x="280" y="198" text-anchor="middle" fill="#6688aa" font-size="6">周六</text>
+          <text x="280" y="206" text-anchor="middle" fill="#88aacc" font-size="6">30/22</text>
+          <text x="330" y="198" text-anchor="middle" fill="#6688aa" font-size="6">周日</text>
+          <text x="330" y="206" text-anchor="middle" fill="#88aacc" font-size="6">29/21</text>
+          <text x="380" y="198" text-anchor="middle" fill="#6688aa" font-size="6">周一</text>
+          <text x="380" y="206" text-anchor="middle" fill="#88aacc" font-size="6">28/20</text>
+          <!-- 右侧信息区 -->
+          <rect x="485" y="95" width="75" height="55" rx="6" fill="#0d1a2a" stroke="#2a3a5a" stroke-width="0.5"/>
+          <text x="522" y="112" text-anchor="middle" fill="#00ff88" font-size="8" font-family="monospace">26.5&deg;C</text>
+          <text x="522" y="124" text-anchor="middle" fill="#66ccaa" font-size="7" font-family="monospace">RH 62%</text>
+          <text x="522" y="140" text-anchor="middle" fill="#4488cc" font-size="6" font-family="monospace">DHT22</text>
+          <!-- 闹钟信息 -->
+          <rect x="485" y="155" width="75" height="50" rx="6" fill="#0d1a2a" stroke="#2a3a5a" stroke-width="0.5"/>
+          <text x="522" y="172" text-anchor="middle" fill="#ffaa44" font-size="8" font-family="sans-serif">&#9200; 07:00</text>
+          <text x="522" y="185" text-anchor="middle" fill="#6688aa" font-size="6" font-family="sans-serif">工作日</text>
+          <!-- 触摸按键 -->
+          <rect x="485" y="218" width="32" height="20" rx="5" fill="#2a2a3a" stroke="#3a3a5a" stroke-width="0.5"/>
+          <rect x="521" y="218" width="32" height="20" rx="5" fill="#2a2a3a" stroke="#3a3a5a" stroke-width="0.5"/>
+          <rect x="557" y="218" width="32" height="20" rx="5" fill="#2a2a3a" stroke="#3a3a5a" stroke-width="0.5"/>
+          <rect x="557" y="218" width="32" height="20" rx="5" fill="#2a2a3a" stroke="#3a3a5a" stroke-width="0.5"/>
+          <text x="501" y="232" text-anchor="middle" fill="#6a8aaa" font-size="7">模式</text>
+          <text x="537" y="232" text-anchor="middle" fill="#6a8aaa" font-size="7">设置</text>
+          <text x="573" y="232" text-anchor="middle" fill="#6a8aaa" font-size="7">闹钟</text>
+          <!-- WiFi 指示灯 -->
+          <circle cx="560" cy="108" r="4" fill="#44aaff" opacity="0.9">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <text x="560" y="120" text-anchor="middle" fill="#66aacc" font-size="5">WiFi</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

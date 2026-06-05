@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能特性 - STM32F103C8T6 酒精检测仪</title>
+  <meta name="description" content="MQ-3 酒精检测 · 吹气感应 · 声光报警 · 数据记录">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">酒精检测仪 / 功能特性</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0808 0%, #7f1d1d 40%, #991b1b 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127867;</div>
+      <h1>STM32F103C8T6 酒精检测仪</h1>
+      <p class="detail-hero-sub">MQ-3 酒精检测 · 吹气感应 · 声光报警 · 数据记录</p>
+      <div class="detail-hero-tags">
+        <span>MQ-3</span>
+        <span>ADC</span>
+        <span>吹气流量</span>
+        <span>OLED</span>
+        <span>蜂鸣器</span>
+        <span>RGB LED</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <span class="sec-nav-item active">功能特性</span>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="features" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#9889;</span>
+        <h2>功能特性</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fc-icon">&#127867;</div>
+          <h4>MQ-3 酒精检测</h4>
+          <p>高灵敏度酒精传感器，量程 0-5mg/L，预热自检</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128168;</div>
+          <h4>吹气流量防作弊</h4>
+          <p>吹气流量传感器检测真实吹气，防止气囊作弊</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128308;</div>
+          <h4>三色 LED 分级指示</h4>
+          <p>绿灯安全 &lt;0.2mg/L、黄灯 0.2-0.8、红灯超标</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128424;</div>
+          <h4>OLED 实时显示</h4>
+          <p>1.3 寸 OLED 显示浓度、分级、时间、历史记录</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128266;</div>
+          <h4>语音播报结果</h4>
+          <p>JQ8900 语音模块中文播报检测结果和提示</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128197;</div>
+          <h4>日历记录</h4>
+          <p>DS3231 RTC 时间戳，存储 1000 条历史检测记录</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

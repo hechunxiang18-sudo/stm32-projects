@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>元器件清单 - STM32F103C8T6 智能报警系统</title>
+  <meta name="description" content="多传感器探测 · GSM 短信报警 · 声光联动 · 布防撤防">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能报警系统 / 元器件清单</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0808 0%, #7f1d1d 40%, #991b1b 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#9726;</div>
+      <h1>STM32F103C8T6 智能报警系统</h1>
+      <p class="detail-hero-sub">多传感器探测 · GSM 短信报警 · 声光联动 · 布防撤防</p>
+      <div class="detail-hero-tags">
+        <span>PIR</span>
+        <span>门磁</span>
+        <span>烟雾</span>
+        <span>GSM</span>
+        <span>声光</span>
+        <span>遥控</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <span class="sec-nav-item active">元器件清单</span>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="bom" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128221;</span>
+        <h2>元器件清单 (BOM)</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Ref</th><th>型号</th><th>封装</th><th>说明</th><th>数量</th><th>参考价</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>U1</td><td>STM32F103C8T6</td><td>LQFP-48</td><td>主控 MCU，72MHz Cortex-M3</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>S1</td><td>HC-SR501</td><td>PCB 模组</td><td>PIR 人体感应模块，5-8 米</td><td>1</td><td>¥3.0</td></tr>
+            <tr><td>S2</td><td>门磁传感器</td><td>2-pin</td><td>干簧管 + 磁铁，NO 常开</td><td>1</td><td>¥1.5</td></tr>
+            <tr><td>S3</td><td>MQ-2</td><td>PCB 模组</td><td>烟雾/液化气传感器，模拟输出</td><td>1</td><td>¥4.0</td></tr>
+            <tr><td>U2</td><td>SIM800L</td><td>PCB 模组</td><td>GSM/GPRS 模块，短信+通话</td><td>1</td><td>¥18.0</td></tr>
+            <tr><td>B1</td><td>高分贝蜂鸣器</td><td>2-pin 直插</td><td>12V 有源蜂鸣器，≥100dB</td><td>1</td><td>¥3.0</td></tr>
+            <tr><td>LED1-2</td><td>高亮 LED</td><td>5mm 直插</td><td>红色高亮，报警频闪</td><td>2</td><td>¥0.5</td></tr>
+            <tr><td>U3</td><td>红外接收 VS1838B</td><td>3-pin 直插</td><td>红外遥控接收头，38kHz</td><td>1</td><td>¥1.0</td></tr>
+            <tr><td>&mdash;</td><td>按键 + LED</td><td>&mdash;</td><td>面板按键 4 个 + 状态 LED 3 个</td><td>1</td><td>¥1.0</td></tr>
+            <tr><td>&mdash;</td><td>12V 电源</td><td>&mdash;</td><td>DC 5.5 接口 + 降压模块</td><td>1</td><td>¥6.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="bom-total">全套硬件成本（含 MCU）：<strong>≈ ¥43</strong></p>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

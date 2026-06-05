@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 RFID 考勤机</title>
+  <meta name="description" content="IC 卡签到 · 大屏显示 · USB 数据导出 · 语音播报">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">RFID 考勤机 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#9726;</div>
+      <h1>STM32F103C8T6 RFID 考勤机</h1>
+      <p class="detail-hero-sub">IC 卡签到 · 大屏显示 · USB 数据导出 · 语音播报</p>
+      <div class="detail-hero-tags">
+        <span>RC522</span>
+        <span>LCD12864</span>
+        <span>CH340</span>
+        <span>语音模块</span>
+        <span>DS3231</span>
+        <span>SD卡</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心软件代码</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>以下展示 RFID 考勤机的核心模块，包括 RC522 读卡、LCD12864 显示、语音播报、CSV 导出等功能。
+      </div>
+      <pre><code>/* ========== RFID 考勤机 - 主程序框架 ========== */
+
+#include "rc522.h"
+#include "lcd12864.h"
+#include "jq8900.h"
+#include "ds3231.h"
+#include "sd_card.h"
+
+typedef struct {
+    uint8_t  uid[8];            /* 卡片 UID */
+    char     name[16];          /* 姓名 */
+    char     empID[12];         /* 工号 */
+    uint16_t year;
+    uint8_t  month;
+    uint8_t  day;
+    uint8_t  hour;
+    uint8_t  minute;
+    uint8_t  second;
+    uint8_t  valid;             /* 记录有效标志 */
+} AttendanceRecord_t;
+
+AttendanceRecord_t g_records[1000];  /* 考勤记录缓冲区 */
+uint16_t g_recordCount = 0;
+
+/* ===== 员工信息表（预置） ===== */
+const Employee_t g_employees[] = {
+    {.uid = {0x12,0x34,0x56,0x78}, .name = "张三", .empID = "ST-2024-001"},
+    {.uid = {0xAB,0xCD,0xEF,0x01}, .name = "李四", .empID = "ST-2024-002"},
+    {.uid = {0x98,0x76,0x54,0x32}, .name = "王五", .empID = "ST-2024-003"},
+    /* 更多员工... */
+};
+
+/* ===== 1. RC522 读卡 ===== */
+uint8_t RFID_ReadCard(uint8_t *uid) {
+    uint8_t status;
+
+    /* 寻卡（Request） */
+    status = RC522_Request(PICC_REQIDL, uid);
+    if (status != MI_OK) return 0;
+
+    /* 防冲突（AntiCollision），获取完整 UID */
+    status = RC522_Anticoll(uid);
+    if (status != MI_OK) return 0;
+
+    /* 选卡（Select Tag），激活卡片 */
+    uint8_t uidSize = uid[0] & 0x0F;
+    status = RC522_SelectTag(uid, uidSize);
+    if (status != MI_OK) return 0;
+
+    return 1;  /* 读卡成功 */
+}
+
+/* ===== 2. 考勤签到处理 ===== */
+void Attendance_CheckIn(uint8_t *uid) {
+    char name[16] = "未知用户";
+    char empID[12] = "---";
+
+    /* 在员工表中查找匹配 UID */
+    for (int i = 0; i < EMPLOYEE_COUNT; i++) {
+        if (memcmp(uid, g_employees[i].uid, 4) == 0) {
+            strcpy(name, g_employees[i].name);
+            strcpy(empID, g_employees[i].empID);
+            break;
+        }
+    }
+
+    /* 获取当前时间 */
+    DS3231_GetTime(&g_rtcTime);
+
+    /* LCD 显示签到信息 */
+    LCD12864_Clear();
+    LCD12864_Print(0, 0, "  RFID 考勤系统 ");
+    LCD12864_Print(1, 0, "姓名: ");
+    LCD12864_Print(1, 4, name);
+    LCD12864_Print(2, 0, "工号: ");
+    LCD12864_Print(2, 4, empID);
+
+    char timeStr[18];
+    sprintf(timeStr, "%02d:%02d:%02d",
+            g_rtcTime.hour, g_rtcTime.minute, g_rtcTime.second);
+    LCD12864_Print(3, 0, "时间: ");
+    LCD12864_Print(3, 4, timeStr);
+
+    if (strcmp(name, "未知用户") != 0) {
+        LCD12864_Print(4, 0, "状态: 签到成功!");
+        /* 语音播报欢迎 */
+        JQ8900_PlayByIndex(1);  /* 播放"签到成功" */
+    } else {
+        LCD12864_Print(4, 0, "状态: 未注册卡!");
+        JQ8900_PlayByIndex(2);  /* 播放"无效卡" */
+    }
+
+    /* 保存记录到缓冲区 */
+    AttendanceRecord_t *rec = &g_records[g_recordCount];
+    memcpy(rec->uid, uid, 4);
+    strcpy(rec->name, name);
+    strcpy(rec->empID, empID);
+    rec->hour   = g_rtcTime.hour;
+    rec->minute = g_rtcTime.minute;
+    rec->second = g_rtcTime.second;
+    rec->valid  = 1;
+    g_recordCount++;
+
+    /* 同时写入 SD 卡备份 */
+    SDCard_AppendRecord(rec);
+}
+
+/* ===== 3. USB 导出 CSV 报表 ===== */
+void USB_ExportCSV(void) {
+    char buf[128];
+    uint16_t exported = 0;
+
+    /* 发送 CSV 表头 */
+    UART1_SendString("工号,姓名,日期,时间,状态\r\n");
+
+    for (int i = 0; i < g_recordCount; i++) {
+        AttendanceRecord_t *rec = &g_records[i];
+        if (!rec->valid) continue;
+
+        /* 格式：工号,姓名,2024-01-15,08:30:00,签到成功 */
+        sprintf(buf, "%s,%s,%04d-%02d-%02d,%02d:%02d:%02d,签到成功\r\n",
+                rec->empID, rec->name,
+                rec->year, rec->month, rec->day,
+                rec->hour, rec->minute, rec->second);
+        UART1_SendString(buf);
+        exported++;
+        HAL_Delay(2);  /* USB 发送缓冲 */
+    }
+
+    /* 发送结束标记 */
+    sprintf(buf, "\r\n共导出 %d 条记录\r\n", exported);
+    UART1_SendString(buf);
+}
+
+/* ===== 4. LCD12864 驱动（SPI 模式） ===== */
+void LCD12864_Print(uint8_t row, uint8_t col, const char *str) {
+    uint8_t addr;
+
+    /* 计算显示地址（ST7920 控制器） */
+    if (row < 4) {
+        addr = 0x80 + row * 16 + col;    /* 上半屏 */
+    } else {
+        addr = 0x88 + (row - 4) * 16 + col; /* 下半屏 */
+    }
+
+    LCD12864_WriteCmd(addr);  /* 设置地址 */
+
+    while (*str) {
+        LCD12864_WriteData(*str++);  /* 写入字符数据 */
+    }
+}
+
+/* ===== 5. 主循环 ===== */
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+
+    SPI1_Init();           /* RC522 */
+    UART1_Init(115200);    /* CH340 USB */
+    UART2_Init(9600);      /* JQ8900 语音 */
+    I2C1_Init();           /* DS3231 RTC */
+    SPI2_Init();           /* SD 卡 */
+
+    RC522_Init();
+    LCD12864_Init();
+    JQ8900_Init();
+    DS3231_Init();
+
+    /* 开机画面 */
+    LCD12864_Clear();
+    LCD12864_Print(1, 1, "RFID 考勤系统");
+    LCD12864_Print(2, 1, "正在初始化...");
+    HAL_Delay(1000);
+
+    /* 语音播报开机 */
+    JQ8900_PlayByIndex(0);  /* "系统已就绪" */
+
+    LCD12864_Clear();
+    LCD12864_Print(0, 1, "RFID 考勤系统");
+    LCD12864_Print(2, 0, "请刷卡签到");
+    LCD12864_Print(3, 0, "USB 导出按 KEY1");
+
+    uint8_t uid[8];
+
+    while (1) {
+        /* 主任务：刷卡检测 */
+        if (RFID_ReadCard(uid)) {
+            Attendance_CheckIn(uid);
+            HAL_Delay(2000);   /* 防重复刷卡 */
+
+            /* 返回待机画面 */
+            LCD12864_Clear();
+            LCD12864_Print(0, 1, "RFID 考勤系统");
+            LCD12864_Print(2, 0, "请刷卡签到");
+        }
+
+        /* 按键检测：KEY1 导出 CSV */
+        if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_10) == 0) {
+            LCD12864_Print(3, 0, "正在导出数据...");
+            USB_ExportCSV();
+            LCD12864_Print(3, 0, "导出完成!      ");
+        }
+
+        /* 按键检测：KEY2 切换显示签到统计 */
+        if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_11) == 0) {
+            char buf[16];
+            sprintf(buf, "今日: %d 人", GetTodayCount());
+            LCD12864_Print(3, 0, buf);
+        }
+
+        HAL_Delay(100);
+    }
+}
+
+/* ===== 6. 实用工具函数 ===== */
+uint16_t GetTodayCount(void) {
+    uint16_t count = 0;
+    RTC_TimeTypeDef now;
+    DS3231_GetTime(&now);
+
+    for (int i = 0; i < g_recordCount; i++) {
+        if (g_records[i].valid &&
+            g_records[i].year  == now.year &&
+            g_records[i].month == now.month &&
+            g_records[i].day   == now.date) {
+            count++;
+        }
+    }
+    return count;
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心软件代码
+      
+      
+        代码说明：以下展示 RFID 考勤机的核心模块，包括 RC522 读卡、LCD12864 显示、语音播报、CSV 导出等功能。
+      
+      /* ========== RFID 考勤机 - 主程序框架 ========== */
+
+#include "rc522.h"
+#include "lcd12864.h"
+#include "jq8900.h"
+#include "ds3231.h"
+#include "sd_card.h"
+
+typedef struct {
+    uint8_t  uid[8];            /* 卡片 UID */
+    char     name[16];          /* 姓名 */
+    char     empID[12];         /* 工号 */
+    uint16_t year;
+    uint8_t  month;
+    uint8_t  day;
+    uint8_`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

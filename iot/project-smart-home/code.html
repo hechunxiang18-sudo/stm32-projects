@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能家居系统</title>
+  <meta name="description" content="多传感器采集 · 家电远程控制 · MQTT 云端联动 · 红外学习遥控">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能家居系统 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127968;</div>
+      <h1>STM32F103C8T6 智能家居系统</h1>
+      <p class="detail-hero-sub">多传感器采集 · 家电远程控制 · MQTT 云端联动 · 红外学习遥控</p>
+      <div class="detail-hero-tags">
+        <span>DHT11</span>
+        <span>BH1750</span>
+        <span>ESP8266</span>
+        <span>OLED 0.96"</span>
+        <span>4路继电器</span>
+        <span>FreeRTOS</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="schematic.html" class="sec-nav-item item-download">电路原理图 &#128229;</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>软件架构 - FreeRTOS 任务分配</h2>
+      </div>
+      <div class="note-box">
+        <strong>软件架构说明：</strong>采用 FreeRTOS 实时操作系统，按功能划分为三个独立任务，
+        利用消息队列实现任务间通信，确保系统实时性和稳定性。
+      </div>
+      <pre><code>/* 智能家居主程序任务结构 (FreeRTOS) */
+
+/* 任务 1：传感器采集（优先级 2，周期 2s） */
+void vTask_SensorCollect(void *pvParam) {
+    for (;;) {
+        DHT11_ReadData();              // 读取温湿度
+        BH1750_ReadLight();            // 读取光照
+        MQTT_Publish_SensorData();     // 发布到 MQTT
+        OLED_UpdateDisplay();          // 更新显示屏
+        vTaskDelay(pdMS_TO_TICKS(2000));
+    }
+}
+
+/* 任务 2：MQTT 通信（优先级 3，周期 100ms） */
+void vTask_MQTT_Handle(void *pvParam) {
+    for (;;) {
+        ESP8266_ProcessBuffer();       // 处理 WiFi 数据
+        if (mqtt_msg_available()) {
+            handle_mqtt_command();     // 解析云端指令
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+}
+
+/* 任务 3：自动联动控制（优先级 1，周期 500ms） */
+void vTask_AutoControl(void *pvParam) {
+    for (;;) {
+        if (lux &lt; 50) Relay_On(LIGHT_RELAY);
+        else           Relay_Off(LIGHT_RELAY);
+        if (temp &gt; 30) Relay_On(FAN_RELAY);
+        else           Relay_Off(FAN_RELAY);
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        软件架构 - FreeRTOS 任务分配
+      
+      
+        软件架构说明：采用 FreeRTOS 实时操作系统，按功能划分为三个独立任务，
+        利用消息队列实现任务间通信，确保系统实时性和稳定性。
+      
+      /* 智能家居主程序任务结构 (FreeRTOS) */
+
+/* 任务 1：传感器采集（优先级 2，周期 2s） */
+void vTask_SensorCollect(void *pvParam) {
+    for (;;) {
+        DHT11_ReadData();              // 读取温湿度
+        BH1750_ReadLight();            // 读取光照
+        MQTT_Publish_SensorData();     // 发布到 MQTT
+        OLED_UpdateDisplay();          // 更新显示屏
+        vTaskDelay(pdMS_`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统框图 - STM32F103C8T6 智能血糖仪</title>
+  <meta name="description" content="电化学检测 · 试纸识别 · 蓝牙同步 · 趋势分析">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能血糖仪 / 系统框图</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0808 0%, #7f1d1d 40%, #991b1b 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128137;</div>
+      <h1>STM32F103C8T6 智能血糖仪</h1>
+      <p class="detail-hero-sub">电化学检测 · 试纸识别 · 蓝牙同步 · 趋势分析</p>
+      <div class="detail-hero-tags">
+        <span>电化学传感器</span>
+        <span>ADC</span>
+        <span>恒电位仪</span>
+        <span>蓝牙</span>
+        <span>OLED</span>
+        <span>按键</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <span class="sec-nav-item active">系统框图</span>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="block" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128200;</span>
+        <h2>系统框图</h2>
+      </div>
+      <div class="block-diagram">
+        <div class="bd-title">智能血糖仪系统架构</div>
+        <div class="bd-flow">
+          <div class="bd-node danger">
+            <div class="bd-icon">&#9889;</div>
+            <div class="bd-label">恒电位仪</div>
+            <small>运放电路</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#128300;</div>
+            <div class="bd-label">试纸电极</div>
+            <small>电流信号</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#9741;</div>
+            <div class="bd-label">ADS1115</div>
+            <small>ADC 采样</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node primary">
+            <div class="bd-icon">&#9726;</div>
+            <div class="bd-label">STM32F103</div>
+            <small>主控 MCU</small>
+          </div>
+        </div>
+        <div class="bd-flow" style="margin-top:10px;">
+          <div class="bd-node primary">
+            <div class="bd-icon">&#9726;</div>
+            <div class="bd-label">STM32F103</div>
+            <small>数据处理</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node accent">
+            <div class="bd-icon">&#128264;</div>
+            <div class="bd-label">HC-05</div>
+            <small>蓝牙同步</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#128241;</div>
+            <div class="bd-label">手机 App</div>
+            <small>记录/报告</small>
+          </div>
+        </div>
+        <div class="bd-flow" style="margin-top:10px;">
+          <div class="bd-node primary">
+            <div class="bd-icon">&#9726;</div>
+            <div class="bd-label">STM32F103</div>
+            <small>外设管理</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#128424;</div>
+            <div class="bd-label">OLED 0.96"</div>
+            <small>显示</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#128340;</div>
+            <div class="bd-label">DS3231 RTC</div>
+            <small>时间戳</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node warn">
+            <div class="bd-icon">&#128276;</div>
+            <div class="bd-label">蜂鸣器</div>
+            <small>报警</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>引脚连接 - STM32F103C8T6 OBD 车载诊断系统</title>
+  <meta name="description" content="CAN 总线读取 · 车辆故障码 · 实时数据流 · 蓝牙显示">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">OBD 车载诊断 / 引脚连接</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128663;</div>
+      <h1>STM32F103C8T6 OBD 车载诊断系统</h1>
+      <p class="detail-hero-sub">CAN 总线读取 · 车辆故障码 · 实时数据流 · 蓝牙显示</p>
+      <div class="detail-hero-tags">
+        <span>MCP2515</span>
+        <span>TJA1050</span>
+        <span>HC-05</span>
+        <span>OLED 1.3"</span>
+        <span>SD 卡</span>
+        <span>DS3231</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">引脚连接</span>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="pinout" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128279;</span>
+        <h2>引脚连接表</h2>
+      </div>
+      <div class="table-wrap pinout-wrap">
+        <table class="pin-table">
+          <thead>
+            <tr><th>STM32 引脚</th><th>功能</th><th>连接目标</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>PA4</td><td>SPI1_CS</td><td>MCP2515 CS</td><td>CAN 控制器片选</td></tr>
+            <tr><td>PA5</td><td>SPI1_SCK</td><td>MCP2515 SCK</td><td>SPI 时钟 10MHz</td></tr>
+            <tr><td>PA6</td><td>SPI1_MISO</td><td>MCP2515 MISO</td><td>SPI 主入从出</td></tr>
+            <tr><td>PA7</td><td>SPI1_MOSI</td><td>MCP2515 MOSI</td><td>SPI 主出从入</td></tr>
+            <tr><td>PB0</td><td>EXTI0</td><td>MCP2515 INT</td><td>CAN 中断输入</td></tr>
+            <tr><td>PB1</td><td>EXTI1</td><td>按键 1 (模式)</td><td>外部中断</td></tr>
+            <tr><td>PA0</td><td>SPI2_CS</td><td>SD 卡 CS</td><td>备用 SPI 接口</td></tr>
+            <tr><td>PA2</td><td>USART2_TX</td><td>HC-05 RXD</td><td>蓝牙发送</td></tr>
+            <tr><td>PA3</td><td>USART2_RX</td><td>HC-05 TXD</td><td>蓝牙接收</td></tr>
+            <tr><td>PB6</td><td>I2C1_SCL</td><td>OLED SCL</td><td>I2C 时钟</td></tr>
+            <tr><td>PB7</td><td>I2C1_SDA</td><td>OLED SDA</td><td>I2C 数据</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>引脚连接 - STM32F103C8T6 智能门禁系统</title>
+  <meta name="description" content="IC 卡刷卡 · 密码键盘 · 指纹识别 · 远程开门 · 访客记录">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能门禁系统 / 引脚连接</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128301;</div>
+      <h1>STM32F103C8T6 智能门禁系统</h1>
+      <p class="detail-hero-sub">IC 卡刷卡 · 密码键盘 · 指纹识别 · 远程开门 · 访客记录</p>
+      <div class="detail-hero-tags">
+        <span>RC522</span>
+        <span>AS608</span>
+        <span>4×4 键盘</span>
+        <span>电磁锁</span>
+        <span>ESP8266</span>
+        <span>OLED</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">引脚连接</span>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="pinout" class="section">
+      <div class="section-header"><span class="sec-icon">&#128279;</span><h2>引脚连接表</h2></div>
+      <div class="table-wrap pinout-wrap">
+        <table class="pin-table">
+          <thead><tr><th>STM32 引脚</th><th>功能</th><th>连接目标</th><th>备注</th></tr></thead>
+          <tbody>
+            <tr><td>PA4-PA7</td><td>SPI1</td><td>RC522</td><td>SPI @ 4MHz</td></tr>
+            <tr><td>PA9-PA10</td><td>USART1</td><td>AS608 指纹</td><td>57600 8N1</td></tr>
+            <tr><td>PA2-PA3</td><td>USART2</td><td>ESP8266</td><td>115200 8N1</td></tr>
+            <tr><td>PB12-PB15</td><td>GPIO</td><td>4×4 键盘行列</td><td>行列扫描</td></tr>
+            <tr><td>PB6-PB7</td><td>I2C1</td><td>OLED + DS3231</td><td>共用 I2C 总线</td></tr>
+            <tr><td>PC0</td><td>GPIO Output</td><td>电磁锁 MOSFET</td><td>高电平开锁</td></tr>
+            <tr><td>PC1</td><td>GPIO Input</td><td>门磁传感器</td><td>门状态检测</td></tr>
+            <tr><td>PC2</td><td>GPIO Input</td><td>防拆开关</td><td>低电平报警</td></tr>
+            <tr><td>PB0</td><td>TIM3_CH1</td><td>蜂鸣器</td><td>PWM 音调</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

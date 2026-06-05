@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能台灯</title>
+  <meta name="description" content="无级调光 · 色温调节 · 触摸开关 · 护眼模式">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能台灯 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128161;</div>
+      <h1>STM32F103C8T6 智能台灯</h1>
+      <p class="detail-hero-sub">无级调光 · 色温调节 · 触摸开关 · 护眼模式</p>
+      <div class="detail-hero-tags">
+        <span>PWM</span>
+        <span>RGBW</span>
+        <span>触摸</span>
+        <span>TTP223</span>
+        <span>光敏</span>
+        <span>OLED</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - 调光调色与自动亮度</h2>
+      </div>
+      <div class="note-box">
+        <strong>核心逻辑：</strong>PWM 驱动白光和暖光两路混合实现色温调节，光敏 ADC 采样环境光后
+        自动计算目标亮度，实现恒照度补偿。
+      </div>
+      <pre><code>/* 色温 PWM 混合计算 */
+void Light_SetColorTemp(uint16_t kelvin) {
+    /* 3000K ~ 6500K 映射到 warm_ratio 0.0~1.0 */
+    float warm_ratio = 1.0f - (float)(kelvin - 3000) / 3500;
+    float cool_ratio = 1.0f - warm_ratio;
+
+    uint16_t warm_pulse = (uint16_t)(current_brightness * warm_ratio * 999);
+    uint16_t cool_pulse = (uint16_t)(current_brightness * cool_ratio * 999);
+
+    TIM_SetCompare2(TIM2, warm_pulse);  /* PA1 - 暖光 */
+    TIM_SetCompare3(TIM2, cool_pulse);  /* PA2 - 冷光 */
+}
+
+/* 自动调光：根据环境光补偿 */
+void AutoBrightness_Adjust(void) {
+    uint16_t adc_val = ADC_GetValue(ADC1, ADC_Channel_0);
+
+    /* 环境光越暗，台灯越亮（反比例映射）*/
+    uint16_t target_brightness;
+    if (adc_val &lt; 200) {
+        target_brightness = 80;   /* 环境很暗 → 80% */
+    } else if (adc_val &lt; 800) {
+        target_brightness = 60;   /* 较暗 → 60% */
+    } else if (adc_val &lt; 2000) {
+        target_brightness = 40;   /* 适中 → 40% */
+    } else {
+        target_brightness = 20;   /* 明亮 → 20% */
+    }
+
+    /* 渐变过渡到目标亮度 */
+    if (current_brightness &lt; target_brightness)
+        current_brightness++;
+    else if (current_brightness > target_brightness)
+        current_brightness--;
+
+    Light_SetBrightness(current_brightness);
+}
+
+/* 45 分钟休息提醒 (基于 SysTick 计时) */
+uint32_t work_seconds = 0;
+
+void RestReminder_Check(void) {
+    work_seconds++;
+    if (work_seconds >= 45 * 60) {      /* 45 分钟 */
+        OLED_ShowString(0, 4, "Take a rest!");
+        Buzzer_Twice();                  /* 蜂鸣提示 */
+        work_seconds = 0;
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - 调光调色与自动亮度
+      
+      
+        核心逻辑：PWM 驱动白光和暖光两路混合实现色温调节，光敏 ADC 采样环境光后
+        自动计算目标亮度，实现恒照度补偿。
+      
+      /* 色温 PWM 混合计算 */
+void Light_SetColorTemp(uint16_t kelvin) {
+    /* 3000K ~ 6500K 映射到 warm_ratio 0.0~1.0 */
+    float warm_ratio = 1.0f - (float)(kelvin - 3000) / 3500;
+    float cool_ratio = 1.0f - warm_ratio;
+
+    uint16_t warm_pulse = (uint16_t)(current_brightness * warm_ratio * 999);
+    uint16_t cool_pulse = (uint16_t)(current_brightness * `;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

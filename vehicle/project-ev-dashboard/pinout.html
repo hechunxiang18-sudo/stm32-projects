@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>引脚连接 - STM32F103C8T6 电动车智能仪表</title>
+  <meta name="description" content="速度/里程/电量显示 · 蓝牙手机连接 · 行车记录 · 故障诊断">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">电动车智能仪表 / 引脚连接</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128690;</div>
+      <h1>STM32F103C8T6 电动车智能仪表</h1>
+      <p class="detail-hero-sub">速度/里程/电量显示 · 蓝牙手机连接 · 行车记录 · 故障诊断</p>
+      <div class="detail-hero-tags">
+        <span>霍尔传感器</span>
+        <span>ADS1115</span>
+        <span>蓝牙</span>
+        <span>OLED</span>
+        <span>电压检测</span>
+        <span>温度</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <span class="sec-nav-item active">引脚连接</span>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="pinout" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128279;</span>
+        <h2>引脚连接表</h2>
+      </div>
+      <div class="table-wrap pinout-wrap">
+        <table class="pin-table">
+          <thead>
+            <tr><th>STM32 引脚</th><th>功能</th><th>连接目标</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>PA0</td><td>TIM2_CH1 (输入捕获)</td><td>霍尔传感器脉冲输出</td><td>测频法计算速度</td></tr>
+            <tr><td>PA1</td><td>I2C1_SCL</td><td>ADS1115 SCL</td><td>I2C 读取 ADC 值</td></tr>
+            <tr><td>PA2</td><td>I2C1_SDA</td><td>ADS1115 SDA</td><td>I2C 读取 ADC 值</td></tr>
+            <tr><td>PA2</td><td>USART2_TX</td><td>HC-05 RXD</td><td>蓝牙通信</td></tr>
+            <tr><td>PA3</td><td>USART2_RX</td><td>HC-05 TXD</td><td>蓝牙通信</td></tr>
+            <tr><td>PB6</td><td>I2C1_SCL</td><td>OLED SCL</td><td>I2C 显示</td></tr>
+            <tr><td>PB7</td><td>I2C1_SDA</td><td>OLED SDA</td><td>I2C 显示</td></tr>
+            <tr><td>PB0</td><td>GPIO (单总线)</td><td>DS18B20 DQ</td><td>单总线温度读取</td></tr>
+            <tr><td>PB1</td><td>GPIO Output</td><td>蜂鸣器</td><td>故障报警</td></tr>
+            <tr><td>PB10</td><td>GPIO Output</td><td>背光 PWM (MOS 栅极)</td><td>PWM 调光</td></tr>
+            <tr><td>PB12</td><td>EXTI</td><td>按键 1 (模式)</td><td>外部中断</td></tr>
+            <tr><td>PB13</td><td>EXTI</td><td>按键 2 (设置)</td><td>外部中断</td></tr>
+            <tr><td>PB14</td><td>EXTI</td><td>按键 3 (确认)</td><td>外部中断</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

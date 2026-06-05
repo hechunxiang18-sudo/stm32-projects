@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能宠物饮水机</title>
+  <meta name="description" content="活水循环 · 水位检测 · 多级过滤 · UV 杀菌">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能宠物饮水机 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128054;</div>
+      <h1>STM32F103C8T6 智能宠物饮水机</h1>
+      <p class="detail-hero-sub">活水循环 · 水位检测 · 多级过滤 · UV 杀菌</p>
+      <div class="detail-hero-tags">
+        <span>水泵</span>
+        <span>水位传感器</span>
+        <span>活性炭</span>
+        <span>UV LED</span>
+        <span>OLED</span>
+        <span>红外</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - 水泵控制与水位保护</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>主循环中读取水位值，依据水位和 PIR 触发状态控制水泵 PWM 输出和安全保护。
+      </div>
+      <pre><code>/* 智能宠物饮水机 - 水泵控制与水位保护 */
+
+#include "fountain_control.h"
+#include "water_level.h"
+#include "pir_sensor.h"
+#include "oled_display.h"
+
+/* 水泵工作模式 */
+typedef enum {
+    MODE_CONTINUOUS,    /* 连续循环 */
+    MODE_INTERVAL,      /* 间歇运行 (开10min/停30min) */
+    MODE_SMART,         /* 智能模式 (PIR 触发) */
+    MODE_SLEEP          /* 睡眠待机 */
+} FountainMode;
+
+static FountainMode current_mode = MODE_SMART;
+static uint8_t pump_running = 0;
+static uint8_t water_ok = 0;
+
+/* PWM 参数 */
+#define PUMP_TIMER    TIM2
+#define PUMP_CHANNEL  1
+#define PWM_PERIOD    7199   /* 72MHz / (7199+1) = 10kHz */
+
+/* 水泵初始化 */
+void pump_init(void) {
+    RCC-&gt;APB1ENR |= RCC_APB1ENR_TIM2EN;
+    PUMP_TIMER-&gt;PSC = 0;
+    PUMP_TIMER-&gt;ARR = PWM_PERIOD;
+    PUMP_TIMER-&gt;CCMR1 = TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2;  /* PWM 模式1 */
+    PUMP_TIMER-&gt;CCER = TIM_CCER_CC1E;
+    PUMP_TIMER-&gt;BDTR = TIM_BDTR_MOE;
+    PUMP_TIMER-&gt;CR1 = TIM_CR1_CEN;
+}
+
+/* 设置水泵流量 0-100% */
+void pump_set_speed(uint8_t percent) {
+    uint32_t pulse = (uint32_t)PWM_PERIOD * percent / 100;
+    PUMP_TIMER-&gt;CCR1 = pulse;
+    pump_running = (percent > 0) ? 1 : 0;
+}
+
+/* 水位监测 */
+uint8_t water_level_check(void) {
+    uint32_t adc_val = 0;
+    for (int i = 0; i < 8; i++) {
+        adc_val += adc_read(ADC1, 1);
+        delay_us(100);
+    }
+    adc_val /= 8;
+
+    uint8_t percent = (uint8_t)(adc_val * 100 / 4095);
+    water_ok = (percent > 15) ? 1 : 0;
+
+    if (!water_ok) {
+        pump_set_speed(0);     /* 立即停泵 */
+        Buzzer_On();
+        OLED_ShowWarning("缺水! 请加水");
+    } else {
+        Buzzer_Off();
+    }
+
+    return percent;
+}
+
+/* 智能模式主逻辑 */
+void fountain_smart_loop(void) {
+    water_level_check();
+
+    if (!water_ok) {
+        delay_ms(1000);
+        return;
+    }
+
+    switch (current_mode) {
+        case MODE_CONTINUOUS:
+            pump_set_speed(70);
+            break;
+
+        case MODE_INTERVAL:
+            /* 10 分钟运行，30 分钟停止 */
+            static uint16_t interval_counter = 0;
+            interval_counter++;
+            if (interval_counter < 600) {       /* 10分钟 = 600秒 */
+                pump_set_speed(70);
+            } else {
+                pump_set_speed(0);
+                if (interval_counter >= 2400)   /* 30分钟 = 2400秒 */
+                    interval_counter = 0;
+            }
+            break;
+
+        case MODE_SMART:
+            /* PIR 触发时开启，持续 5 分钟后自动减小流量 */
+            if (pir_detected()) {
+                pump_set_speed(80);
+                uint16_t active_time = 0;
+                while (active_time < 300) {      /* 持续 5 分钟 */
+                    if (!water_level_check()) break;
+                    delay_ms(1000);
+                    active_time++;
+                }
+                pump_set_speed(30);              /* 转入低流量维持 */
+            } else {
+                pump_set_speed(30);              /* 无人时低流量循环 */
+            }
+            break;
+
+        case MODE_SLEEP:
+            pump_set_speed(0);
+            break;
+    }
+
+    /* 更新 OLED 显示 */
+    oled_show_status(current_mode, water_ok, pump_running);
+}
+
+/* UV 杀菌定时任务 (每 6 小时运行 15 分钟) */
+void uv_schedule_task(void) {
+    static uint32_t last_uv_time = 0;
+    uint32_t now = HAL_GetTick() / 1000;
+
+    if (now - last_uv_time >= 21600) {   /* 6 小时 */
+        last_uv_time = now;
+        GPIO_SetPin(GPIOA, GPIO_PIN_3);   /* 开启 UV */
+        delay_ms(900000);                  /* 15 分钟 */
+        GPIO_ResetPin(GPIOA, GPIO_PIN_3);  /* 关闭 UV */
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - 水泵控制与水位保护
+      
+      
+        代码说明：主循环中读取水位值，依据水位和 PIR 触发状态控制水泵 PWM 输出和安全保护。
+      
+      /* 智能宠物饮水机 - 水泵控制与水位保护 */
+
+#include "fountain_control.h"
+#include "water_level.h"
+#include "pir_sensor.h"
+#include "oled_display.h"
+
+/* 水泵工作模式 */
+typedef enum {
+    MODE_CONTINUOUS,    /* 连续循环 */
+    MODE_INTERVAL,      /* 间歇运行 (开10min/停30min) */
+    MODE_SMART,         /* 智能模式 (PIR 触发) */
+    MODE_SLEEP          /* 睡眠待机 */
+} FountainMode;
+
+static FountainMode curr`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

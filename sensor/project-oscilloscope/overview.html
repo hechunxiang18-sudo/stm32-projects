@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目概述 - STM32F103C8T6 DIY 示波器</title>
+  <meta name="description" content="1Msps ADC 采样 · 2.4 寸 TFT 显示 · 边沿触发 · FFT 频谱分析">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">DIY 示波器 / 项目概述</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128300;</div>
+      <h1>STM32F103C8T6 DIY 示波器</h1>
+      <p class="detail-hero-sub">1Msps ADC 采样 · 2.4 寸 TFT 显示 · 边沿触发 · FFT 频谱分析</p>
+      <div class="detail-hero-tags">
+        <span>ADC1</span>
+        <span>ILI9341</span>
+        <span>DMA</span>
+        <span>定时器触发</span>
+        <span>FFT</span>
+        <span>探头</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <span class="sec-nav-item active">项目概述</span>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="overview" class="section">
+      <div class="section-header"><span class="sec-icon">&#128300;</span><h2>项目概述</h2></div>
+      <div class="project-intro">
+        <div class="project-intro-text">
+          <p>基于 STM32F103C8T6 的微型 DIY 示波器，充分利用内置 ADC（1Msps 采样率）+ DMA 传输 + 定时器触发，实现双通道波形采集与显示。配备 2.4 寸 320×240 TFT 彩屏绘制波形，支持边沿/脉宽触发、时基/电压档位调节，以及 FFT 频谱分析功能。</p>
+          <p>输入信号经过运放调理电路处理（±10V 输入范围，1MΩ 输入阻抗），探头 ×1/×10 切换。外壳可 3D 打印，是电子工程师的调试利器。</p>
+        </div>
+        <div class="project-intro-icon">&#128300;</div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

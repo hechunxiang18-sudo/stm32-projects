@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能消防系统</title>
+  <meta name="description" content="多传感器融合探测 · 三级火情分级 · 自动灭火喷淋 · GSM 短信报警">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能消防系统 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0808 0%, #7f1d1d 40%, #991b1b 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128293;</div>
+      <h1>STM32F103C8T6 智能消防系统</h1>
+      <p class="detail-hero-sub">多传感器融合探测 · 三级火情分级 · 自动灭火喷淋 · GSM 短信报警</p>
+      <div class="detail-hero-tags">
+        <span>火焰传感器 ×5</span>
+        <span>MQ-2 烟雾</span>
+        <span>DS18B20 ×3</span>
+        <span>SIM800L GSM</span>
+        <span>12V 水泵</span>
+        <span>LCD1602</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心算法代码</h2>
+      </div>
+      <div class="info-box">
+        <strong>算法说明：</strong>采用多传感器融合判据，对火焰、烟雾、温度三项指标综合打分，
+        根据得分等级执行不同响应策略。得分 &ge; 3 触发三级火警，自动启动灭火流程。
+      </div>
+      <pre><code>#include "fire_alarm.h"
+
+/* 传感器数据结构 */
+typedef struct {
+    uint8_t  flame_active;        // 火焰传感器触发
+    uint16_t smoke_ppm;           // 烟雾浓度 (ppm)
+    int16_t  temperature;         // 温度值 (&deg;C * 10)
+} SensorData;
+
+/* 火情等级 */
+typedef enum {
+    FIRE_NONE  = 0,              // 正常
+    FIRE_LEVEL1,                 // 注意：单传感器异常
+    FIRE_LEVEL2,                 // 预警：双传感器异常
+    FIRE_LEVEL3                  // 火警：三传感器异常 → 自动灭火
+} FireLevel;
+
+/* 多传感器融合判据 */
+FireLevel Fire_Judge(SensorData *data) {
+    uint8_t score = 0;
+
+    // 火焰检测：任意 2 路以上触发计 1 分
+    if (data->flame_active) score++;
+
+    // 烟雾检测：浓度 > 300ppm 计 1 分
+    if (data->smoke_ppm > 300) score++;
+
+    // 温度检测：> 60&deg;C 或 10s 温升 > 15&deg;C 计 1 分
+    if (data->temperature > 600) score++;
+
+    // 综合判定
+    switch (score) {
+        case 0:  return FIRE_NONE;
+        case 1:  return FIRE_LEVEL1;
+        case 2:  return FIRE_LEVEL2;
+        case 3:  return FIRE_LEVEL3;
+        default: return FIRE_LEVEL3;
+    }
+}
+
+/* 火情响应执行 */
+void Fire_Response(FireLevel level) {
+    switch (level) {
+        case FIRE_NONE:
+            Buzzer_Off();
+            Relay_Off(RELAY_PUMP);
+            break;
+
+        case FIRE_LEVEL1:
+            Buzzer_Beep(BEEP_INTERVAL_2S);
+            LCD_ShowString("注意：检测到异常");
+            break;
+
+        case FIRE_LEVEL2:
+            Buzzer_Beep(BEEP_INTERVAL_500MS);
+            Relay_On(RELAY_EXHAUST);
+            LCD_ShowString("预警：启动排烟");
+            break;
+
+        case FIRE_LEVEL3:
+            Buzzer_Beep(BEEP_CONTINUOUS);
+            Relay_On(RELAY_PUMP);              // 启动水泵喷淋
+            Relay_On(RELAY_GAS_VALVE_OFF);     // 关闭燃气阀
+            Relay_On(RELAY_MAIN_POWER_OFF);    // 切断电源
+            GSM_SendAlert("FIRE_ALERT",
+                "火警！请立即撤离！");         // 发送短信
+            LCD_ShowString("火警！！自动灭火");
+            break;
+    }
+}
+
+/* 主循环（每 500ms 执行一次） */
+void Fire_MainLoop(void) {
+    SensorData sensor;
+
+    sensor.flame_active = FlameSensor_ReadAny();
+    sensor.smoke_ppm    = MQ2_ReadPPM();
+    sensor.temperature  = DS18B20_ReadAvg();
+
+    FireLevel level = Fire_Judge(&amp;sensor);
+    Fire_Response(level);
+
+    printf("[FIRE] level=%d flame=%d smoke=%dppm temp=%d.%dC\n",
+        level, sensor.flame_active, sensor.smoke_ppm,
+        sensor.temperature / 10, sensor.temperature % 10);
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心算法代码
+      
+      
+        算法说明：采用多传感器融合判据，对火焰、烟雾、温度三项指标综合打分，
+        根据得分等级执行不同响应策略。得分 &ge; 3 触发三级火警，自动启动灭火流程。
+      
+      #include "fire_alarm.h"
+
+/* 传感器数据结构 */
+typedef struct {
+    uint8_t  flame_active;        // 火焰传感器触发
+    uint16_t smoke_ppm;           // 烟雾浓度 (ppm)
+    int16_t  temperature;         // 温度值 (&deg;C * 10)
+} SensorData;
+
+/* 火情等级 */
+typedef enum {
+    FIRE_NONE  = 0,              // 正常
+    FIRE_LEVEL1,                 // 注意：单传感器异常
+    FIRE_`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

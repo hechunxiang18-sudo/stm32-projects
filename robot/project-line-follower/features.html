@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能特性 - STM32F103C8T6 循迹小车</title>
+  <meta name="description" content="5 路红外循迹 · PID 纠偏 · 速度可调 · 竞赛级">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">循迹小车 / 功能特性</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#9726;</div>
+      <h1>STM32F103C8T6 循迹小车</h1>
+      <p class="detail-hero-sub">5 路红外循迹 · PID 纠偏 · 速度可调 · 竞赛级</p>
+      <div class="detail-hero-tags">
+        <span>TCRT5000×5</span>
+        <span>TB6612</span>
+        <span>PID</span>
+        <span>编码器</span>
+        <span>OLED</span>
+        <span>蓝牙</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <span class="sec-nav-item active">功能特性</span>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="features" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#9889;</span>
+        <h2>功能特性</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fc-icon">&#128300;</div>
+          <h4>5 路红外循迹</h4>
+          <p>TCRT5000 一字排列，检测精度 2mm，有效距离 5-15mm</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#9881;</div>
+          <h4>PID 纠偏控制</h4>
+          <p>位置式 PID 算法，KP/KI/KD 在线可调，响应速度 &lt;10ms</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128200;</div>
+          <h4>速度闭环</h4>
+          <p>霍尔编码器测速，增量式 PID 速度控制，目标速度可调</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128424;</div>
+          <h4>OLED 显示</h4>
+          <p>0.96 寸 OLED 显示传感器偏差、PID输出、左右轮速度</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128252;</div>
+          <h4>蓝牙调参</h4>
+          <p>HC-05 蓝牙无线修改 PID 参数，实时查看运行数据</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#127942;</div>
+          <h4>竞赛模式</h4>
+          <p>一键启动竞赛模式，支持急弯、S弯、十字交叉等多种赛道</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

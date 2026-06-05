@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 电子负载仪</title>
+  <meta name="description" content="恒流放电 · 电池容量测试 · 过温保护 · OLED 显示">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">电子负载仪 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128200;</div>
+      <h1>STM32F103C8T6 电子负载仪</h1>
+      <p class="detail-hero-sub">恒流放电 · 电池容量测试 · 过温保护 · OLED 显示</p>
+      <div class="detail-hero-tags">
+        <span>IRFP250 MOS</span>
+        <span>OP07</span>
+        <span>MCP4725 DAC</span>
+        <span>ADC</span>
+        <span>散热器</span>
+        <span>旋转编码器</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - PI 恒流控制算法</h2>
+      </div>
+      <div class="note-box">
+        <strong>控制算法说明：</strong>采用 PI 闭环控制算法，通过 ADC 采样实际电流与设定电流的偏差，调整 MCP4725 DAC 输出电压以控制 MOS 管导通程度，实现高精度恒流放电。
+      </div>
+      <pre><code>/* 电子负载仪 PI 恒流控制核心 */
+
+/* PI 控制器参数 */
+typedef struct {
+    float Kp;       /* 比例系数 */
+    float Ki;       /* 积分系数 */
+    float integral; /* 积分累加 */
+    float limit;    /* 输出限幅 */
+    float last_err; /* 上次偏差 */
+} PID_t;
+
+PID_t current_pid = {
+    .Kp = 1.5f,
+    .Ki = 0.2f,
+    .integral = 0,
+    .limit = 3.3f,   /* DAC 输出范围 0-3.3V */
+    .last_err = 0
+};
+
+/* 目标电流 (A) */
+float target_current = 1.0f;
+
+/* PI 控制器计算 */
+float PID_Update(PID_t *pid, float setpoint, float measurement) {
+    float error = setpoint - measurement;
+
+    /* 比例项 */
+    float p_out = pid->Kp * error;
+
+    /* 积分项（带抗积分饱和） */
+    pid->integral += error;
+    if (pid->integral > pid->limit / pid->Ki)
+        pid->integral = pid->limit / pid->Ki;
+    else if (pid->integral < -pid->limit / pid->Ki)
+        pid->integral = -pid->limit / pid->Ki;
+    float i_out = pid->Ki * pid->integral;
+
+    float output = p_out + i_out;
+
+    /* 输出限幅 */
+    if (output > pid->limit) output = pid->limit;
+    else if (output < 0) output = 0;
+
+    pid->last_err = error;
+    return output;
+}
+
+/* ADC 读取电流值 (A) */
+float Get_Current(void) {
+    uint32_t adc_val = 0;
+    for (int i = 0; i < 16; i++) {
+        adc_val += HAL_ADC_GetValue(&hadc1);
+    }
+    adc_val >>= 4; /* 16 次均值滤波 */
+
+    /* 采样电阻 0.1Ω，运放增益 10 倍 */
+    float voltage = (adc_val / 4095.0f) * 3.3f;
+    return voltage / (10.0f * 0.1f); /* I = V/(Gain * Rsense) */
+}
+
+/* 设置 DAC 输出电压 */
+void DAC_SetOutput(float voltage) {
+    /* MCP4725 12bit DAC */
+    uint16_t dac_val = (uint16_t)(voltage / 3.3f * 4095);
+    MCP4725_Write(dac_val);
+}
+
+/* 恒流控制主循环 (1kHz) */
+void CC_ControlLoop(void) {
+    float actual_current = Get_Current();
+    float control = PID_Update(&current_pid,
+                                target_current, actual_current);
+    DAC_SetOutput(control);
+
+    /* 计算实时功率和容量 */
+    float voltage = Get_Voltage();
+    float power = actual_current * voltage;
+    capacity_mAh += actual_current * (1.0f / 3600.0f); /* 每秒累加 */
+
+    /* 更新显示 */
+    OLED_ShowData(actual_current, voltage, power, capacity_mAh);
+
+    /* 温度检测 - 过温保护 */
+    float temp = Get_Temperature();
+    if (temp > 80.0f) {
+        DAC_SetOutput(0);         /* 紧急关断 */
+        OLED_ShowAlert("OVERTEMP!");
+        Fan_SetSpeed(100);        /* 风扇全速 */
+    } else if (temp > 50.0f) {
+        Fan_SetSpeed((uint8_t)((temp - 50) / 30 * 100)); /* 自动调速 */
+    } else {
+        Fan_SetSpeed(0);          /* 风扇停止 */
+    }
+
+    /* 截止电压检测 */
+    if (voltage < cutoff_voltage) {
+        DAC_SetOutput(0);
+        OLED_ShowAlert("CUTOFF!");
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - PI 恒流控制算法
+      
+      
+        控制算法说明：采用 PI 闭环控制算法，通过 ADC 采样实际电流与设定电流的偏差，调整 MCP4725 DAC 输出电压以控制 MOS 管导通程度，实现高精度恒流放电。
+      
+      /* 电子负载仪 PI 恒流控制核心 */
+
+/* PI 控制器参数 */
+typedef struct {
+    float Kp;       /* 比例系数 */
+    float Ki;       /* 积分系数 */
+    float integral; /* 积分累加 */
+    float limit;    /* 输出限幅 */
+    float last_err; /* 上次偏差 */
+} PID_t;
+
+PID_t current_pid = {
+    .Kp = 1.5f,
+    .Ki = 0.2f,
+    .integral = 0,
+    .limit = 3.3f,   /* DAC 输出范围 0-`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

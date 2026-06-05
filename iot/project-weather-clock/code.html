@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 WiFi 天气时钟</title>
+  <meta name="description" content="NTP 自动校时 · 天气实况 · 闹钟 · 温湿度显示">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">WiFi 天气时钟 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127774;</div>
+      <h1>STM32F103C8T6 WiFi 天气时钟</h1>
+      <p class="detail-hero-sub">NTP 自动校时 · 天气实况 · 闹钟 · 温湿度显示</p>
+      <div class="detail-hero-tags">
+        <span>ESP8266</span>
+        <span>OLED 1.3"</span>
+        <span>DHT22</span>
+        <span>DS3231</span>
+        <span>光敏电阻</span>
+        <span>触摸按键</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - NTP 校时与天气 API 解析</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>ESP8266 AT 指令连接 WiFi，通过 TCP 获取 NTP 时间 (SNTP) 和
+        天气 API JSON 数据。cJSON 库解析天气报文，更新 RTC 和 OLED 显示。
+      </div>
+      <pre><code>/* WiFi 天气时钟 - NTP 校时与天气获取 (HAL 库) */
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include "cJSON.h"
+
+/* NTP 服务器 */
+#define NTP_SERVER   "ntp.aliyun.com"
+#define NTP_PORT     123
+
+/* 天气 API */
+#define WEATHER_URL  "api.seniverse.com/v3/weather/now.json?key=YOUR_KEY&amp;location=beijing"
+
+/* NTP 时间戳获取 */
+uint32_t Get_NTP_Time(void) {
+    uint8_t ntp_pkt[48] = {0};
+    ntp_pkt[0] = 0x1B;  /* NTP v3, client mode */
+
+    /* ESP8266 TCP 连接 */
+    ESP8266_TCPConnect(NTP_SERVER, NTP_PORT);
+
+    /* 发送 NTP 请求 */
+    ESP8266_SendData(ntp_pkt, 48);
+
+    /* 接收响应 (超时 5s) */
+    uint8_t buf[128];
+    if (!ESP8266_ReceiveData(buf, 128, 5000)) return 0;
+
+    /* 解析 NTP 时间戳 (字节 40-43) */
+    uint32_t sec = (buf[40] &lt;&lt; 24) | (buf[41] &lt;&lt; 16)
+                 | (buf[42] &lt;&lt; 8)  | buf[43];
+
+    /* NTP 到 Unix 时间偏移 2208988800 */
+    sec -= 2208988800UL;
+
+    /* 东八区 +8 */
+    sec += 8 * 3600;
+
+    return sec;
+}
+
+/* 设置 RTC 时间 */
+void RTC_SetFromNTP(uint32_t unix_sec) {
+    RTC_TimeTypeDef time;
+    RTC_DateTypeDef date;
+
+    /* 计算日期时间 (简化，使用本地函数) */
+    UnixToDateTime(unix_sec, &amp;date, &amp;time);
+
+    HAL_RTC_SetTime(&amp;hrtc, &amp;time, RTC_FORMAT_BIN);
+    HAL_RTC_SetDate(&amp;hrtc, &amp;date, RTC_FORMAT_BIN);
+}
+
+/* 获取并解析天气 JSON */
+uint8_t Fetch_Weather(float *temp, const char *weather, uint8_t *humidity) {
+    char http_req[256];
+    snprintf(http_req, sizeof(http_req),
+        "GET /v3/weather/now.json?key=KEY&amp;location=beijing HTTP/1.1\r\n"
+        "Host: api.seniverse.com\r\n"
+        "Connection: close\r\n\r\n");
+
+    ESP8266_TCPConnect("api.seniverse.com", 80);
+    ESP8266_SendString(http_req);
+
+    char resp[1024];
+    if (!ESP8266_ReceiveData((uint8_t*)resp, 1024, 10000)) return 0;
+
+    /* 提取 JSON 部分 (跳过 HTTP 头) */
+    char *json = strstr(resp, "\r\n\r\n");
+    if (!json) return 0;
+    json += 4;
+
+    /* cJSON 解析 */
+    cJSON *root = cJSON_Parse(json);
+    if (!root) return 0;
+
+    cJSON *results = cJSON_GetObjectItem(root, "results");
+    cJSON *now = cJSON_GetObjectItem(cJSON_GetArrayItem(results, 0), "now");
+
+    if (temp)     *temp     = atof(cJSON_GetObjectItem(now, "temperature")-&gt;valuestring);
+    if (humidity) *humidity = atoi(cJSON_GetObjectItem(now, "humidity")-&gt;valuestring);
+    if (weather)  strcpy(weather, cJSON_GetObjectItem(now, "text")-&gt;valuestring);
+
+    cJSON_Delete(root);
+    return 1;
+}
+
+/* 自动亮度调节 */
+void Adjust_Brightness(void) {
+    HAL_ADC_Start(&amp;hadc1);
+    HAL_ADC_PollForConversion(&amp;hadc1, 50);
+    uint16_t adc = HAL_ADC_GetValue(&amp;hadc1);
+    HAL_ADC_Stop(&amp;hadc1);
+
+    /* OLED 对比度 0-255 */
+    uint8_t contrast = (uint8_t)(adc * 200 / 4096 + 20);
+    OLED_SetContrast(contrast);
+}
+
+/* 闹钟检查 */
+void Check_Alarm(RTC_HandleTypeDef *hrtc) {
+    RTC_TimeTypeDef time;
+    HAL_RTC_GetTime(hrtc, &amp;time, RTC_FORMAT_BIN);
+
+    /* 预设闹钟 07:00 */
+    if (time.Hours == 7 &amp;&amp; time.Minutes == 0 &amp;&amp; time.Seconds == 0) {
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+        HAL_Delay(3000);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - NTP 校时与天气 API 解析
+      
+      
+        代码说明：ESP8266 AT 指令连接 WiFi，通过 TCP 获取 NTP 时间 (SNTP) 和
+        天气 API JSON 数据。cJSON 库解析天气报文，更新 RTC 和 OLED 显示。
+      
+      /* WiFi 天气时钟 - NTP 校时与天气获取 (HAL 库) */
+
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include "cJSON.h"
+
+/* NTP 服务器 */
+#define NTP_SERVER   "ntp.aliyun.com"
+#define NTP_PORT     123
+
+/* 天气 API */
+#define WEATHER_URL  "api.seniverse.com/v3/weather/now.json?key=YOUR_KEY&amp;location=beijing"
+
+/* `;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

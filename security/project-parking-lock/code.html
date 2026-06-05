@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能车位锁</title>
+  <meta name="description" content="超声波检测 · 自动升降 · 蓝牙遥控 · 防撞保护">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能车位锁 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#9726;</div>
+      <h1>STM32F103C8T6 智能车位锁</h1>
+      <p class="detail-hero-sub">超声波检测 · 自动升降 · 蓝牙遥控 · 防撞保护</p>
+      <div class="detail-hero-tags">
+        <span>HC-SR04</span>
+        <span>SG90舵机</span>
+        <span>HC-05</span>
+        <span>红外对射</span>
+        <span>太阳能</span>
+        <span>锂电池</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心软件代码</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>以下展示智能车位锁的核心模块，包括超声波测距、舵机升降控制、蓝牙指令解析、低功耗管理。
+      </div>
+      <pre><code>/* ========== 智能车位锁 - 主程序框架 ========== */
+
+#include "hcsr04.h"
+#include "servo.h"
+#include "hc05_bt.h"
+
+typedef enum { LOCKED, UNLOCKED, MOVING } LockState_t;
+LockState_t g_lockState = LOCKED;
+uint8_t g_carPresent = 0;       /* 车辆存在标志 */
+uint16_t g_batteryMV = 0;       /* 电池电压 (mV) */
+
+/* ===== 1. 超声波测距 ===== */
+uint16_t Ultrasonic_Measure(void) {
+    uint32_t tick;
+
+    /* 发送 10us Trig 脉冲 */
+    GPIO_SetBits(GPIOA, GPIO_Pin_0);    /* Trig高 */
+    delay_us(10);
+    GPIO_ResetBits(GPIOA, GPIO_Pin_0);  /* Trig低 */
+
+    /* 等待 Echo 上升沿（超时 30ms） */
+    uint32_t timeout = 0;
+    while (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1) == 0) {
+        if (++timeout > 3000) return 999;
+        delay_us(10);
+    }
+
+    /* 记录上升沿时间 */
+    tick = GetSysTick();
+
+    /* 等待 Echo 下降沿 */
+    timeout = 0;
+    while (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1) == 1) {
+        if (++timeout > 30000) return 999;
+        delay_us(10);
+    }
+
+    /* 计算脉宽 (us) -> 距离 (cm) = 脉宽 / 58 */
+    uint32_t pulseWidth = GetSysTick() - tick;
+    return pulseWidth / 58;
+}
+
+/* ===== 2. 舵机控制 ===== */
+void Servo_SetAngle(uint8_t servo, uint8_t angle) {
+    /* SG90 角度转 PWM 占空比:
+     *   0度  -> 0.5ms  -> CCR = 50  (2.5%)
+     *  90度 -> 1.5ms  -> CCR = 150 (7.5%)
+     * 180度 -> 2.5ms  -> CCR = 250 (12.5%)
+     * 定时器 ARR=1999, 预分频=71 => 50Hz
+     */
+    uint16_t ccr = 50 + (uint16_t)angle * 200 / 180;
+
+    if (servo == 0) {
+        TIM3->CCR3 = ccr;  /* 舵机1 */
+    } else {
+        TIM3->CCR4 = ccr;  /* 舵机2 */
+    }
+}
+
+void Lock_Raise(void) {
+    if (g_lockState == LOCKED) return;
+
+    g_lockState = MOVING;
+    /* 同步升锁 (0度->90度) */
+    for (uint8_t a = 0; a <= 90; a += 2) {
+        Servo_SetAngle(0, a);
+        Servo_SetAngle(1, a);
+        HAL_Delay(15);
+    }
+    g_lockState = LOCKED;
+    GPIO_SetBits(GPIOC, GPIO_Pin_13);  /* LED 指示锁定 */
+}
+
+void Lock_Lower(void) {
+    if (g_lockState == UNLOCKED) return;
+
+    g_lockState = MOVING;
+    /* 同步降锁 (90度->0度) */
+    for (uint8_t a = 90; a > 0; a -= 2) {
+        Servo_SetAngle(0, a);
+        Servo_SetAngle(1, a);
+        HAL_Delay(15);
+    }
+    g_lockState = UNLOCKED;
+    GPIO_ResetBits(GPIOC, GPIO_Pin_13);  /* LED 指示解锁 */
+}
+
+/* ===== 3. 蓝牙指令解析 ===== */
+void Bluetooth_ProcessCmd(uint8_t *cmd, uint16_t len) {
+    /* 指令格式: "DOWN\r\n" 降锁, "UP\r\n" 升锁, "STAT\r\n" 查询状态 */
+
+    if (strncmp((char *)cmd, "DOWN", 4) == 0) {
+        Lock_Lower();
+        BT_SendString("OK:UNLOCKED\r\n");
+    }
+    else if (strncmp((char *)cmd, "UP", 2) == 0) {
+        Lock_Raise();
+        BT_SendString("OK:LOCKED\r\n");
+    }
+    else if (strncmp((char *)cmd, "STAT", 4) == 0) {
+        char buf[32];
+        sprintf(buf, "STAT:%d,%dmV\r\n", g_lockState, g_batteryMV);
+        BT_SendString(buf);
+    }
+    else if (strncmp((char *)cmd, "PWD", 3) == 0) {
+        /* 修改管理员密码 */
+        /* 格式: PWD123456\r\n */
+        EEPROM_Write(0x00, cmd + 3, 6);
+        BT_SendString("OK:PWD_SET\r\n");
+    }
+    else {
+        BT_SendString("ERR:UNKNOWN\r\n");
+    }
+}
+
+/* ===== 4. 电池电压检测 ===== */
+void Battery_Check(void) {
+    HAL_ADC_Start(&hadc1);
+    if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK) {
+        uint16_t adcVal = HAL_ADC_GetValue(&hadc1);
+        /* 分压比 1:2, ADC 参考 3.3V, 12位
+         * 电池电压 = adcVal * 3.3 / 4096 * 3 (分压比) * 1000 (mV)
+         */
+        g_batteryMV = (uint32_t)adcVal * 3300 / 4096 * 3;
+
+        /* 低电量报警 */
+        if (g_batteryMV < 3300) {
+            /* 蓝牙推送低电量通知 */
+            BT_SendString("WARN:LOW_BATTERY\r\n");
+            /* LED 闪烁指示 */
+            for (int i = 0; i < 5; i++) {
+                GPIO_ToggleBits(GPIOC, GPIO_Pin_13);
+                HAL_Delay(200);
+            }
+        }
+    }
+}
+
+/* ===== 5. 自动检测逻辑 ===== */
+void Auto_Detection(void) {
+    if (g_lockState == MOVING) return;  /* 正在动作中 */
+
+    uint16_t dist = Ultrasonic_Measure();
+
+    /* 车辆靠近 (距离 < 50cm) -> 自动降锁 */
+    if (dist < 50 && dist > 5) {
+        if (g_lockState == LOCKED && !g_carPresent) {
+            Lock_Lower();
+            g_carPresent = 1;
+        }
+    }
+
+    /* 红外对射检测车辆通过 */
+    if (g_carPresent) {
+        if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_2) == 1) {
+            /* 车辆已通过 -> 自动升锁 */
+            HAL_Delay(3000);  /* 延迟 3 秒 */
+            Lock_Raise();
+            g_carPresent = 0;
+        }
+    }
+
+    /* 防撞保护：若降锁过程中红外有遮挡，立即停止 */
+    if (g_lockState == MOVING) {
+        if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_2) == 0) {
+            /* 有人/车在锁上方，停止动作 */
+            /* 实际需要保存当前角度并暂停 */
+        }
+    }
+}
+
+/* ===== 6. 低功耗模式 ===== */
+void Enter_SleepMode(void) {
+    /* 进入 STOP 模式，待机电流 ~50uA */
+    /* 使用 RTC 闹钟定时唤醒或外部中断唤醒 */
+
+    /* 关闭不必要的外设时钟 */
+    __HAL_RCC_USART1_CLK_DISABLE();
+    __HAL_RCC_SPI1_CLK_DISABLE();
+
+    /* 进入 STOP 模式 */
+    HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON,
+                          PWR_STOPENTRY_WFI);
+}
+
+/* ===== 7. 主循环 ===== */
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+
+    TIM3_PWM_Init(1999, 71);   /* 舵机 PWM 50Hz */
+    UART2_Init(9600);          /* HC-05 蓝牙 */
+    ADC1_Init();               /* 电池电压检测 */
+    EXTI_Init();               /* 按键中断 */
+
+    Servo_SetAngle(0, 0);      /* 初始锁定 */
+    Servo_SetAngle(1, 0);
+    g_lockState = LOCKED;
+
+    /* 蓝牙广播 */
+    BT_SendString("ParkingLock v1.0 Ready\r\n");
+
+    uint32_t lastMeasureTick = 0;
+    uint32_t lastBatteryTick = 0;
+
+    while (1) {
+        uint32_t now = HAL_GetTick();
+
+        /* 1. 自动检测（每 200ms） */
+        if (now - lastMeasureTick > 200) {
+            Auto_Detection();
+            lastMeasureTick = now;
+        }
+
+        /* 2. 电池检测（每 60 秒） */
+        if (now - lastBatteryTick > 60000) {
+            Battery_Check();
+            lastBatteryTick = now;
+        }
+
+        /* 3. 蓝牙指令处理 */
+        if (BT_DataAvailable()) {
+            uint8_t buf[64];
+            uint16_t len = BT_Receive(buf, 64);
+            Bluetooth_ProcessCmd(buf, len);
+        }
+
+        /* 4. 按键处理 */
+        if (KEY_1_Pressed()) Lock_Lower();
+        if (KEY_2_Pressed()) Lock_Raise();
+
+        /* 5. 空闲时进入低功耗 */
+        /* if (IdleTime > 10000) Enter_SleepMode(); */
+
+        HAL_Delay(50);
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心软件代码
+      
+      
+        代码说明：以下展示智能车位锁的核心模块，包括超声波测距、舵机升降控制、蓝牙指令解析、低功耗管理。
+      
+      /* ========== 智能车位锁 - 主程序框架 ========== */
+
+#include "hcsr04.h"
+#include "servo.h"
+#include "hc05_bt.h"
+
+typedef enum { LOCKED, UNLOCKED, MOVING } LockState_t;
+LockState_t g_lockState = LOCKED;
+uint8_t g_carPresent = 0;       /* 车辆存在标志 */
+uint16_t g_batteryMV = 0;       /* 电池电压 (mV) */
+
+/* ===== 1. 超声波测距 ===== */
+uint16_t Ultrasonic_Measure(void) {
+    uint32_t tick;
+
+    /`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

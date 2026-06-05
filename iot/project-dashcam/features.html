@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能特性 - STM32F103C8T6 智能行车记录仪</title>
+  <meta name="description" content="视频循环录制 · G-Sensor 碰撞锁定 · GPS 轨迹 · WiFi 查看">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能行车记录仪 / 功能特性</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127663;</div>
+      <h1>STM32F103C8T6 智能行车记录仪</h1>
+      <p class="detail-hero-sub">视频循环录制 · G-Sensor 碰撞锁定 · GPS 轨迹 · WiFi 查看</p>
+      <div class="detail-hero-tags">
+        <span>OV5640</span>
+        <span>SD卡</span>
+        <span>G-Sensor</span>
+        <span>GPS</span>
+        <span>WiFi</span>
+        <span>LCD</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <span class="sec-nav-item active">功能特性</span>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="features" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#9889;</span>
+        <h2>功能特性</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fc-icon">&#127916;</div>
+          <h4>1080P 循环录制</h4>
+          <p>OV5640 摄像头采集 1080P 视频，SD 卡循环存储，满卡自动覆盖最早片段</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128680;</div>
+          <h4>G-Sensor 碰撞锁定</h4>
+          <p>MPU6050 检测碰撞/急刹车，自动锁定当前片段，防止被循环录制覆盖</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128506;</div>
+          <h4>GPS 轨迹同步</h4>
+          <p>NEO-6M 卫星定位，记录行驶轨迹、速度、时间，导出 KML/GEOJSON 格式</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128252;</div>
+          <h4>WiFi 手机查看</h4>
+          <p>ESP8266 建立热点，手机连接 App 实时预览、回放录像、下载锁定片段</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128424;</div>
+          <h4>LCD 实时预览</h4>
+          <p>2.0 寸 TFT 屏幕实时显示画面，支持录音状态、电量、GPS 信号强度指示</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128663;</div>
+          <h4>停车监控</h4>
+          <p>车辆熄火后进入低功耗监控模式，检测振动自动唤醒录制 30 秒</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

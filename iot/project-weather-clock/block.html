@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统框图 - STM32F103C8T6 WiFi 天气时钟</title>
+  <meta name="description" content="NTP 自动校时 · 天气实况 · 闹钟 · 温湿度显示">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">WiFi 天气时钟 / 系统框图</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127774;</div>
+      <h1>STM32F103C8T6 WiFi 天气时钟</h1>
+      <p class="detail-hero-sub">NTP 自动校时 · 天气实况 · 闹钟 · 温湿度显示</p>
+      <div class="detail-hero-tags">
+        <span>ESP8266</span>
+        <span>OLED 1.3"</span>
+        <span>DHT22</span>
+        <span>DS3231</span>
+        <span>光敏电阻</span>
+        <span>触摸按键</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <span class="sec-nav-item active">系统框图</span>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="block" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128200;</span>
+        <h2>系统框图</h2>
+      </div>
+      <div class="block-diagram">
+        <div class="bd-title">WiFi 天气时钟系统架构</div>
+        <div class="bd-flow">
+          <div class="bd-node">
+            <div class="bd-icon">&#128252;</div>
+            <div class="bd-label">ESP8266</div>
+            <small>WiFi+NTP+天气</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node primary">
+            <div class="bd-icon">&#9726;</div>
+            <div class="bd-label">STM32F103</div>
+            <small>主控调度</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#128424;</div>
+            <div class="bd-label">OLED 1.3"</div>
+            <small>UI 显示</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#127777;</div>
+            <div class="bd-label">DHT22</div>
+            <small>温湿度</small>
+          </div>
+        </div>
+        <div class="bd-flow" style="margin-top:10px;">
+          <div class="bd-node">
+            <div class="bd-icon">&#128337;</div>
+            <div class="bd-label">DS3231 RTC</div>
+            <small>本地时钟</small>
+          </div>
+          <div class="bd-arrow">&larr;</div>
+          <div class="bd-node primary">
+            <div class="bd-icon">&#9726;</div>
+            <div class="bd-label">STM32F103</div>
+            <small>逻辑中心</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#128156;</div>
+            <div class="bd-label">触摸按键</div>
+            <small>x4 输入</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#9728;</div>
+            <div class="bd-label">光敏电阻</div>
+            <small>亮度调节</small>
+          </div>
+          <div class="bd-arrow">&rarr;</div>
+          <div class="bd-node">
+            <div class="bd-icon">&#128276;</div>
+            <div class="bd-label">蜂鸣器</div>
+            <small>闹钟</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

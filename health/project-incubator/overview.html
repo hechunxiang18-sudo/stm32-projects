@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目概述 - STM32F103C8T6 智能孵化器</title>
+  <meta name="description" content="温湿度 PID 控制 · 自动翻蛋 · 照蛋灯 · 孵化记录">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能孵化器 / 项目概述</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #065f46 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#129514;</div>
+      <h1>STM32F103C8T6 智能孵化器</h1>
+      <p class="detail-hero-sub">温湿度 PID 控制 · 自动翻蛋 · 照蛋灯 · 孵化记录</p>
+      <div class="detail-hero-tags">
+        <span>DHT22</span>
+        <span>加热膜</span>
+        <span>步进电机</span>
+        <span>风扇</span>
+        <span>触摸按键</span>
+        <span>OLED</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <span class="sec-nav-item active">项目概述</span>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="overview" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#129514;</span>
+        <h2>项目概述</h2>
+      </div>
+      <div class="project-intro">
+        <div class="project-intro-text">
+          <p>
+            基于 STM32F103C8T6 的智能孵化器，采用 DHT22 高精度温湿度传感器配合 PID 算法实现恒温恒湿控制，
+            温度精度达 ±0.1°C，湿度范围 40-80%RH。28BYJ-48 步进电机驱动翻蛋机构按设定周期自动翻蛋，
+            内置 LED 照蛋灯方便观察胚胎发育。
+          </p>
+          <p>
+            配备 1.3 寸 OLED 实时显示温湿度、孵化天数和倒计时，4 个触摸按键完成参数设置。
+            陶瓷加热膜（50W）配合雾化片加湿，散热风扇确保内部空气循环，全套适合禽类/爬宠孵化场景。
+          </p>
+        </div>
+      </div>
+
+      <div class="svg-product">
+        <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="inc-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0a1f1a"/><stop offset="100%" stop-color="#065f46"/></linearGradient>
+            <linearGradient id="inc-body" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e8e0d0"/><stop offset="100%" stop-color="#c8c0b0"/></linearGradient>
+            <linearGradient id="inc-lid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0eae0"/><stop offset="100%" stop-color="#d8d0c0"/></linearGradient>
+            <linearGradient id="inc-glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="rgba(255,255,255,0.3)"/><stop offset="100%" stop-color="rgba(255,255,255,0.05)"/></linearGradient>
+            <filter id="inc-shadow"><feDropShadow dx="2" dy="4" stdDeviation="6" flood-opacity="0.4"/></filter>
+            <radialGradient id="egg-glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ffee88" stop-opacity="0.6"/><stop offset="100%" stop-color="#ffcc33" stop-opacity="0"/></radialGradient>
+          </defs>
+          <rect width="800" height="300" fill="url(#inc-bg)" rx="12"/>
+          <!-- 底座阴影 -->
+          <ellipse cx="400" cy="270" rx="280" ry="18" fill="rgba(0,0,0,0.3)"/>
+          <!-- 孵化器箱体 -->
+          <rect x="180" y="100" width="440" height="150" rx="12" fill="url(#inc-body)" filter="url(#inc-shadow)"/>
+          <rect x="180" y="100" width="440" height="150" rx="12" fill="url(#inc-glass)"/>
+          <!-- 透明观察窗 -->
+          <rect x="220" y="115" width="240" height="110" rx="8" fill="#1a3a2a" opacity="0.85"/>
+          <rect x="220" y="115" width="240" height="110" rx="8" fill="none" stroke="#4a8a6a" stroke-width="2"/>
+          <!-- 鸡蛋 -->
+          <ellipse cx="290" cy="175" rx="16" ry="20" fill="#f0e8d0" stroke="#d0c8aa" stroke-width="1"/>
+          <ellipse cx="330" cy="172" rx="15" ry="19" fill="#f0e8d0" stroke="#d0c8aa" stroke-width="1"/>
+          <ellipse cx="370" cy="176" rx="16" ry="20" fill="#f0e8d0" stroke="#d0c8aa" stroke-width="1"/>
+          <ellipse cx="410" cy="170" rx="15" ry="19" fill="#f0e8d0" stroke="#d0c8aa" stroke-width="1"/>
+          <!-- 照蛋灯光晕 -->
+          <ellipse cx="340" cy="145" rx="60" ry="40" fill="url(#egg-glow)" opacity="0.5"/>
+          <!-- LED 灯 -->
+          <circle cx="340" cy="125" r="6" fill="#ffee44">
+            <animate attributeName="opacity" values="0.4;1;0.4" dur="3s" repeatCount="indefinite"/>
+          </circle>
+          <!-- 翻蛋架示意 -->
+          <line x1="250" y1="160" x2="430" y2="160" stroke="#8a8a7a" stroke-width="2"/>
+          <line x1="250" y1="185" x2="430" y2="185" stroke="#8a8a7a" stroke-width="1.5"/>
+          <!-- OLED 屏 -->
+          <rect x="490" y="115" width="110" height="50" rx="6" fill="#0a1a2a"/>
+          <rect x="494" y="119" width="102" height="42" rx="4" fill="#0d2a1a"/>
+          <text x="545" y="135" text-anchor="middle" fill="#00ff88" font-size="9" font-family="monospace">37.8&deg;C</text>
+          <text x="545" y="147" text-anchor="middle" fill="#66ccaa" font-size="8" font-family="monospace">60%RH</text>
+          <text x="545" y="157" text-anchor="middle" fill="#4488cc" font-size="7" font-family="monospace">Day 12/21</text>
+          <!-- 触摸按键 -->
+          <rect x="490" y="180" width="22" height="22" rx="5" fill="#2a3a2a" stroke="#4a6a4a" stroke-width="0.5"/>
+          <rect x="516" y="180" width="22" height="22" rx="5" fill="#2a3a2a" stroke="#4a6a4a" stroke-width="0.5"/>
+          <rect x="542" y="180" width="22" height="22" rx="5" fill="#2a3a2a" stroke="#4a6a4a" stroke-width="0.5"/>
+          <rect x="568" y="180" width="22" height="22" rx="5" fill="#2a3a2a" stroke="#4a6a4a" stroke-width="0.5"/>
+          <text x="501" y="194" text-anchor="middle" fill="#6aaa6a" font-size="8">+</text>
+          <text x="527" y="194" text-anchor="middle" fill="#6aaa6a" font-size="8">-</text>
+          <text x="553" y="194" text-anchor="middle" fill="#6aaa6a" font-size="6">翻蛋</text>
+          <text x="579" y="194" text-anchor="middle" fill="#6aaa6a" font-size="6">灯</text>
+          <!-- 进气/排气格栅 -->
+          <rect x="200" y="228" width="30" height="8" rx="3" fill="#8a7a6a"/>
+          <rect x="240" y="228" width="30" height="8" rx="3" fill="#8a7a6a"/>
+          <rect x="280" y="228" width="30" height="8" rx="3" fill="#8a7a6a"/>
+          <!-- 电源指示灯 -->
+          <circle cx="600" cy="125" r="4" fill="#00ff44" opacity="0.9">
+            <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <text x="600" y="140" text-anchor="middle" fill="#66cc88" font-size="6">PWR</text>
+        </svg>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

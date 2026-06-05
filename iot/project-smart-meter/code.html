@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能电表</title>
+  <meta name="description" content="电流/电压/功率测量 · WiFi 上传 · 过载保护 · Web 展示">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能电表 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128200;</div>
+      <h1>STM32F103C8T6 智能电表</h1>
+      <p class="detail-hero-sub">电流/电压/功率测量 · WiFi 上传 · 过载保护 · Web 展示</p>
+      <div class="detail-hero-tags">
+        <span>HLW8032</span>
+        <span>电流互感器</span>
+        <span>继电器</span>
+        <span>ESP8266</span>
+        <span>OLED</span>
+        <span>校准</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - HLW8032 电能计量与 MQTT 上传</h2>
+      </div>
+      <div class="note-box">
+        <strong>工作原理：</strong>HLW8032 通过 UART 持续输出电能数据帧，STM32 解析电压、电流、功率参数。
+        每 2 秒将数据通过 ESP8266 以 MQTT 协议上报到云平台，同时检测过载条件控制继电器。
+      </div>
+      <pre><code>/* 智能电表核心代码 - HLW8032 计量 + MQTT 上传 */
+
+/* HLW8032 数据帧结构 */
+typedef struct {
+    float voltage;      /* 电压 (V) */
+    float current;      /* 电流 (A) */
+    float active_power; /* 有功功率 (W) */
+    float power_factor; /* 功率因数 */
+    float energy;       /* 累计电量 (kWh) */
+} MeterData_t;
+
+/* 解析 HLW8032 UART 数据帧 (24 字节) */
+uint8_t HLW8032_Parse(uint8_t *buf, MeterData_t *data) {
+    /* 校验和 */
+    uint8_t checksum = 0;
+    for (int i = 0; i < 23; i++) checksum += buf[i];
+    if (checksum != buf[23]) return 0; /* 校验失败 */
+
+    /* 解析电压寄存器 (24bit, 寄存器 0x00) */
+    uint32_t v_reg = (buf[2] << 16) | (buf[1] << 8) | buf[0];
+
+    /* 解析电流寄存器 (24bit, 寄存器 0x02) */
+    uint32_t i_reg = (buf[5] << 16) | (buf[4] << 8) | buf[3];
+
+    /* 解析功率寄存器 (32bit, 寄存器 0x04) */
+    uint32_t p_reg = (buf[9] << 24) | (buf[8] << 16)
+                   | (buf[7] << 8) | buf[6];
+
+    /* 校准系数 (需实际校准确认) */
+    #define V_COEFF 0.001215f
+    #define I_COEFF 0.000318f
+    #define P_COEFF 0.000381f
+
+    data->voltage       = v_reg * V_COEFF;
+    data->current       = i_reg * I_COEFF;
+    data->active_power  = p_reg * P_COEFF;
+    data->power_factor  = data->active_power
+                        / (data->voltage * data->current + 0.001f);
+
+    /* 累计电量累加 */
+    static uint32_t last_energy_reg = 0;
+    uint32_t energy_reg = (buf[13] << 24) | (buf[12] << 16)
+                        | (buf[11] << 8) | buf[10];
+    if (energy_reg >= last_energy_reg) {
+        data->energy += (energy_reg - last_energy_reg)
+                       * P_COEFF / 1000.0f / 3600.0f;
+    }
+    last_energy_reg = energy_reg;
+
+    return 1;
+}
+
+/* MQTT 发布数据到云平台 */
+void MQTT_PublishMeterData(MeterData_t *data) {
+    char payload[256];
+    sprintf(payload,
+        "{\"V\":%.1f,\"I\":%.2f,\"P\":%.1f,"
+        "\"PF\":%.2f,\"E\":%.3f}",
+        data->voltage, data->current, data->active_power,
+        data->power_factor, data->energy);
+
+    char topic[] = "home/meter/data";
+    ESP8266_MQTT_Publish(topic, payload);
+}
+
+/* 过载保护检测 */
+void Overload_Check(MeterData_t *data) {
+    /* 功率阈值 3000W，电流阈值 15A */
+    if (data->active_power > 3000.0f
+        || data->current > 15.0f) {
+
+        /* 断开继电器 */
+        HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+
+        /* 蜂鸣器报警 */
+        Buzzer_Alert();
+
+        /* OLED 显示告警 */
+        OLED_ShowAlert("OVERLOAD!");
+
+        /* MQTT 发送告警 */
+        ESP8266_MQTT_Publish("home/meter/alarm",
+            "{\"alarm\":\"overload\",\"action\":\"trip\"}");
+    }
+}
+
+/* 主循环 (500ms 周期) */
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+    MX_GPIO_Init();
+    MX_USART1_UART_Init(); /* HLW8032 */
+    MX_USART2_UART_Init(); /* ESP8266 */
+    MX_I2C1_Init();        /* OLED */
+    OLED_Init();
+    ESP8266_Init();
+    ESP8266_MQTT_Connect("mqtt.example.com", 1883);
+
+    MeterData_t meter = {0};
+    uint8_t rx_buf[24];
+    uint32_t last_mqtt_time = 0;
+
+    while (1) {
+        /* 1. 读取 HLW8032 数据 */
+        if (HLW8032_ReadFrame(rx_buf)) {
+            HLW8032_Parse(rx_buf, &meter);
+        }
+
+        /* 2. OLED 本地显示 */
+        OLED_ShowMeterData(&meter);
+
+        /* 3. 过载保护 */
+        Overload_Check(&meter);
+
+        /* 4. 每 2s 上传到云平台 */
+        if (HAL_GetTick() - last_mqtt_time > 2000) {
+            MQTT_PublishMeterData(&meter);
+            last_mqtt_time = HAL_GetTick();
+        }
+
+        HAL_Delay(500);
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - HLW8032 电能计量与 MQTT 上传
+      
+      
+        工作原理：HLW8032 通过 UART 持续输出电能数据帧，STM32 解析电压、电流、功率参数。
+        每 2 秒将数据通过 ESP8266 以 MQTT 协议上报到云平台，同时检测过载条件控制继电器。
+      
+      /* 智能电表核心代码 - HLW8032 计量 + MQTT 上传 */
+
+/* HLW8032 数据帧结构 */
+typedef struct {
+    float voltage;      /* 电压 (V) */
+    float current;      /* 电流 (A) */
+    float active_power; /* 有功功率 (W) */
+    float power_factor; /* 功率因数 */
+    float energy;       /* 累计电量 (kWh) */
+} MeterData_t;
+
+/* 解析 HLW803`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

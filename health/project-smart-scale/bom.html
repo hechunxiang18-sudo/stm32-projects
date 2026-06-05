@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>元器件清单 - STM32F103C8T6 智能电子秤</title>
+  <meta name="description" content="高精度称重 · 蓝牙传输 · 体脂估算 · 健康记录">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能电子秤 / 元器件清单</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#9878;</div>
+      <h1>STM32F103C8T6 智能电子秤</h1>
+      <p class="detail-hero-sub">高精度称重 · 蓝牙传输 · 体脂估算 · 健康记录</p>
+      <div class="detail-hero-tags">
+        <span>HX711</span>
+        <span>压力传感器</span>
+        <span>OLED 0.96"</span>
+        <span>HC-05</span>
+        <span>DS3231</span>
+        <span>锂电池</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <span class="sec-nav-item active">元器件清单</span>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="bom" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128221;</span>
+        <h2>元器件清单 (BOM)</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Ref</th><th>型号</th><th>封装</th><th>说明</th><th>数量</th><th>参考价</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>U1</td><td>STM32F103C8T6</td><td>LQFP-48</td><td>主控 MCU，72MHz Cortex-M3</td><td>1</td><td>¥5.0</td></tr>
+            <tr><td>U2</td><td>HX711</td><td>SOP-16</td><td>24 位高精度 ADC，桥式传感器接口</td><td>1</td><td>¥3.5</td></tr>
+            <tr><td>S1</td><td>压力传感器</td><td>铝合梁</td><td>5kg 或 100kg 量程可选</td><td>1</td><td>¥8.0</td></tr>
+            <tr><td>U3</td><td>OLED 0.96"</td><td>PCB 模组</td><td>I2C 128×64，显示重量/单位/BMI</td><td>1</td><td>¥12.0</td></tr>
+            <tr><td>U4</td><td>HC-05</td><td>PCB 模组</td><td>蓝牙 2.0 串口模块，10m 传输</td><td>1</td><td>¥12.0</td></tr>
+            <tr><td>U5</td><td>DS3231</td><td>PCB 模组</td><td>高精度 RTC，±2ppm 时钟</td><td>1</td><td>¥6.0</td></tr>
+            <tr><td>U6</td><td>TP4056</td><td>PCB 模组</td><td>锂电池充电管理，1A 充电</td><td>1</td><td>¥2.5</td></tr>
+            <tr><td>BAT1</td><td>18650</td><td>圆柱 18650</td><td>3.7V 2600mAh，供电</td><td>1</td><td>¥8.0</td></tr>
+            <tr><td>Q1</td><td>AMS1117-3.3</td><td>SOT-223</td><td>3.3V 稳压</td><td>1</td><td>¥0.3</td></tr>
+            <tr><td>&mdash;</td><td>按键+蜂鸣器</td><td>&mdash;</td><td>功能按键×3，蜂鸣器×1</td><td>1</td><td>¥1.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="bom-total">全套硬件成本（含 MCU）：<strong>≈ ¥58.3</strong></p>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

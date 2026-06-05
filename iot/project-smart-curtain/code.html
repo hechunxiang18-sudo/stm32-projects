@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能窗帘系统</title>
+  <meta name="description" content="步进电机驱动 · 光感自动 · 遥控/定时 · 手机远程">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能窗帘系统 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127745;</div>
+      <h1>STM32F103C8T6 智能窗帘系统</h1>
+      <p class="detail-hero-sub">步进电机驱动 · 光感自动 · 遥控/定时 · 手机远程</p>
+      <div class="detail-hero-tags">
+        <span>28BYJ-48</span>
+        <span>光敏电阻</span>
+        <span>HC-05</span>
+        <span>ESP8266</span>
+        <span>红外遥控</span>
+        <span>极限开关</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心代码 - 步进电机控制</h2>
+      </div>
+      <div class="note-box">
+        <strong>核心逻辑：</strong>28BYJ-48 步进电机采用四相八拍驱动方式（A-AB-B-BC-C-CD-D-DA），
+        通过 ULN2003 驱动。光敏 ADC 定时采样，联动自动控制窗帘开合。
+      </div>
+      <pre><code>/* 步进电机四相八拍驱动表 */
+const uint8_t step_seq[8] = {
+    0x08, 0x0C, 0x04, 0x06,  /* A, AB, B, BC */
+    0x02, 0x03, 0x01, 0x09   /* C, CD, D, DA */
+};
+
+/* 左电机 GPIO (PB0-PB3) */
+#define MOTOR_L_PORT  GPIOB
+#define MOTOR_L_PINS  (GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3)
+
+/* 右电机 GPIO (PB4-PB7) */
+#define MOTOR_R_PORT  GPIOB
+#define MOTOR_R_PINS  (GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7)
+
+/* 步进电机走一步 */
+void Stepper_Step(GPIO_TypeDef* port, uint16_t base_pin, uint8_t step_val) {
+    uint16_t pins[] = {base_pin, base_pin &lt;&lt; 1, base_pin &lt;&lt; 2, base_pin &lt;&lt; 3};
+    for (int i = 0; i &lt; 4; i++) {
+        if (step_val & (1 &lt;&lt; i))
+            GPIO_SetBits(port, pins[i]);
+        else
+            GPIO_ResetBits(port, pins[i]);
+    }
+}
+
+/* 光敏 ADC 读取与自动控制 */
+void AutoCurtain_Control(void) {
+    uint16_t adc_val = ADC_GetValue(ADC1, ADC_Channel_0);
+    uint32_t lux = (uint32_t)adc_val * 100 / 4095;  /* 转换到近似 lux */
+
+    static uint8_t curtain_open = 1;
+
+    if (lux &lt; 20 &amp;&amp; curtain_open) {     /* 光线暗 → 关窗帘 */
+        Stepper_Move(MOTOR_L_PORT, 512, STEP_CLOSE);
+        Stepper_Move(MOTOR_R_PORT, 512, STEP_CLOSE);
+        curtain_open = 0;
+    }
+    else if (lux > 60 &amp;&amp; !curtain_open) { /* 光线亮 → 开窗帘 */
+        Stepper_Move(MOTOR_L_PORT, 512, STEP_OPEN);
+        Stepper_Move(MOTOR_R_PORT, 512, STEP_OPEN);
+        curtain_open = 1;
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心代码 - 步进电机控制
+      
+      
+        核心逻辑：28BYJ-48 步进电机采用四相八拍驱动方式（A-AB-B-BC-C-CD-D-DA），
+        通过 ULN2003 驱动。光敏 ADC 定时采样，联动自动控制窗帘开合。
+      
+      /* 步进电机四相八拍驱动表 */
+const uint8_t step_seq[8] = {
+    0x08, 0x0C, 0x04, 0x06,  /* A, AB, B, BC */
+    0x02, 0x03, 0x01, 0x09   /* C, CD, D, DA */
+};
+
+/* 左电机 GPIO (PB0-PB3) */
+#define MOTOR_L_PORT  GPIOB
+#define MOTOR_L_PINS  (GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3)
+
+/* 右电机 GPIO (PB4-PB7) */
+#define MOTOR_R_PORT  GPI`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

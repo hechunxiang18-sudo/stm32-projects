@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能特性 - STM32F103C8T6 WiFi 天气时钟</title>
+  <meta name="description" content="NTP 自动校时 · 天气实况 · 闹钟 · 温湿度显示">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">WiFi 天气时钟 / 功能特性</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127774;</div>
+      <h1>STM32F103C8T6 WiFi 天气时钟</h1>
+      <p class="detail-hero-sub">NTP 自动校时 · 天气实况 · 闹钟 · 温湿度显示</p>
+      <div class="detail-hero-tags">
+        <span>ESP8266</span>
+        <span>OLED 1.3"</span>
+        <span>DHT22</span>
+        <span>DS3231</span>
+        <span>光敏电阻</span>
+        <span>触摸按键</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <span class="sec-nav-item active">功能特性</span>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="features" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#9889;</span>
+        <h2>功能特性</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fc-icon">&#128338;</div>
+          <h4>NTP 自动校时</h4>
+          <p>ESP8266 获取 NTP 网络时间，自动修正 RTC</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#127780;</div>
+          <h4>天气预报</h4>
+          <p>实时天气 + 未来 3 天预报，HTTP API 获取</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#9200;</div>
+          <h4>闹钟/秒表</h4>
+          <p>多组闹钟设置，支持秒表与倒计时功能</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#127777;</div>
+          <h4>温湿度显示</h4>
+          <p>DHT22 高精度采集环境温湿度并显示</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#9728;</div>
+          <h4>自动亮度</h4>
+          <p>光敏电阻检测环境光，OLED 自动调亮度</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128156;</div>
+          <h4>触摸切换</h4>
+          <p>4 个触摸按键切换时钟/天气/温湿度/闹钟</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

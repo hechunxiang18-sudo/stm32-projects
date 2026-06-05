@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>核心代码 - STM32F103C8T6 智能报警系统</title>
+  <meta name="description" content="多传感器探测 · GSM 短信报警 · 声光联动 · 布防撤防">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能报警系统 / 核心代码</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0808 0%, #7f1d1d 40%, #991b1b 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#9726;</div>
+      <h1>STM32F103C8T6 智能报警系统</h1>
+      <p class="detail-hero-sub">多传感器探测 · GSM 短信报警 · 声光联动 · 布防撤防</p>
+      <div class="detail-hero-tags">
+        <span>PIR</span>
+        <span>门磁</span>
+        <span>烟雾</span>
+        <span>GSM</span>
+        <span>声光</span>
+        <span>遥控</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <span class="sec-nav-item active">核心代码</span>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="code" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128187;</span>
+        <h2>核心软件代码</h2>
+      </div>
+      <div class="note-box">
+        <strong>代码说明：</strong>以下展示智能报警系统的核心模块，包括多传感器轮询、GSM 短信发送、红外遥控解码、声光报警控制。
+      </div>
+      <pre><code>/* ========== 智能报警系统 - 主程序框架 ========== */
+
+#include "sim800l.h"
+#include "mq2.h"
+#include "ir_remote.h"
+
+typedef enum { DISARMED, ARMED, ALARMING } SystemState_t;
+SystemState_t g_state = DISARMED;
+
+/* 预设报警短信接收号码 */
+const char *g_alarmNumbers[] = {
+    "13800138001",
+    "13800138002",
+    "13800138003",
+    "13800138004",
+    "13800138005"
+};
+
+volatile uint8_t g_pirTrigger = 0;
+volatile uint8_t g_doorTrigger = 0;
+uint16_t g_smokeLevel = 0;
+
+/* ===== 1. 传感器轮询任务 ===== */
+void Sensors_Poll(void) {
+    /* PIR 状态由中断更新，这里只读取标志 */
+    uint8_t pir = g_pirTrigger;
+
+    /* 门磁状态读取 */
+    uint8_t door = !GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_1);
+
+    /* MQ-2 烟雾浓度 ADC 读取 */
+    HAL_ADC_Start(&hadc1);
+    if (HAL_ADC_PollForConversion(&hadc1, 100) == HAL_OK) {
+        g_smokeLevel = HAL_ADC_GetValue(&hadc1);
+    }
+
+    if (g_state != ARMED) return;  /* 非布防状态不报警 */
+
+    /* 判断是否触发报警 */
+    uint8_t alarm = 0;
+    char sensorType[16] = {0};
+
+    if (pir) {
+        strcpy(sensorType, "PIR 红外");
+        alarm = 1;
+    }
+    if (door) {
+        strcpy(sensorType, "门磁");
+        alarm = 1;
+    }
+    if (g_smokeLevel > 800) {  /* ADC 阈值 */
+        strcpy(sensorType, "烟雾");
+        alarm = 1;
+    }
+
+    if (alarm) {
+        g_state = ALARMING;
+        Alarm_Trigger(sensorType);
+    }
+}
+
+/* ===== 2. 声光报警 ===== */
+void Alarm_Trigger(const char *sensor) {
+    /* 声光报警 - 循环 10 次 */
+    for (int i = 0; i < 10; i++) {
+        /* 蜂鸣器 PWM 输出 */
+        TIM3->CCR2 = 500;       /* 50% 占空比 */
+        GPIO_SetBits(GPIOC, GPIO_Pin_0);   /* 报警灯亮 */
+        HAL_Delay(200);
+
+        TIM3->CCR2 = 0;         /* 关闭 */
+        GPIO_ResetBits(GPIOC, GPIO_Pin_0); /* 报警灯灭 */
+        HAL_Delay(200);
+    }
+
+    /* 发送 GSM 短信 */
+    GSM_SendAlarmSMS(sensor);
+
+    /* 记录报警日志 */
+    Alarm_Log(sensor);
+}
+
+/* ===== 3. GSM 短信发送 ===== */
+void GSM_SendAlarmSMS(const char *sensor) {
+    char smsBuf[128];
+    RTC_TimeTypeDef now;
+    DS3231_GetTime(&now);
+
+    /* 构造短信内容 */
+    sprintf(smsBuf,
+            "[报警] 传感器: %s\r\n"
+            "时间: %04d-%02d-%02d %02d:%02d:%02d\r\n"
+            "位置: 家庭安防系统",
+            sensor,
+            now.year, now.month, now.date,
+            now.hour, now.minute, now.second);
+
+    /* 逐一向 5 个号码发送短信 */
+    for (int i = 0; i < 5; i++) {
+        if (SIM800L_SendSMS(g_alarmNumbers[i], smsBuf) == SMS_OK) {
+            /* 发送成功指示 */
+            GPIO_SetBits(GPIOC, GPIO_Pin_1);
+            HAL_Delay(100);
+            GPIO_ResetBits(GPIOC, GPIO_Pin_1);
+        } else {
+            /* 发送失败重试一次 */
+            SIM800L_SendSMS(g_alarmNumbers[i], smsBuf);
+        }
+        HAL_Delay(3000);  /* 间隔 3 秒 */
+    }
+}
+
+/* ===== 4. 红外遥控解码 ===== */
+void IR_Remote_Decode(void) {
+    /* NEC 协议解码 */
+    uint32_t irCode = IR_GetCode();
+
+    switch (irCode) {
+        case 0xFF00BF00:  /* 遥控器"布防"键 */
+            if (g_state == DISARMED) {
+                g_state = ARMED;
+                GPIO_SetBits(GPIOC, GPIO_Pin_1);  /* 布防 LED 亮 */
+                /* GSM 发送布防通知 */
+                SIM800L_SendSMS(g_alarmNumbers[0],
+                    "[系统] 已布防，智能报警系统已启动");
+            }
+            break;
+
+        case 0xFF807F00:  /* 遥控器"撤防"键 */
+            if (g_state == ARMED || g_state == ALARMING) {
+                g_state = DISARMED;
+                GPIO_ResetBits(GPIOC, GPIO_Pin_1);  /* 布防 LED 灭 */
+                /* 停止声光报警 */
+                TIM3->CCR2 = 0;
+                GPIO_ResetBits(GPIOC, GPIO_Pin_0);
+                /* 发送撤防通知 */
+                SIM800L_SendSMS(g_alarmNumbers[0],
+                    "[系统] 已撤防，智能报警系统已关闭");
+            }
+            break;
+
+        case 0xFF40BF00:  /* 紧急报警键 */
+            Alarm_Trigger("紧急按钮");
+            break;
+    }
+}
+
+/* ===== 5. 报警日志记录 ===== */
+void Alarm_Log(const char *sensor) {
+    static uint16_t logIdx = 0;
+    RTC_TimeTypeDef now;
+    DS3231_GetTime(&now);
+
+    /* 日志结构（存 EEPROM） */
+    typedef struct {
+        char sensor[16];
+        uint16_t year;
+        uint8_t  month;
+        uint8_t  day;
+        uint8_t  hour;
+        uint8_t  minute;
+        uint8_t  second;
+    } AlarmLog_t;
+
+    AlarmLog_t log;
+    strcpy(log.sensor, sensor);
+    log.year   = now.year;
+    log.month  = now.month;
+    log.day    = now.date;
+    log.hour   = now.hour;
+    log.minute = now.minute;
+    log.second = now.second;
+
+    /* 写入 EEPROM（地址 = logIdx * sizeof(AlarmLog_t)） */
+    AT24CXX_Write(LOG_BASE_ADDR + logIdx * sizeof(AlarmLog_t),
+                  (uint8_t *)&log, sizeof(AlarmLog_t));
+    logIdx = (logIdx + 1) % 100;
+}
+
+/* ===== 6. PIR / 门磁 中断处理 ===== */
+void EXTI0_IRQHandler(void) {
+    if (EXTI_GetITStatus(EXTI_Line0)) {
+        if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == SET) {
+            g_pirTrigger = 1;
+        }
+        EXTI_ClearITPendingBit(EXTI_Line0);
+    }
+}
+
+void EXTI1_IRQHandler(void) {
+    if (EXTI_GetITStatus(EXTI_Line1)) {
+        g_doorTrigger = 1;
+        EXTI_ClearITPendingBit(EXTI_Line1);
+    }
+}
+
+/* ===== 7. 主循环 ===== */
+int main(void) {
+    HAL_Init();
+    SystemClock_Config();
+
+    UART1_Init(9600);        /* SIM800L */
+    ADC1_Init();             /* MQ-2 */
+    EXTI0_Init();            /* PIR */
+    EXTI1_Init();            /* 门磁 */
+    EXTI6_Init();            /* 红外遥控 */
+    TIM3_PWM_Init();         /* 蜂鸣器 */
+
+    SIM800L_Init();
+    /* 等待 GSM 网络注册 */
+    while (!SIM800L_CheckNetwork()) {
+        HAL_Delay(1000);
+    }
+
+    /* 系统就绪 */
+    GPIO_SetBits(GPIOC, GPIO_Pin_1);  /* 电源指示 */
+    OLED_ShowString(0, 0, "报警系统 v2.0");
+    OLED_ShowString(0, 2, "状态: 已撤防");
+    OLED_ShowString(0, 4, "按遥控布防");
+
+    while (1) {
+        /* 1. 处理红外遥控指令 */
+        if (IR_Remote_Available()) {
+            IR_Remote_Decode();
+        }
+
+        /* 2. 传感器轮询（每 200ms） */
+        Sensors_Poll();
+
+        /* 3. 更新 OLED 显示 */
+        UpdateDisplay();
+
+        /* 4. 键盘扫描（面板撤防） */
+        uint8_t key = Keypad_Scan();
+        if (key == KEY_ARM) {
+            if (g_state == DISARMED) {
+                g_state = ARMED;
+            }
+        } else if (key == KEY_DISARM) {
+            if (g_state != DISARMED) {
+                if (Keypad_PasswordVerify()) {
+                    g_state = DISARMED;
+                }
+            }
+        }
+
+        HAL_Delay(200);
+    }
+}</code></pre>
+    </section>
+  </div>
+
+  
+  <div class="download-section">
+    <div class="download-box">
+      <div class="download-icon">&#128229;</div>
+      <h3>下载源代码</h3>
+      <p>点击下方按钮下载本项目的源代码文件</p>
+      <button class="download-btn" onclick="triggerDownload('code')">
+        &#128190; 下载源代码
+      </button>
+    </div>
+  </div>
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+
+  <script>
+  function triggerDownload(type) {
+    var content = `
+      
+        &#128187;
+        核心软件代码
+      
+      
+        代码说明：以下展示智能报警系统的核心模块，包括多传感器轮询、GSM 短信发送、红外遥控解码、声光报警控制。
+      
+      /* ========== 智能报警系统 - 主程序框架 ========== */
+
+#include "sim800l.h"
+#include "mq2.h"
+#include "ir_remote.h"
+
+typedef enum { DISARMED, ARMED, ALARMING } SystemState_t;
+SystemState_t g_state = DISARMED;
+
+/* 预设报警短信接收号码 */
+const char *g_alarmNumbers[] = {
+    "13800138001",
+    "13800138002",
+    "13800138003",
+    "13800138004",
+    "13800138005"
+};
+
+volatile uint8_t g_pirT`;
+    var filename = type === 'schematic' ? 'schematic.txt' : 'source-code.c';
+    var blob = new Blob([content], {type: 'text/plain'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+  function copyWechat() {
+    navigator.clipboard.writeText('AELL').then(function() {
+      var btn = document.querySelector('.wechat-copy-btn');
+      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
+    });
+  }
+  </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能特性 - STM32F103C8T6 PM2.5 空气质量仪</title>
+  <meta name="description" content="PM2.5/PM10 · CO2 · TVOC · 甲醛 · 温湿度">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">PM2.5 空气质量仪 / 功能特性</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#127800;</div>
+      <h1>STM32F103C8T6 PM2.5 空气质量仪</h1>
+      <p class="detail-hero-sub">PM2.5/PM10 · CO2 · TVOC · 甲醛 · 温湿度</p>
+      <div class="detail-hero-tags">
+        <span>PMS5003</span>
+        <span>CCS811</span>
+        <span>SGP30</span>
+        <span>甲醛传感器</span>
+        <span>OLED</span>
+        <span>WiFi</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <span class="sec-nav-item active">功能特性</span>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="features" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#9889;</span>
+        <h2>功能特性</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fc-icon">&#127788;</div>
+          <h4>PM2.5 / PM10 检测</h4>
+          <p>激光散射原理 PMS5003，实时检测 PM1.0/2.5/10 三种颗粒物浓度</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128168;</div>
+          <h4>CO2 浓度检测</h4>
+          <p>CCS811 检测 CO2 当量浓度 400-8192ppm，通风换气提示</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#127800;</div>
+          <h4>TVOC 空气质量</h4>
+          <p>SGP30 高精度 TVOC 检测，与 CCS811 双传感器交叉校准</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128137;</div>
+          <h4>甲醛(HCHO)检测</h4>
+          <p>ZE08 电化学甲醛传感器，ppb 级精度，新装环境必测</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#127777;</div>
+          <h4>温湿度补偿</h4>
+          <p>DHT22 高精度温湿度，用于传感器校零补偿和环境舒适度指示</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128252;</div>
+          <h4>WiFi 上传云端</h4>
+          <p>ESP8266 上传至 MQTT/HTTP 云平台，App 远程查看历史曲线</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

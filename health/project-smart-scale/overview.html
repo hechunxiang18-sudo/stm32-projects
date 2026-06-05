@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>项目概述 - STM32F103C8T6 智能电子秤</title>
+  <meta name="description" content="高精度称重 · 蓝牙传输 · 体脂估算 · 健康记录">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能电子秤 / 项目概述</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #1a0a2e 0%, #4a1a6b 40%, #6d28d9 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#9878;</div>
+      <h1>STM32F103C8T6 智能电子秤</h1>
+      <p class="detail-hero-sub">高精度称重 · 蓝牙传输 · 体脂估算 · 健康记录</p>
+      <div class="detail-hero-tags">
+        <span>HX711</span>
+        <span>压力传感器</span>
+        <span>OLED 0.96"</span>
+        <span>HC-05</span>
+        <span>DS3231</span>
+        <span>锂电池</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <span class="sec-nav-item active">项目概述</span>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="overview" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#9878;</span>
+        <h2>项目概述</h2>
+      </div>
+      <div class="project-intro">
+        <div class="project-intro-text">
+          <p>
+            基于 STM32F103C8T6 的智能电子秤，采用 HX711 高精度 ADC 配合压力传感器实现 ±1g~±10g 的精确称重，
+            支持去皮/置零、BMI 体脂估算、蓝牙手机同步与历史记录趋势图。内置 DS3231 实时时钟为每次称重记录时间戳，
+            搭配 OLED 屏本地显示，TP4056+18650 锂电池供电，适合家庭健康管理场景。
+          </p>
+          <p>
+            设备支持两种量程（5kg/100kg 传感器可选），称重数据通过 HC-05 蓝牙传输至手机 App，
+            自动绘制体重/体脂变化趋势图，帮助用户追踪健康状态。
+          </p>
+        </div>
+      </div>
+
+      <!-- ===== SVG 产品效果图 ===== -->
+      <div class="svg-product">
+        <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="scl-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a0a2e"/><stop offset="100%" stop-color="#2d1b69"/></linearGradient>
+            <linearGradient id="scl-base" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a4a5a"/><stop offset="100%" stop-color="#2a2a3a"/></linearGradient>
+            <linearGradient id="scl-pad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#6d8fb0"/><stop offset="100%" stop-color="#4a6a8a"/></linearGradient>
+            <linearGradient id="scl-glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="rgba(255,255,255,0.15)"/><stop offset="100%" stop-color="rgba(255,255,255,0.02)"/></linearGradient>
+            <filter id="scl-shadow"><feDropShadow dx="2" dy="4" stdDeviation="6" flood-opacity="0.5"/></filter>
+          </defs>
+          <!-- 背景 -->
+          <rect width="800" height="300" fill="url(#scl-bg)" rx="12"/>
+          <!-- 台面阴影 -->
+          <ellipse cx="400" cy="260" rx="280" ry="20" fill="rgba(0,0,0,0.3)"/>
+          <!-- 秤体底座 -->
+          <rect x="180" y="190" width="440" height="60" rx="12" fill="url(#scl-base)" filter="url(#scl-shadow)"/>
+          <rect x="180" y="190" width="440" height="60" rx="12" fill="none" stroke="#6a6a7a" stroke-width="1"/>
+          <!-- 称重面板 -->
+          <rect x="200" y="100" width="400" height="95" rx="10" fill="url(#scl-pad)" filter="url(#scl-shadow)"/>
+          <rect x="200" y="100" width="400" height="95" rx="10" fill="url(#scl-glass)"/>
+          <!-- 压力传感器示意 -->
+          <rect x="350" y="180" width="20" height="15" rx="3" fill="#3a3a4a"/>
+          <rect x="430" y="180" width="20" height="15" rx="3" fill="#3a3a4a"/>
+          <!-- OLED 屏幕 -->
+          <rect x="240" y="115" width="130" height="55" rx="6" fill="#0a1a2a"/>
+          <rect x="245" y="120" width="120" height="45" rx="4" fill="#0d2a1a"/>
+          <!-- 屏幕文字 -->
+          <text x="305" y="138" text-anchor="middle" fill="#00ff88" font-size="14" font-family="monospace">75.35</text>
+          <text x="305" y="148" text-anchor="middle" fill="#00ff88" font-size="7" font-family="monospace">kg</text>
+          <text x="305" y="158" text-anchor="middle" fill="#66ccaa" font-size="6" font-family="monospace">BMI 23.1</text>
+          <!-- 蓝牙指示灯 -->
+          <circle cx="490" cy="130" r="8" fill="#1a3a1a" stroke="#00ff88" stroke-width="1"/>
+          <circle cx="490" cy="130" r="4" fill="#00ff88" opacity="0.8">
+            <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <text x="490" y="148" text-anchor="middle" fill="#88ffbb" font-size="7" font-family="monospace">BT</text>
+          <!-- RTC 指示灯 -->
+          <rect x="520" y="118" width="40" height="20" rx="3" fill="#1a2a3a" stroke="#4488cc" stroke-width="0.5"/>
+          <text x="540" y="132" text-anchor="middle" fill="#4488cc" font-size="7" font-family="monospace">RTC</text>
+          <!-- 去皮/置零按钮 -->
+          <rect x="380" y="205" width="50" height="22" rx="5" fill="#1a1a2a" stroke="#555" stroke-width="0.5"/>
+          <text x="405" y="219" text-anchor="middle" fill="#aaa" font-size="9" font-family="sans-serif">去皮</text>
+          <rect x="440" y="205" width="50" height="22" rx="5" fill="#1a1a2a" stroke="#555" stroke-width="0.5"/>
+          <text x="465" y="219" text-anchor="middle" fill="#aaa" font-size="9" font-family="sans-serif">置零</text>
+          <!-- 重量单位标示 -->
+          <text x="550" y="138" text-anchor="middle" fill="#8899bb" font-size="10" font-family="sans-serif">MAX 5kg</text>
+          <text x="550" y="152" text-anchor="middle" fill="#667799" font-size="8" font-family="sans-serif">d=1g</text>
+          <!-- 待测物品——苹果 -->
+          <circle cx="290" cy="78" r="18" fill="#cc4433"/>
+          <ellipse cx="290" cy="72" rx="4" ry="6" fill="#55aa33"/>
+          <ellipse cx="290" cy="78" rx="18" ry="18" fill="#dd5544" opacity="0.3"/>
+          <!-- 待测物品——哑铃 -->
+          <rect x="390" y="68" width="50" height="28" rx="5" fill="#888" stroke="#aaa" stroke-width="1"/>
+          <rect x="395" y="64" width="8" height="36" rx="3" fill="#777"/>
+          <rect x="427" y="64" width="8" height="36" rx="3" fill="#777"/>
+          <!-- 装饰线条 -->
+          <line x1="180" y1="215" x2="620" y2="215" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/>
+        </svg>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

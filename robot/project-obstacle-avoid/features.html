@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>功能特性 - STM32F103C8T6 避障小车</title>
+  <meta name="description" content="超声波避障 · 激光雷达 · 路径规划 · 自动驾驶">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">避障小车 / 功能特性</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1628 0%, #1a3a6b 40%, #2d1b69 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#9726;</div>
+      <h1>STM32F103C8T6 避障小车</h1>
+      <p class="detail-hero-sub">超声波避障 · 激光雷达 · 路径规划 · 自动驾驶</p>
+      <div class="detail-hero-tags">
+        <span>HC-SR04×3</span>
+        <span>SG90舵机</span>
+        <span>L298N</span>
+        <span>超声波</span>
+        <span>蓝牙</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <span class="sec-nav-item active">功能特性</span>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+            </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="features" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#9889;</span>
+        <h2>功能特性</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="fc-icon">&#128266;</div>
+          <h4>3 路超声波</h4>
+          <p>前+左+右三路超声探测，有效测距 2-400cm</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128260;</div>
+          <h4>舵机扫描</h4>
+          <p>SG90 舵机带动超声探头 180 度扫描建图</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128200;</div>
+          <h4>路径规划</h4>
+          <p>基于障碍物距离的路径决策，实现最优绕行</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128252;</div>
+          <h4>蓝牙遥控/自动</h4>
+          <p>HC-05 蓝牙遥控模式 + 自动避障模式一键切换</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128200;</div>
+          <h4>速度自适应</h4>
+          <p>根据障碍物距离自动减速/加速，安全行驶</p>
+        </div>
+        <div class="feature-card">
+          <div class="fc-icon">&#128424;</div>
+          <h4>OLED 雷达图</h4>
+          <p>实时绘制超声波雷达扫描图，直观显示环境</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  
+  <div class="wechat-section" style="margin-top:0; padding:0 20px;">
+    <div class="wechat-box" style="margin-bottom:24px;">
+      <div class="wechat-icon">&#128172;</div>
+      <div class="wechat-text">
+        <h3>需要技术支持？</h3>
+        <p>项目定制、技术咨询、问题解答，欢迎添加作者微信交流</p>
+        <div class="wechat-id">
+          <span class="wechat-label">微信号：</span>
+          <span class="wechat-value">AELL</span>
+          <button class="wechat-copy-btn" onclick="copyWechat()">复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>

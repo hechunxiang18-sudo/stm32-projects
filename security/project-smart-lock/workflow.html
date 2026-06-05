@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工作流程 - STM32F103C8T6 智能门锁系统</title>
+  <meta name="description" content="指纹识别 · 密码键盘 · RFID 刷卡 · 蓝牙远程 · 安全防护">
+  <link rel="stylesheet" href="../../style.css">
+</head>
+<body class="detail-page">
+  <nav class="detail-nav">
+    <a href="../../index.html" class="back-link">&larr; 返回项目列表</a>
+    <span class="detail-nav-title">智能门锁系统 / 工作流程</span>
+  </nav>
+
+  <header class="detail-hero" style="background:linear-gradient(135deg, #0a1f1a 0%, #0d5c52 40%, #0a3d2e 100%);">
+    <div class="detail-hero-content">
+      <div class="detail-hero-icon">&#128274;</div>
+      <h1>STM32F103C8T6 智能门锁系统</h1>
+      <p class="detail-hero-sub">指纹识别 · 密码键盘 · RFID 刷卡 · 蓝牙远程 · 安全防护</p>
+      <div class="detail-hero-tags">
+        <span>AS608</span>
+        <span>RC522</span>
+        <span>4×4 键盘</span>
+        <span>电磁锁</span>
+        <span>HC-05</span>
+        <span>DS3231 RTC</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="container detail-container">
+    <!-- ===== 板块导航 ===== -->
+    <nav class="sec-nav">
+              <a href="overview.html" class="sec-nav-item">项目概述</a>
+              <a href="features.html" class="sec-nav-item">功能特性</a>
+              <a href="block.html" class="sec-nav-item">系统框图</a>
+              <span class="sec-nav-item active">工作流程</span>
+              <a href="algorithm.html" class="sec-nav-item">判据算法</a>
+              <a href="bom.html" class="sec-nav-item">元器件清单</a>
+              <a href="schematic.html" class="sec-nav-item">电路原理</a>
+              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+              <a href="code.html" class="sec-nav-item">核心代码</a>
+              <a href="pcb.html" class="sec-nav-item">PCB 布局</a>
+
+    </nav>
+
+    <!-- ===== 内容 ===== -->
+    <section id="workflow" class="section">
+      <div class="section-header">
+        <span class="sec-icon">&#128257;</span>
+        <h2>开锁工作流程</h2>
+      </div>
+      <div class="workflow">
+        <div class="wf-step">
+          <div class="wf-dot" style="background:#1565c0;">1</div>
+          <span class="wf-label">触发唤醒</span>
+        </div>
+        <span class="wf-arrow">&rarr;</span>
+        <div class="wf-step">
+          <div class="wf-dot" style="background:#00897b;">2</div>
+          <span class="wf-label">选择开锁方式</span>
+        </div>
+        <span class="wf-arrow">&rarr;</span>
+        <div class="wf-step">
+          <div class="wf-dot" style="background:#e65100;">3</div>
+          <span class="wf-label">身份验证</span>
+        </div>
+        <span class="wf-arrow">&rarr;</span>
+        <div class="wf-step">
+          <div class="wf-dot" style="background:#1565c0;">4</div>
+          <span class="wf-label">验证通过？</span>
+        </div>
+        <span class="wf-arrow">&rarr;</span>
+        <div class="wf-step">
+          <div class="wf-dot" style="background:#c62828;">5</div>
+          <span class="wf-label">驱动电磁锁</span>
+        </div>
+        <span class="wf-arrow">&rarr;</span>
+        <div class="wf-step">
+          <div class="wf-dot" style="background:#00695c;">6</div>
+          <span class="wf-label">记录日志</span>
+        </div>
+      </div>
+      <div class="note-box" style="margin-top:16px;">
+        <strong>安全策略：</strong>
+        5 次验证失败后锁定 30 秒 &nbsp;|&nbsp;
+        虚位密码（随意输入字符 + 最后 6 位正确密码）防偷窥 &nbsp;|&nbsp;
+        门磁传感器监测门窗异常开启
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <p><a href="{back_path}index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>{meta['nav_title']}</strong></p>
+  </footer>
+</body>
+</html>
