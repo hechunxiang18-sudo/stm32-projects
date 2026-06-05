@@ -32,14 +32,14 @@
   <div class="container detail-container">
     <!-- ===== 板块导航 ===== -->
     <nav class="sec-nav">
-              <a href="overview.html" class="sec-nav-item">项目概述</a>
-              <a href="features.html" class="sec-nav-item">功能特性</a>
-              <a href="block.html" class="sec-nav-item">系统框图</a>
-              <a href="bom.html" class="sec-nav-item">元器件清单</a>
-              <a href="pinout.html" class="sec-nav-item">引脚连接</a>
-              <span class="sec-nav-item active">电路原理图</span>
-              <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
-            </nav>
+      <a href="overview.html" class="sec-nav-item">项目概述</a>
+      <a href="features.html" class="sec-nav-item">功能特性</a>
+      <a href="block.html" class="sec-nav-item">系统框图</a>
+      <a href="bom.html" class="sec-nav-item">元器件清单</a>
+      <a href="pinout.html" class="sec-nav-item">引脚连接</a>
+      <span class="sec-nav-item active">电路原理图</span>
+      <a href="code.html" class="sec-nav-item item-download">核心代码 &#128229;</a>
+    </nav>
 
     <!-- ===== 内容 ===== -->
     <section id="schematic" class="section">
@@ -60,18 +60,6 @@
     </section>
   </div>
 
-  
-  <div class="download-section">
-    <div class="download-box">
-      <div class="download-icon">&#128229;</div>
-      <h3>下载原理图</h3>
-      <p>点击下方按钮下载本项目的原理图文件</p>
-      <button class="download-btn" onclick="triggerDownload('schematic')">
-        &#128190; 下载原理图
-      </button>
-    </div>
-  </div>
-  
   <div class="wechat-section" style="margin-top:0; padding:0 20px;">
     <div class="wechat-box" style="margin-bottom:24px;">
       <div class="wechat-icon">&#128172;</div>
@@ -86,43 +74,12 @@
       </div>
     </div>
   </div>
-  
-  <div class="download-section">
-    <div class="download-box">
-      <div class="download-icon">&#128229;</div>
-      <h3>下载原理图</h3>
-      <p>点击下方按钮下载本项目的原理图文件</p>
-      <button class="download-btn" onclick="triggerDownload('schematic')">
-        &#128190; 下载原理图
-      </button>
-    </div>
-  </div>
+
   <footer class="footer">
-    <p><a href="../..index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>智能家居系统 / 电路原理</strong></p>
+    <p><a href="../../index.html" style="color:var(--text-muted);">&larr; 返回项目列表</a> &nbsp;|&nbsp; <strong>智能家居系统 / 电路原理</strong></p>
   </footer>
 
   <script>
-  function triggerDownload(type) { window.location.href = "schematic.json"; });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
-  }
-  function copyWechat() {
-    navigator.clipboard.writeText('HE-8473').then(function() {
-      var btn = document.querySelector('.wechat-copy-btn');
-      if (btn) { btn.textContent = '已复制'; setTimeout(function() { btn.textContent = '复制'; }, 2000); }
-    });
-  }
-  </script>
-
-  <script>
-  function triggerDownload(type) { window.location.href = "schematic.json"; });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
-  }
   function copyWechat() {
     navigator.clipboard.writeText('HE-8473').then(function() {
       var btn = document.querySelector('.wechat-copy-btn');
